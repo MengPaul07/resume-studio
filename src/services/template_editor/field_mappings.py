@@ -70,6 +70,7 @@ STANDARD_SECTIONS: Dict[str, List[str]] = {
     "workExperience": ["title", "company", "location", "years", "description"],
     "education": ["institution", "degree", "years", "description"],
     "personalProjects": ["name", "role", "years", "description", "github", "website"],
+    "research": ["name", "role", "institution", "years", "description"],
     "additional": ["technicalSkills", "languages", "certificationsTraining", "awards"],
 }
 

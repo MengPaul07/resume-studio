@@ -52,6 +52,13 @@ const workflowModules = [
     tone: 'green' as const,
     action: 'tailor' as const,
   },
+  {
+    title: 'Interview',
+    desc: 'Practice mock interviews with AI tailored to your resume.',
+    to: '/interview',
+    tone: 'blue' as const,
+    action: 'interview' as const,
+  },
 ];
 
 function getErrorMessage(error: unknown, fallback: string): string {

@@ -23,13 +23,21 @@ def normalize_resume_json(state: JsonToolsState) -> Dict[str, Any]:
         "workExperience": _ensure_list(raw.get("workExperience")),
         "education": _ensure_list(raw.get("education")),
         "personalProjects": _ensure_list(raw.get("personalProjects")),
+        "research": _ensure_list(raw.get("research")),
         "additional": _ensure_dict(raw.get("additional")),
         "customSections": _ensure_dict(raw.get("customSections")),
     }
 
-    normalized["additional"].setdefault("technicalSkills", [])
-    normalized["additional"].setdefault("languages", [])
-    normalized["additional"].setdefault("certificationsTraining", [])
-    normalized["additional"].setdefault("awards", [])
+    # Ensure additional fields are arrays (coerce strings from parse prompt)
+    for key in ("technicalSkills", "languages", "certificationsTraining", "awards"):
+        normalized["additional"].setdefault(key, [])
+        val = normalized["additional"][key]
+        if isinstance(val, str):
+            # Split on commas, semicolons, Chinese commas, newlines
+            import re
+            items = [s.strip() for s in re.split(r'[,;，；、\n]+', val) if s.strip()]
+            normalized["additional"][key] = items if items else []
+        elif not isinstance(val, list):
+            normalized["additional"][key] = [str(val)] if val else []
 
     return {"normalized_resume_obj": normalized}

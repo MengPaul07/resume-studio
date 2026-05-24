@@ -9,6 +9,7 @@ const CreateResumePage = lazy(() => import('./pages/create-resume').then(m => ({
 const ResumeViewPage = lazy(() => import('./pages/resume-view').then(m => ({ default: m.ResumeViewPage })));
 const TailorChatPage = lazy(() => import('./pages/tailor-chat').then(m => ({ default: m.TailorChatPage })));
 const SettingsPage = lazy(() => import('./pages/settings').then(m => ({ default: m.SettingsPage })));
+const InterviewPage = lazy(() => import('./pages/interview').then(m => ({ default: m.InterviewPage })));
 const NotFoundPage = lazy(() => import('./pages/not-found').then(m => ({ default: m.NotFoundPage })));
 
 function PageSkeleton() {
@@ -35,6 +36,7 @@ export default function App() {
             <Route path="/create" element={<CreateResumePage />} />
             <Route path="/builder" element={<ResumeViewPage />} />
             <Route path="/tailor" element={<TailorChatPage />} />
+            <Route path="/interview" element={<InterviewPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/resumes/:id" element={<ResumeViewPage />} />
           </Route>

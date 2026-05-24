@@ -5,8 +5,6 @@ from __future__ import annotations
 from typing import Any
 
 from src.services.content_refinement_v3.backends.session import get_session_content
-from ..memory.user_profile import load_profile, ensure_profile, profile_to_prompt_text
-
 CHAT_WINDOW = 9999  # full history, no sliding window
 
 
@@ -35,11 +33,11 @@ def _build_context(session_id: str, message: str, target_jd: str = "") -> dict[s
                 "content": str(m["content"])[:500],
             })
 
-    # User profile — load from disk; extract + save on first miss
-    profile = load_profile(full_resume)
-    if profile is None:
-        profile = ensure_profile(full_resume)  # extract + save, runs once per resume
-    profile_text = profile_to_prompt_text(profile) if profile else ""
+    # User memory — cross-session preferences & facts
+    from src.utils.context import get_user_id
+    from src.services.content_refinement_v3.memory.preference_store import memory_to_prompt
+    user_id = get_user_id()
+    profile_text = memory_to_prompt(user_id) if user_id else ""
 
     rag_context = state.get("rag_context_by_path", {}) if isinstance(state.get("rag_context_by_path", {}), dict) else {}
     saved_target = rag_context.get("target_jd", {}) if isinstance(rag_context.get("target_jd", {}), dict) else {}

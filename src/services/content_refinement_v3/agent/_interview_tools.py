@@ -102,23 +102,26 @@ def tool_end_interview(*, overall_score: int = 0, summary: str = "",
 
 
 @tool("ask_coding_question",
-      "Present a coding/algorithm problem. The candidate will write code in an editor, not in chat. Ask them to explain their approach after they submit.",
+      "Send a coding problem to the candidate's code editor. MUST be called for every coding round — NEVER ask for code in plain chat text. The problem opens automatically in the candidate's editor with starter_code pre-filled. Call this tool again to update the editor: switch languages, modify starter_code, or send a completely new problem. Always provide language (infer from resume: Python if they mention Python, Java if Java, etc.) and appropriate starter_code.",
       {"type": "object", "properties": {
           "problem": {"type": "string", "description": "Full problem statement with examples, constraints, and expected complexity"},
-          "language": {"type": "string", "enum": ["python", "java", "cpp", "javascript", "golang"], "description": "Preferred language"},
+          "language": {"type": "string", "enum": ["python", "java", "cpp", "javascript", "golang"], "description": "REQUIRED. Scan the resume for programming languages mentioned. If Python appears, pick python; if Java appears, pick java; if C++ appears, pick cpp; if unknown default to python. When candidate asks to switch languages, call this tool again with the new language."},
           "difficulty": {"type": "string", "enum": ["easy", "medium", "hard"], "description": "Problem difficulty"},
           "time_limit": {"type": "integer", "description": "Suggested time in minutes"},
+          "starter_code": {"type": "string", "description": "Starter code scaffold. Include function signature, class skeleton, imports, and minimal test examples. For easy problems, pre-fill ~30% (signature + imports + docstring). For medium, ~15% (signature only). For hard, ~5% (just imports). The editor will auto-fill this so the candidate doesn't start from an empty file."},
           "attitude": {"type": "string", "enum": ["neutral", "interested", "skeptical", "impatient", "satisfied"], "description": "Interviewer attitude after this message"},
           "next_wait_seconds": {"type": "integer", "description": "How many seconds the UI should wait before a proactive nudge"},
       }, "required": ["problem", "language"]})
 def tool_ask_coding_question(*, problem: str = "", language: str = "python",
                                difficulty: str = "medium", time_limit: int = 15,
+                               starter_code: str = "",
                                attitude: str = "neutral", next_wait_seconds: int = 90,
                                **kwargs: Any) -> ToolResult:
     return ToolResult(success=True, tool_name="ask_coding_question",
                       data={
                           "problem": problem, "language": language,
                           "difficulty": difficulty, "time_limit": time_limit,
+                          "starter_code": starter_code,
                           "phase": "technical",
                           "attitude": attitude,
                           "next_wait_seconds": next_wait_seconds,

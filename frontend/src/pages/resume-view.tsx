@@ -260,7 +260,9 @@ export function ResumeViewPage() {
   const dirtyHtml = useMemo(() => htmlDraft !== persistedHtml, [htmlDraft, persistedHtml]);
 
   const buildFileName = (): string => {
-    const raw = String(resume?.title || 'resume').toLowerCase();
+    const resumeObj = resume?.resume_obj as Record<string, unknown> | undefined;
+    const name = (resumeObj?.personalInfo as Record<string, unknown> | undefined)?.name as string || '';
+    const raw = String(name || resume?.title || 'resume').toLowerCase();
     const safe = raw.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'resume';
     return safe;
   };
@@ -306,7 +308,9 @@ export function ResumeViewPage() {
       printWindow.document.open();
       printWindow.document.write(htmlDraft);
       printWindow.document.close();
-      printWindow.document.title = `${buildFileName()}.pdf`;
+      const resumeObj = resume?.resume_obj as Record<string, unknown> | undefined;
+      const personName = (resumeObj?.personalInfo as Record<string, unknown> | undefined)?.name as string || '';
+      printWindow.document.title = personName ? `${personName} - Resume` : 'Resume';
       printWindow.focus();
       window.setTimeout(() => {
         printWindow.print();

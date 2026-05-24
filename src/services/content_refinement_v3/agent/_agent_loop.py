@@ -104,7 +104,7 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
                 tool_choice="auto",
                 api_key=llm.api_key or None,
                 api_base=llm.api_base or None,
-                temperature=0.2,
+                temperature=llm.temperature if llm.temperature > 0 else 0.2,
                 max_tokens=16384,
                 timeout=120,
             )
@@ -212,6 +212,11 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
                 fn_args = {}
             fn_args["session_id"] = session_id
             calls.append((tc, tc.function.name, fn_args))
+            # Log: LLM decided to call this tool
+            _emit("llm_tool_decision", {
+                "round": round_idx, "name": tc.function.name,
+                "arguments": {k: v for k, v in fn_args.items() if k != "session_id"},
+            })
 
         # Group: parallel-safe tools go to thread pool, rest sequential
         parallel_calls = [(tc, n, a) for tc, n, a in calls
@@ -235,6 +240,9 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
             # SSE: step_start
             _emit("step_start", {"step_id": step_id, "tool": fn_name})
 
+            # Log: full tool call with args
+            _emit("tool_call", {"step_id": step_id, "name": fn_name, "arguments": fn_args})
+
             tool_span = None
             if tracer:
                 tool_span = tracer.start_span("tool.execute", tool=fn_name, step_id=step_id)
@@ -250,6 +258,13 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
             status = "OK" if res.success else "FAIL"
             with state_lock:
                 thinking_buf[thinking_idx] = f"[{fn_name}] {status}"
+
+            # Log: full tool result
+            _emit("tool_result", {
+                "step_id": step_id, "name": fn_name,
+                "success": res.success, "data": res.data if res.success else {},
+                "error": res.error or "", "ms": ms,
+            })
 
             # SSE: step_done with status
             _emit("step_done", {"step_id": step_id, "tool": fn_name, "ms": ms, "status": status})

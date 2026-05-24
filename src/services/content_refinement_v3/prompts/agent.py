@@ -18,7 +18,7 @@ CONFIG_DIR = Path(__file__).resolve().parent.parent.parent.parent.parent / "conf
 _FALLBACK_DOC_TYPES: dict[str, dict] = {
     "resume": {
         "display_name": "简历",
-        "sections": "personalInfo (name, email, phone, ...), summary, workExperience[], education[], personalProjects[], additional",
+        "sections": "personalInfo (name, email, phone, ...), summary, workExperience[], education[], personalProjects[], research[], additional",
         "fact_sensitive": "personalInfo.*, *.years, *.gpa, *.institution, *.degree",
         "path_examples": "'workExperience[0].description[1]', 'education[0].institution', 'summary'",
         "upsert_example": "path='workExperience', value='{\"title\":\"...\", ...}'",
@@ -92,15 +92,22 @@ def build_agent_system_prompt(doc_type: str = "resume") -> str:
         "WORKFLOW:\n"
         "1. UNDERSTAND: If you need document data, call read_resume. "
         "If you need conversation context, call read_history.\n"
-        "2. EDIT: Call edit_field for each field change. Group related changes together.\n"
+        "2. EDIT: Use the SIMPLE tools below. Group related changes together.\n"
         "3. CONFIRM: Use ask_user for fact-sensitive changes or when confidence < 0.4.\n"
         "4. COMPOSE: Call compose when done. Include a brief Chinese summary and 2-3 guide_prompts.\n\n"
+        "SIMPLIFIED EDIT TOOLS (preferred):\n"
+        "- add_entry(section, value): Append to education/workExperience/personalProjects/research. value is a JSON object string. NEVER need to know the index.\n"
+        "- update_field(path, value): Update a leaf text field. path='summary', 'personalInfo.email', 'additional.technicalSkills'.\n"
+        "- set_entry(path, value): Replace an entire array entry with a new JSON object. path='education[0]'.\n"
+        "- delete_entry(path): Delete an entry. path='education[0]'.\n"
+        "- edit_field (legacy, avoid if possible): Single-tool for update/upsert/delete. Prefer the specific tools above.\n\n"
         "INTENT SELF-CLASSIFICATION:\n"
         "- GREETINGS / QUESTIONS: If just chatting, go directly to compose. Do NOT call read_resume.\n"
-        "- EDIT: read_resume first, then edit_field, then compose.\n"
-        "- ADD: Use edit_field with op='upsert'.\n"
-        "- DELETE: Use edit_field with op='delete'.\n"
-        "- ANALYSIS ONLY: read_resume, then compose with analysis. Do NOT call edit_field.\n"
+        "- ADD NEW ENTRY: Use add_entry. No read_resume needed.\n"
+        "- UPDATE LEAF FIELD: Use update_field. No read_resume needed.\n"
+        "- REPLACE ENTRY: Use set_entry.\n"
+        "- DELETE ENTRY: Use delete_entry. No read_resume needed.\n"
+        "- ANALYSIS ONLY: read_resume, then compose with analysis. Do NOT call any edit tools.\n"
         "- FACT CORRECTIONS: Use ask_user to confirm before editing fact-sensitive fields.\n"
         "- VAGUE / AMBIGUOUS: If the request is too vague to act on, read_resume, then compose "
         "asking for clarification.\n"
@@ -122,12 +129,14 @@ def build_agent_system_prompt(doc_type: str = "resume") -> str:
         "- Align wording, priority, and examples with the target JD, but never invent work the user did not provide.\n"
         "- Adding new skills, credentials, dates, companies, titles, or domain experience based only on the JD requires ask_user or confirm_required.\n\n"
         "EDIT RULES:\n"
-        "- Target ONE path per call. For whole entries (e.g. 'workExperience[0]'), pass a complete JSON object string with ALL fields.\n"
-        "- LEAF path (text field): value is plain text. Example: path='summary', value='Experienced engineer...'\n"
-        "- OBJECT path (ending with [N]): value is a JSON object. Example: path='workExperience[0]', value='{\"title\":\"SDE\",\"company\":\"Google\",\"years\":\"2020-2024\",\"description\":[\"did X\",\"led Y\"]}'\n"
-        "- UPSERT new entry: path='workExperience', value='{\"title\":\"...\",\"company\":\"...\",...}' (JSON object string, not plain text)\n"
-        "- DELETE: op='delete' with an empty value.\n"
-        "- The VALUE is always a string. For objects, it's a JSON string that the system parses automatically.\n"
+        "- PREFER add_entry/update_field/set_entry/delete_entry over edit_field. They are simpler and less error-prone.\n"
+        "- add_entry: value is a JSON object string. add_entry('education', '{\"institution\":\"清华\",\"degree\":\"硕士\",\"years\":\"2024-至今\",\"description\":[\"优秀学生\"]}'). No index needed — appends automatically.\n"
+        "- update_field: value is plain text. update_field('summary', 'Experienced engineer...'). For leaf fields only.\n"
+        "- set_entry: Replace an existing entry with a new JSON object. set_entry('education[0]', '{...}'). Use the index from read_resume.\n"
+        "- delete_entry: No value needed. delete_entry('education[0]').\n"
+        "- description fields MUST be string arrays — split long paragraphs at each sentence or logical break. NEVER dump a long paragraph into a single string.\n"
+        "- FORBIDDEN flat-text format: 'A | B | C'. Always use proper JSON objects for structured entries.\n"
+        "- CORRUPTED FIELDS: If a field contains flat 'A | B | C' text, use set_entry to rewrite it as a proper JSON object.\n"
         "- actionability: 'apply_ready' for content/style, 'confirm_required' for facts.\n"
         "- confidence: 0.9+ definite, 0.7-0.9 reasonable, <0.7 uncertain.\n\n"
         "FIELD WHITELIST — ONLY these paths are valid. ANY other path will be REJECTED:\n"
@@ -174,5 +183,29 @@ def build_task_executor_system_prompt(expected_type: str = "") -> str:
 
 
 def build_parse_prompt(raw_text: str) -> str:
-    """Deprecated."""
-    return ""
+    """Build a prompt that instructs the LLM to extract resume fields from raw text.
+
+    Uses a concise format: fields in English, values copied verbatim from the text.
+    """
+    safe = raw_text[:8000] if len(raw_text) > 8000 else raw_text
+    return f"""Extract resume fields from the text below as JSON. Copy values exactly — never invent data.
+
+{{
+  "personalInfo": {{"name": "", "title": "", "email": "", "phone": "", "location": ""}},
+  "summary": "",
+  "workExperience": [{{"title": "", "company": "", "years": "", "description": [""]}}],
+  "education": [{{"institution": "", "degree": "", "years": ""}}],
+  "personalProjects": [{{"name": "", "description": [""]}}],
+  "research": [],
+  "additional": {{"technicalSkills": [""], "languages": [""], "certificationsTraining": [""], "awards": [""]}}
+}}
+
+RULES:
+- Only output the JSON object, nothing else.
+- Omit any field or section that has no data in the text.
+- description MUST be a string array. Split long text into individual bullets at each sentence, achievement, or logical break. NEVER put a long paragraph into a single string or merge everything into the parent field.
+- FORBIDDEN: dumping all text into one field like \"西南石油大学 | 本科 | 获奖...\" — split into institution, degree, years, and description[] separately.
+- If the text contains no resume data, output {{}}.
+
+TEXT:
+{safe}"""

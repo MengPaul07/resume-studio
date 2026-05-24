@@ -1,11 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom';
-import { FileText, WandSparkles, Settings, LayoutDashboard, PenSquare, Sun, Moon } from 'lucide-react';
+import { FileText, WandSparkles, Settings, LayoutDashboard, PenSquare, Sun, Moon, MessageCircle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getLanguage, setLanguage } from '../../i18n/config';
 
-const NAV_KEYS = ['dashboard', 'layoutBuilder', 'tailor', 'settings'] as const;
-const NAV_ICONS = [LayoutDashboard, PenSquare, WandSparkles, Settings];
+const NAV_KEYS = ['dashboard', 'layoutBuilder', 'tailor', 'interview', 'settings'] as const;
+const NAV_ICONS = [LayoutDashboard, PenSquare, WandSparkles, MessageCircle, Settings];
+const NAV_PATHS: Record<string, string> = {
+  dashboard: '/dashboard',
+  layoutBuilder: '/builder',
+  tailor: '/tailor',
+  interview: '/interview',
+  settings: '/settings',
+};
 
 type Theme = 'light' | 'dark';
 
@@ -54,7 +61,7 @@ export function AppShell() {
                 return (
                   <NavLink
                     key={key}
-                    to={`/${key === 'dashboard' ? 'dashboard' : key === 'layoutBuilder' ? 'builder' : key === 'tailor' ? 'tailor' : 'settings'}`}
+                    to={NAV_PATHS[key]}
                     className={({ isActive }) =>
                       `inline-flex items-center gap-2 rounded-lg px-3 py-1.5 font-sans text-sm font-medium transition-all ${
                         isActive

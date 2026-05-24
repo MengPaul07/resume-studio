@@ -21,7 +21,8 @@ import pytest
 
 
 def _load_resume():
-    with open("tests/fixtures/resumes/full_stack_zh.json", encoding="utf-8") as f:
+    from pathlib import Path as _P
+    with open(_P(__file__).parent.parent / "fixtures/resumes/full_stack_zh.json", encoding="utf-8") as f:
         return json.load(f)
 
 

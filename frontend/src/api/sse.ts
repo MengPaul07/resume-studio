@@ -1,5 +1,6 @@
 import { buildApiUrl } from './http';
 import { ensureOk } from './http';
+import { withUserId } from './http';
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
@@ -11,7 +12,7 @@ export async function postSSEAndCollectFinal<T>(params: {
 }): Promise<T> {
   const resp = await fetch(buildApiUrl(params.path), {
     method: 'POST',
-    headers: JSON_HEADERS,
+    headers: withUserId(JSON_HEADERS),
     body: JSON.stringify(params.body),
   });
   await ensureOk(resp, params.messagePrefix);

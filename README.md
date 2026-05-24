@@ -13,7 +13,7 @@
   <a href="#tech-stack"><img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-Backend-009688?style=flat-square&logo=fastapi&logoColor=white"></a>
   <a href="#tech-stack"><img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=111"></a>
   <a href="#tech-stack"><img alt="Vite" src="https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white"></a>
-  <a href="#tests"><img alt="Tests" src="https://img.shields.io/badge/tests-131%20passing-2EA44F?style=flat-square"></a>
+  <a href="#tests"><img alt="Tests" src="https://img.shields.io/badge/tests-123%20passing-2EA44F?style=flat-square"></a>
 </p>
 
 <p align="center">
@@ -248,7 +248,7 @@ Run the backend test suite:
 ```bash
 python -m pytest tests -q
 ```
-*(Expects ~131 passing tests out-of-the-box)*
+*(Expects ~123 passing tests out-of-the-box; 12 skipped require LLM API key)*
 
 Run the frontend build check:
 

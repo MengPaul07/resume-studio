@@ -89,7 +89,8 @@ class LiteLLMAdapter:
 
     def invoke(self, messages: Sequence[MessageInput],
                tools: list[dict] | None = None,
-               tool_choice: str = "auto") -> LiteLLMResponse:
+               tool_choice: str = "auto",
+               response_format: dict | None = None) -> LiteLLMResponse:
         if completion is None:
             raise RuntimeError("Missing dependency: litellm")
 
@@ -107,6 +108,8 @@ class LiteLLMAdapter:
         if tools:
             payload["tools"] = tools
             payload["tool_choice"] = tool_choice
+        if response_format:
+            payload["response_format"] = response_format
 
         resp = completion(**payload)
         msg = resp.choices[0].message

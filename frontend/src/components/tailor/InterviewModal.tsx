@@ -29,6 +29,9 @@ interface InterviewRecord {
   messages: InterviewMessage[];
   report: Record<string, unknown> | null;
   sessionNum: number;
+  resumeId: string;
+  targetJdId?: string;
+  targetJdTitle?: string;
 }
 
 type InterviewAttitude = 'neutral' | 'waiting' | 'interested' | 'skeptical' | 'impatient' | 'satisfied';
@@ -56,37 +59,39 @@ interface InProgressSession {
   reviewMode: boolean;
   currentRecordId: string;
   ivSessionId: string;
+  resumeId: string;
   updatedAt: string;
 }
 
 // ── Persistence ─────────────────────────────────────────────────────────
 
-const HISTORY_KEY = 'interview_history';
-const IN_PROGRESS_KEY = 'interview_in_progress';
 const SETUP_STORAGE_KEY = 'interview_setup_last';
 
-function loadInterviewHistory(): InterviewRecord[] {
-  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); }
+function historyKey(resumeId: string) { return `interview_history:${resumeId}`; }
+function inProgressKey(resumeId: string) { return `interview_in_progress:${resumeId}`; }
+
+function loadInterviewHistory(resumeId: string): InterviewRecord[] {
+  try { return JSON.parse(localStorage.getItem(historyKey(resumeId)) || '[]'); }
   catch { return []; }
 }
 
-function saveInterviewHistory(records: InterviewRecord[]) {
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(records));
+function saveInterviewHistory(resumeId: string, records: InterviewRecord[]) {
+  localStorage.setItem(historyKey(resumeId), JSON.stringify(records));
 }
 
-function loadInProgress(): InProgressSession | null {
+function loadInProgress(resumeId: string): InProgressSession | null {
   try {
-    const raw = localStorage.getItem(IN_PROGRESS_KEY);
+    const raw = localStorage.getItem(inProgressKey(resumeId));
     if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
   return null;
 }
 
-function saveInProgress(session: InProgressSession | null) {
+function saveInProgress(resumeId: string, session: InProgressSession | null) {
   if (session) {
-    localStorage.setItem(IN_PROGRESS_KEY, JSON.stringify(session));
+    localStorage.setItem(inProgressKey(resumeId), JSON.stringify(session));
   } else {
-    localStorage.removeItem(IN_PROGRESS_KEY);
+    localStorage.removeItem(inProgressKey(resumeId));
   }
 }
 
@@ -339,7 +344,10 @@ interface Props {
   resumeObj: Record<string, unknown>;
   resumeId?: string;
   targetJd?: string;
+  targetJdId?: string;
+  targetJdTitle?: string;
   onClose: () => void;
+  embedded?: boolean;
 }
 
 function toDisplayText(value: unknown): string {
@@ -454,10 +462,10 @@ function DraggablePopup({ title, children, onClose, zoom, onZoomChange }: { titl
   );
 }
 
-export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props) {
+export function InterviewModal({ resumeObj, resumeId, targetJd, targetJdId, targetJdTitle, onClose, embedded }: Props) {
   const { t } = useTranslation();
   const last = loadLastSetup();
-  const [inProgress, setInProgress] = useState<InProgressSession | null>(loadInProgress);
+  const [inProgress, setInProgress] = useState<InProgressSession | null>(() => loadInProgress(resumeId || ''));
   const defaultPreset = PRESETS.find(p => p.id === (last?.preset_id || inProgress?.config?.preset_id || 'li-yan')) || PRESETS[0];
 
   const [step, setStep] = useState<'setup'|'interview'>('setup');
@@ -487,8 +495,13 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
   const [currentRecordId, setCurrentRecordId] = useState<string>('');
   const [ivSessionId, setIvSessionId] = useState<string>('');
   const [sessionReady, setSessionReady] = useState(false);
-  const [history, setHistory] = useState<InterviewRecord[]>(loadInterviewHistory);
+  const [history, setHistory] = useState<InterviewRecord[]>(() => loadInterviewHistory(resumeId || ''));
   const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    setHistory(loadInterviewHistory(resumeId || ''));
+    setInProgress(loadInProgress(resumeId || ''));
+  }, [resumeId]);
   const [phase, setPhase] = useState<string>('setup');
   const [attitude, setAttitude] = useState<InterviewAttitude>('neutral');
   const [waitingSeconds, setWaitingSeconds] = useState(0);
@@ -518,8 +531,9 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
   // ── Persist in-progress session on every state change ───────────────
   useEffect(() => {
     if (step === 'interview' && messages.length > 0) {
-      saveInProgress({
+      saveInProgress(resumeId || '', {
         config, messages, report, reviewMode, currentRecordId, ivSessionId,
+        resumeId: resumeId || '',
         updatedAt: new Date().toISOString(),
       });
     }
@@ -528,7 +542,7 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
   // Clear in-progress when interview ends (has report and no review)
   useEffect(() => {
     if (report && !reviewMode) {
-      saveInProgress(null);
+      saveInProgress(resumeId || '', null);
     }
   }, [report, reviewMode]);
 
@@ -591,7 +605,7 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
   };
 
   const handleDiscardInProgress = () => {
-    saveInProgress(null);
+    saveInProgress(resumeId || '', null);
     setInProgress(null);
   };
 
@@ -620,7 +634,7 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
     setPhase('opening'); setAttitude('neutral'); setWaitingSeconds(0); setNudgeCountForQuestion(0);
     setCodingCode(''); setCodingQuestionKey(''); setManualCode('');
     setCodingQuestion(null); setCodingEditorOpen(false); setManualEditorOpen(false);
-    saveInProgress(null);
+    saveInProgress(resumeId || '', null);
     createSession();
   };
 
@@ -663,6 +677,7 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
       const turn = await toolChat({
         doc_type:'resume', session_id:ivSessionId, message:outboundText, allow_mutation:false,
         layout_preferences:{} as any, target_jd: targetJd||'', mode,
+        llm_config: { temperature: 0.5 },
         interview_config: config ? {
           preset_id: config.preset_id, company: config.company, role: config.role,
           level: config.level, style: config.style, depth: config.depth,
@@ -675,11 +690,15 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
             const q = data as any;
             const key = (q.problem || '').slice(0, 100);
             if (key !== codingQuestionKey) {
-              setCodingCode('');
+              const starter = (q.starter_code || '') as string;
+              setCodingCode(starter);
+              setManualCode(starter);
               setCodingQuestionKey(key);
             }
+            if (q.language) setEditorLang(String(q.language));
             setCodingQuestion(q);
             setCodingEditorOpen(true);
+            setCodePanelOpen(true);
           }
         },
       });
@@ -710,12 +729,15 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
         const record: InterviewRecord = {
           id: Date.now().toString(36), date: new Date().toISOString(), score,
           summary: asst.slice(0,200), messages: [...messages,{role:'assistant',text:asst,blocks}], report: reportData,
-          sessionNum: loadInterviewHistory().length+1,
+          sessionNum: loadInterviewHistory(resumeId || '').length+1,
+          resumeId: resumeId || '',
+          targetJdId: targetJdId || '',
+          targetJdTitle: targetJdTitle || '',
         };
         setCurrentRecordId(record.id);
-        const updated = [record, ...loadInterviewHistory()];
-        saveInterviewHistory(updated); setHistory(updated);
-        saveInProgress(null);
+        const updated = [record, ...loadInterviewHistory(resumeId || '')];
+        saveInterviewHistory(resumeId || '',updated); setHistory(updated);
+        saveInProgress(resumeId || '', null);
         setInProgress(null);
       }
     } catch(err) {
@@ -767,8 +789,9 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
     if (!report) return;
     setReviewMode(true);
     setPhase('review');
-    saveInProgress({
+    saveInProgress(resumeId || '', {
       config, messages, report, reviewMode: true, currentRecordId, ivSessionId,
+      resumeId: resumeId || '',
       updatedAt: new Date().toISOString(),
     });
   };
@@ -776,8 +799,8 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
   // ── Setup UI ──────────────────────────────────────────────────────────
   if (step==='setup') {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--brand-ink)]/40 backdrop-blur-sm" onClick={e => e.stopPropagation()}>
-        <div className="flex max-h-[92vh] w-[95vw] max-w-6xl flex-col overflow-hidden rounded-2xl border-[var(--brand-line)] bg-[var(--brand-paper)] shadow-[var(--shadow-sw-card)]">
+      <div className={embedded ? 'h-full w-full flex flex-col' : 'fixed inset-0 z-50 flex items-center justify-center bg-[var(--brand-ink)]/40 backdrop-blur-sm'} onClick={e => e.stopPropagation()}>
+        <div className={embedded ? 'flex-1 flex flex-col overflow-hidden' : 'flex max-h-[92vh] w-[95vw] max-w-6xl flex-col overflow-hidden rounded-2xl border-[var(--brand-line)] bg-[var(--brand-paper)] shadow-[var(--shadow-sw-card)]'}>
 
           {/* Header */}
           <header className="flex shrink-0 items-center justify-between rounded-t-2xl border-b border-[var(--brand-line)] bg-[var(--brand-surface)] px-5 py-3">
@@ -981,7 +1004,31 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
                   </button>
                 </div>
                 <div className="flex-1 overflow-auto p-3 space-y-2">
-                  {history.length === 0 ? (
+                  {/* In-progress pinned at top */}
+                  {inProgress && inProgress.messages && inProgress.messages.length > 0 && (
+                    <div
+                      onClick={() => {
+                        setConfig(inProgress.config); setMessages(inProgress.messages);
+                        setReport(inProgress.report); setReviewMode(inProgress.reviewMode);
+                        setCurrentRecordId(inProgress.currentRecordId); setIvSessionId(inProgress.ivSessionId);
+                        setShowHistory(false); setStep('interview');
+                        if (inProgress.report) setPhase('review');
+                      }}
+                      className="cursor-pointer rounded-lg border border-[var(--brand-signal)] bg-[var(--brand-signal-soft)]/30 p-2.5 hover:border-[var(--brand-signal)] hover:shadow-sm transition-all">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-[var(--status-running)] animate-pulse" />
+                          <span className="font-sans text-[11px] font-semibold text-[var(--brand-ink)]">In Progress</span>
+                        </div>
+                        <span className="rounded-full bg-[var(--status-running)]/10 px-2 py-0.5 font-sans text-[10px] font-medium text-[var(--status-running)]">{inProgress.messages.length} msgs</span>
+                      </div>
+                      <p className="mt-1 font-sans text-[10px] text-[var(--brand-ink-muted)]">
+                        {inProgress.config?.preset_id ? PRESETS.find(p => p.id === inProgress.config?.preset_id)?.name || 'Interview' : 'Interview'}
+                        &middot; {new Date(inProgress.updatedAt).toLocaleDateString('zh-CN')}
+                      </p>
+                    </div>
+                  )}
+                  {history.length === 0 && !inProgress ? (
                     <div className="py-8 text-center">
                       <History className="mx-auto size-6 text-[var(--brand-ink-muted)]/20" />
                       <p className="mt-2 font-sans text-[11px] text-[var(--brand-ink-muted)]">{t('interview.noRecords')}</p>
@@ -1011,7 +1058,10 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
                               <span className="rounded-full bg-[var(--status-running)]/10 px-2 py-0.5 font-sans text-[10px] text-[var(--status-running)]">In progress</span>
                             )}
                           </div>
-                          <p className="mt-1 font-sans text-[10px] text-[var(--brand-ink-muted)]">{new Date(rec.date).toLocaleDateString('zh-CN')} {new Date(rec.date).toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})}</p>
+                          <p className="mt-1 font-sans text-[10px] text-[var(--brand-ink-muted)]">
+                            {new Date(rec.date).toLocaleDateString('zh-CN')} {new Date(rec.date).toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})}
+                            {rec.targetJdTitle && <span> &middot; {rec.targetJdTitle}</span>}
+                          </p>
                           <p className="mt-1 line-clamp-2 font-sans text-[10px] leading-relaxed text-[var(--brand-ink-muted)]">{rec.summary}</p>
                         </div>
                       );
@@ -1029,8 +1079,8 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
 
   // ── Interview UI ──────────────────────────────────────────────────────
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--brand-ink)]/40 backdrop-blur-sm" onClick={e => e.stopPropagation()}>
-      <div className="flex h-screen w-screen flex-col overflow-hidden bg-[var(--brand-paper)] shadow-[var(--shadow-sw-card)]">
+    <div className={embedded ? 'h-full w-full flex flex-col' : 'fixed inset-0 z-50 flex items-center justify-center bg-[var(--brand-ink)]/40 backdrop-blur-sm'} onClick={e => e.stopPropagation()}>
+      <div className={embedded ? 'flex-1 flex flex-col overflow-hidden' : 'flex h-screen w-screen flex-col overflow-hidden bg-[var(--brand-paper)] shadow-[var(--shadow-sw-card)]'}>
 
         {/* Header */}
         <header className="flex shrink-0 items-center justify-between border-b border-[var(--brand-line)] bg-[var(--brand-surface)] px-5 py-2.5">
@@ -1114,7 +1164,10 @@ export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props
                         rec.score>=8?'bg-[var(--status-done)]/10 text-[var(--status-done)]':rec.score>=6?'bg-[var(--status-running)]/10 text-[var(--status-running)]':'bg-[var(--brand-surface-soft)] text-[var(--brand-ink-muted)]'
                       }`}>{t('interview.scoreFmt', {s: rec.score})}</span>
                     </div>
-                    <p className="mt-1 font-sans text-[11px] text-[var(--brand-ink-muted)]">{new Date(rec.date).toLocaleString('zh-CN')}</p>
+                    <p className="mt-1 font-sans text-[11px] text-[var(--brand-ink-muted)]">
+                      {new Date(rec.date).toLocaleString('zh-CN')}
+                      {rec.targetJdTitle && <span> &middot; {rec.targetJdTitle}</span>}
+                    </p>
                     <p className="mt-1 line-clamp-2 text-xs text-[var(--brand-ink-muted)]">{rec.summary}</p>
                   </div>
                 ))

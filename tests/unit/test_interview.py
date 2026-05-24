@@ -40,7 +40,7 @@ class TestInterviewPrompt:
         )
         assert "Helena Brooks" in prompt
         assert "Investment Bank Risk Panelist" in prompt
-        assert "PLANNED LENGTH: 10 rounds" in prompt
+        # PLANNED_LENGTH removed — rounds now controlled by frontend length selector
         assert "Focus on audit trails and incident response." in prompt
 
     def test_non_internet_industry_persona(self):

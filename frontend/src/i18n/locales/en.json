@@ -3,6 +3,7 @@
     "dashboard": "Dashboard",
     "layoutBuilder": "Layout Builder",
     "tailor": "AI Tailor",
+    "interview": "Interview",
     "settings": "Settings",
     "back": "Back"
   },
@@ -61,6 +62,10 @@
     "tailor": {
       "title": "Tailor",
       "desc": "Open an existing resume and refine with AI."
+    },
+    "interview": {
+      "title": "Interview",
+      "desc": "Practice mock interviews with AI tailored to your resume."
     },
     "creating": "Creating...",
     "startBuild": "Start Build",

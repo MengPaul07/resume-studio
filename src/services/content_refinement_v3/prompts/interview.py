@@ -40,7 +40,7 @@ def build_interview_prompt(
         style=style or "balanced",
         depth=depth or "moderate",
         focus=focus,
-        rounds=rounds or (preset["rounds"] if preset else 8),
+        rounds=rounds or 8,
         language=language or (preset["language"] if preset else "zh"),
         time_pressure=time_pressure or "standard",
         user_preferences=user_preferences,

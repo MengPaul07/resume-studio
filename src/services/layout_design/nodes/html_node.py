@@ -18,6 +18,7 @@ SECTION_KEYS = [
     "workExperience",
     "education",
     "personalProjects",
+    "research",
     "technicalSkills",
     "languages",
     "certifications",
@@ -96,6 +97,8 @@ def _required_sections(resume_obj: Dict[str, Any]) -> List[str]:
         required.append("education")
     if _has_data(resume_obj.get("personalProjects")):
         required.append("personalProjects")
+    if _has_data(resume_obj.get("research")):
+        required.append("research")
     if _has_data(additional.get("technicalSkills")):
         required.append("technicalSkills")
     if _has_data(additional.get("languages")):
@@ -360,6 +363,7 @@ def _layout_plan_from_payload(payload: Dict[str, Any], theme: str) -> Dict[str, 
                 "workExperience": int(max_items.get("work_experience") or 8),
                 "personalProjects": int(max_items.get("projects") or 8),
                 "education": int(max_items.get("education") or 6),
+                "research": int(max_items.get("research") or 6),
             },
             "bullet_style": "impact_first",
             "date_style": "ym",

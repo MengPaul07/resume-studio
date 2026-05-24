@@ -24,19 +24,19 @@
 │                    Backend (FastAPI)                     │
 │  ┌──────────────────────┴───────────────────────────┐   │
 │  │              API Routes                           │   │
-│  │  /api/v1/v3/*     → Agent loop, chat, interview   │   │
-│  │  /api/v1/resources/* → CRUD for data              │   │
-│  │  /api/v1/latex/*   → LaTeX generation             │   │
+│  │  /api/v1/agent/v3/*  → Agent loop, chat, interview   │   │
+│  │  /api/v1/agent/*     → CRUD for data                 │   │
+│  │  /api/v1/latex/*   → LaTeX generation                │   │
 │  └──────┬────────────────────────┬──────────────────┘   │
 │         │                        │                       │
 │         ▼                        ▼                       │
 │  ┌──────────────┐    ┌──────────────────────┐           │
 │  │ Agent Engine │    │   Data Services      │           │
 │  │ ──────────── │    │   ─────────────────  │           │
-│  │ IntentResolv │    │   RecentResumeStore  │           │
-│  │ ChainPlanner │    │   SessionStore       │           │
-│  │ ToolRunner   │    │   JdRepository       │           │
-│  │ SelfChecker  │    │   LaTeX Generator    │           │
+│  │ Agent Loop   │    │   RecentResumeStore  │           │
+│  │ Tool Registry│    │   SessionStore       │           │
+│  │ Self-Check   │    │   JdRepository       │           │
+│  │ Compose      │    │   LaTeX Generator    │           │
 │  └──────┬───────┘    └──────────┬───────────┘           │
 │         │                       │                        │
 │         ▼                       ▼                        │
@@ -72,8 +72,9 @@
 |------|------|-------------|
 | `/` | `Dashboard` | Workspace overview |
 | `/create` | `CreateResumePage` | AI-guided resume creation |
-| `/resumes/:id` | `ResumeViewPage` | Layout builder with preview |
+| `/builder` | `ResumeViewPage` | Layout builder with preview |
 | `/tailor` | `TailorChatPage` | AI refinement chat |
+| `/interview` | `InterviewPage` | AI mock interview |
 | `/settings` | `SettingsPage` | LLM configuration |
 | `*` | `NotFoundPage` | 404 |
 
@@ -157,26 +158,41 @@ components/
 
 | Method | Path | Description |
 |--------|------|-------------|
-| POST | `/api/v1/v3/session/start` | Start a new agent session |
-| POST | `/api/v1/v3/turn/chat` | Send message + run agent loop (SSE) |
-| GET | `/api/v1/v3/session/{id}/content` | Get session history |
-| POST | `/api/v1/v3/turn/rollback` | Rollback last turn |
+| POST | `/api/v1/agent/v3/sessions` | Create a new agent session |
+| POST | `/api/v1/agent/v3/sessions/{id}/turns:run` | Send message + run agent loop (SSE) |
+| POST | `/api/v1/agent/v3/sessions/{id}/turns:resume` | Resume a paused turn |
+| GET | `/api/v1/agent/v3/sessions/{id}` | Get session history |
+| POST | `/api/v1/agent/v3/sessions/{id}/actions:apply` | Apply suggested changes |
+| POST | `/api/v1/agent/v3/sessions/{id}/actions:reject` | Reject suggested changes |
+| POST | `/api/v1/agent/v3/sessions/{id}/rollback` | Rollback to a version |
+| DELETE | `/api/v1/agent/v3/sessions/by-resume/{resumeId}` | Delete all sessions for a resume |
 
 #### Resources (CRUD)
 
 | Method | Path | Description |
 |--------|------|-------------|
-| GET | `/api/v1/resources/recent-resumes` | List recent resumes |
-| POST | `/api/v1/resources/recent-resumes` | Create/update resume |
-| GET | `/api/v1/resources/recent-resumes/{id}` | Get resume by ID |
-| DELETE | `/api/v1/resources/recent-resumes/{id}` | Delete resume |
-| GET | `/api/v1/resources/job-descriptions` | List JDs |
-| POST | `/api/v1/resources/job-descriptions` | Create JD |
-| GET | `/api/v1/resources/job-descriptions/{id}` | Get JD by ID |
-| DELETE | `/api/v1/resources/job-descriptions/{id}` | Delete JD |
-| GET | `/api/v1/resources/imports` | List imported files |
-| POST | `/api/v1/resources/imports` | Upload file |
-| DELETE | `/api/v1/resources/imports/{id}` | Delete import |
+| GET | `/api/v1/agent/recent-resumes` | List recent resumes |
+| POST | `/api/v1/agent/recent-resumes/save` | Create/update resume |
+| GET | `/api/v1/agent/recent-resumes/{id}` | Get resume by ID |
+| DELETE | `/api/v1/agent/recent-resumes/{id}` | Delete resume |
+| GET | `/api/v1/agent/job-descriptions` | List JDs |
+| POST | `/api/v1/agent/job-descriptions/save` | Create JD |
+| GET | `/api/v1/agent/job-descriptions/{id}` | Get JD by ID |
+| DELETE | `/api/v1/agent/job-descriptions/{id}` | Delete JD |
+| GET | `/api/v1/agent/imports` | List imported files |
+| POST | `/api/v1/agent/import-file` | Upload and parse file |
+| POST | `/api/v1/agent/run-import` | Build resume from imported text |
+| DELETE | `/api/v1/agent/imports/{id}` | Delete import |
+| POST | `/api/v1/agent/test-llm` | Test LLM connectivity |
+
+#### Template & Render
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/v1/agent/v3/template:inspect` | Inspect template sections |
+| POST | `/api/v1/agent/v3/template:align` | Align resume to template |
+| POST | `/api/v1/agent/v3/template:render` | Render resume to paginated HTML |
+| POST | `/api/v1/agent/v3/template:export-latex` | Export LaTeX source |
 
 #### LaTeX
 
@@ -187,55 +203,48 @@ components/
 ### Agent Engine / Agent 引擎
 
 ```
-                     ┌─────────────┐
-User Message ──────→│IntentResolver│
-                     │  (LLM call)  │
-                     └──────┬──────┘
-                            │ intent
-                     ┌──────▼──────┐
-                     │ChainPlanner │
-                     │ (deterministic)│
-                     └──────┬──────┘
-                            │ tool_chain
-              ┌─────────────┼─────────────┐
-              ▼             ▼             ▼
-        ┌─────────┐  ┌─────────┐  ┌─────────┐
-        │ observe │→ │ suggest │→ │ compose │
-        └─────────┘  └─────────┘  └─────────┘
-              │             │             │
-              └─────────────┼─────────────┘
-                            │ output
-                     ┌──────▼──────┐
-                     │SelfChecker  │
-                     │  (LLM call)  │
-                     └──────┬──────┘
-                            │ pass / retry / fail_soft
-                     ┌──────▼──────┐
-                     │  Response   │
-                     └─────────────┘
+User Message → Agent Loop (LLM picks tools) → Self-Check → Response
+                        │
+        ┌───────────────┼───────────────┐
+        ▼               ▼               ▼
+  read_resume      edit_field       compose
+  read_history     add_entry        ask_user
+  search_jd        update_field     ...
+                   set_entry
+                   delete_entry
 ```
 
-#### Tools / 工具函数
+The agent loop (`_run_agent_loop` in `_agent_loop.py`) gives the LLM a set of tools and lets it decide which to call. Each turn runs up to 6 rounds of LLM → tool execution → result → LLM. The LLM chooses tools autonomously based on user intent.
 
-Core tools executed by `TurnRunner`:
+#### Core Editing Tools
 
-| Tool | Function | Description |
-|------|----------|-------------|
-| `observe` | Read current resume state | 读取当前简历 |
+| Tool | Description |
+|------|-------------|
+| `read_resume` | Read the current resume state |
+| `add_entry` | Append to education/workExperience/personalProjects/research |
+| `update_field` | Update a leaf text field (summary, skills, etc.) |
+| `set_entry` | Replace an entire array entry with a new JSON object |
+| `delete_entry` | Delete an entry from an array section |
+| `edit_field` | Legacy multi-mode edit tool (deprecated) |
+| `compose` | Finish turn, produce user-facing response |
+| `ask_user` | Pause for fact-sensitive change confirmation |
+| `search_jd` | Search job descriptions |
+| `set_target_jd` | Set target JD for optimization |
+
+#### Interview Tools
 | `suggest` | Propose changes | 建议修改 |
-| `refine` | Apply and polish suggestions | 应用并润色 |
-| `analyze` | Generate analysis report | 生成分析报告 |
-| `compose` | Assemble final response | 组装最终回复 |
+#### Interview Tools
 
-Interview-specific tools:
-
-| Tool | Function | Description |
-|------|----------|-------------|
-| `interview_question` | Generate next question | 生成下一个问题 |
-| `coding_question` | Generate coding problem (SSE) | 生成编程题 |
-| `interview_review` | Analyse performance | 复盘分析 |
+| Tool | Description |
+|------|-------------|
+| `start_interview` | Opening and first question |
+| `ask_question` | Ask the next non-coding question |
+| `ask_coding_question` | Send coding problem to editor (with starter_code) |
+| `end_interview` | Final score, per-round evaluation, improvement actions |
 
 ### Data Storage / 数据存储
+
+Runtime data is stored under `src/services/data/` (gitignored):
 
 ```
 src/services/data/
@@ -244,12 +253,14 @@ src/services/data/
 ├── recent_resumes/
 │   ├── recent_resumes_index.json  → Resume index (JSON)
 │   └── {id}.resume.json           → Resume data per record
-│   └── {id}.html                  → Rendered HTML per record
-│   └── {id}.md                     → Markdown per record
-├── user_profiles/
-│   └── {id}.json                  → User profile data
-└── imports/
-    └── {id}.json                  → Imported file metadata
+├── job_descriptions/
+│   ├── job_descriptions_index.json → JD index (JSON)
+│   └── {id}.txt                    → JD text per record
+├── imports/
+│   ├── imports_index.json         → Import index (JSON)
+│   └── {id}.txt                    → Raw text per record
+└── user_profiles/
+    └── {id}.json                  → User profile data
 ```
 
 ### JD Repository / JD 数据库
@@ -268,7 +279,7 @@ src/services/data/
 
 ```
 User inputs (role, skills, background)
-  → POST /api/v1/resources/recent-resumes
+  → POST /api/v1/agent/recent-resumes/save
   → AI generates skeleton (buildResumeSkeleton)
   → Redirect to /tailor?resumeId={id}
 ```
@@ -277,7 +288,7 @@ User inputs (role, skills, background)
 
 ```
 User message
-  → POST /api/v1/v3/turn/chat (SSE)
+  → POST /api/v1/agent/v3/sessions/{id}/turns:run (SSE)
   → Agent loop: IntentResolver → ChainPlanner → Tools → SelfChecker
   → SSE events streamed to frontend
   → Frontend applies changes to resume state

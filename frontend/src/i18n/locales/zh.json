@@ -3,6 +3,7 @@
     "dashboard": "仪表盘",
     "layoutBuilder": "布局生成器",
     "tailor": "AI 定制",
+    "interview": "模拟面试",
     "settings": "设置",
     "back": "返回"
   },
@@ -61,6 +62,10 @@
     "tailor": {
       "title": "定制",
       "desc": "打开已有简历并通过 AI 优化。"
+    },
+    "interview": {
+      "title": "模拟面试",
+      "desc": "使用 AI 进行针对你简历的模拟面试练习。"
     },
     "creating": "创建中...",
     "startBuild": "开始创建",

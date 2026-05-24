@@ -72,6 +72,6 @@ Shows real-time availability of core services:
 
 | State | Storage | Purpose |
 |-------|---------|---------|
-| Import list | Backend API | `GET /api/v1/resources/imports` |
-| Resume list | Backend API | `GET /api/v1/resources/recent-resumes` |
+| Import list | Backend API | `GET /api/v1/agent/imports` |
+| Resume list | Backend API | `GET /api/v1/agent/recent-resumes` |
 | Last selected | URL params | `?resumeId=xxx` |

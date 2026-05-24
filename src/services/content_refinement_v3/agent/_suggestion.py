@@ -293,7 +293,7 @@ def _resolve_target_scopes(message: str, observed: Dict[str, Any]) -> List[str]:
     if inferred:
         return [inferred]
     if _is_edit_intent(message):
-        return ["summary", "workExperience", "education", "personalProjects"]
+        return ["summary", "workExperience", "education", "personalProjects", "research"]
     return ["summary"]
 
 

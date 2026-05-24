@@ -16,7 +16,7 @@ numpy>=2.0.0
 jinja2>=3.1.0
 
 # File Handling
-markitdown>=0.1.0
+markitdown[docx,pdf]>=0.1.0
 
 # Utilities
 python-dotenv>=1.0.0

@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse
 from src.api import routes_v3
 from src.api import routes_resources
 from src.config import settings
+from src.utils.context import set_user_id
 
 
 @asynccontextmanager
@@ -38,6 +39,15 @@ app.add_middleware(
 
 app.include_router(routes_v3.router, prefix=settings.API_PREFIX)
 app.include_router(routes_resources.router, prefix=settings.API_PREFIX)
+
+
+@app.middleware("http")
+async def extract_user_id(request, call_next):
+    uid = request.headers.get("X-User-Id", "")
+    if uid:
+        set_user_id(uid)
+    response = await call_next(request)
+    return response
 
 
 @app.get("/health")

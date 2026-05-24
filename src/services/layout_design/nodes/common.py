@@ -139,11 +139,11 @@ def default_layout_plan(theme: str = "modern") -> Dict[str, Any]:
         },
         "section_map": {
             "left": ["summary", "technicalSkills", "languages", "certificationsTraining"],
-            "right": ["workExperience", "education", "personalProjects", "awards", "customSections"],
+            "right": ["workExperience", "education", "personalProjects", "research", "awards", "customSections"],
         },
         "constraints": {
             "preserve_facts": True,
-            "max_items": {"workExperience": 8, "personalProjects": 8, "education": 6},
+            "max_items": {"workExperience": 8, "personalProjects": 8, "education": 6, "research": 6},
             "bullet_style": "impact_first",
             "date_style": "ym",
         },

@@ -29,8 +29,6 @@ from ..session.service import _get_by_path_local, _set_by_path_local
 from ._types import StepRecord, ToolResult, TurnContext
 from ._registry import ToolRegistry
 from . import _sse
-from ._planner import _safe_json
-from ..memory.user_profile import load_profile, ensure_profile, profile_to_prompt_text, update_profile_background
 from ._tools import schema_list, registered_tools
 
 MAX_STEPS = 6
@@ -63,6 +61,7 @@ def _save_compact_turn_log(
     message: str,
     final_payload: Dict[str, Any],
     ctx: TurnContext,
+    agent_dump: Dict[str, Any] | None = None,
 ) -> None:
     from ._turn_log import save_turn_log
 
@@ -73,6 +72,7 @@ def _save_compact_turn_log(
             message=message,
             final_payload=final_payload,
             sse_trace=getattr(ctx, "sse_trace", None) or [],
+            agent_dump=agent_dump,
         )
     except Exception as exc:
         logger.warning("[turn] log save failed: %s", exc)
@@ -429,7 +429,7 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
                 turn_output_bundle=ctx.turn_output_bundle,
             )
             yield from _sse.emit_turn_completed(final_payload)
-            _save_compact_turn_log(session_id=session_id, turn_id=turn_id, message=clean_message, final_payload=final_payload, ctx=ctx)
+            _save_compact_turn_log(session_id=session_id, turn_id=turn_id, message=clean_message, final_payload=final_payload, ctx=ctx, agent_dump=agent_result)
             return
 
         # Handle ask_user pause — stop here, don't continue to compose
@@ -658,7 +658,44 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
                                                              "termination_reason", "selected_tool_chain")})
         yield from _sse.emit_turn_completed(final_payload)
 
-        _save_compact_turn_log(session_id=session_id, turn_id=turn_id, message=clean_message, final_payload=final_payload, ctx=ctx)
+        _save_compact_turn_log(session_id=session_id, turn_id=turn_id, message=clean_message, final_payload=final_payload, ctx=ctx, agent_dump=agent_result)
+
+        # Background: extract user preferences & key facts for cross-session memory
+        from src.utils.context import get_user_id as _uid
+        _user = _uid()
+        if _user:
+            import threading as _thr
+            _msg = clean_message
+            _bundle = ctx.turn_output_bundle if ctx.turn_output_bundle else {}
+            _asst = str(_bundle.get("assistant_message", ""))
+            # Collect proposed changes for context
+            _suggestions = _bundle.get("suggestion_document_obj", {}) if isinstance(_bundle, dict) else {}
+            _items = _suggestions.get("items", []) if isinstance(_suggestions, dict) else []
+            _accepted = [i for i in _items if isinstance(i, dict) and i.get("status") == "applied"]
+            _rejected = [i for i in _items if isinstance(i, dict) and i.get("status") == "rejected"]
+            # Resume summary for context
+            _resume_brief = {}
+            try:
+                _state = (session.get("state", {}) if isinstance(session, dict) else {})
+                _refined = (_state.get("refined_document_obj") or _state.get("refined_resume_obj") or {})
+                if isinstance(_refined, dict):
+                    _resume_brief = {
+                        "title": str(_refined.get("personalInfo", {}).get("title", ""))[:60] if isinstance(_refined.get("personalInfo", {}), dict) else "",
+                        "summary": str(_refined.get("summary", ""))[:100],
+                        "skills": str(_refined.get("additional", {}).get("technicalSkills", ""))[:80] if isinstance(_refined.get("additional", {}), dict) else "",
+                    }
+            except Exception:
+                pass
+            def _extract():
+                from src.services.content_refinement_v3.memory.extractor import update_memory_after_turn
+                n = update_memory_after_turn(
+                    user_id=_user, user_message=_msg, assistant_message=_asst,
+                    accepted_items=_accepted, rejected_items=_rejected,
+                    resume_brief=_resume_brief,
+                )
+                if n > 0:
+                    logger.info("[memory] updated %d items for user=%s", n, _user[:12])
+            _thr.Thread(target=_extract, daemon=True).start()
 
     except Exception as exc:
         logger.exception("[v3][turn.error] session=%s turn=%s error=%s", session_id, turn_id, exc)
@@ -972,7 +1009,13 @@ def apply_changes(*, session_id: str, human_review_decision: Dict[str, Any] | No
             failed_changes.append({"path": path, "item_key": "", "source": "override", "status": "failed", "reason": "manual_override", "error": f"路径 {path} 在简历中不存在，无法应用覆盖。"})
 
     persisted = _normalize_suggestions(normalized)
-    save_session_state(session_id=session_id, refined_resume_obj=refined, suggestion_resume_obj=persisted, review_payload={"items": []})
+    existing = (session.get("state", {}) if isinstance(session, dict) else {}).get("review_payload", {}) if isinstance(session.get("state", {}), dict) else {}
+    existing = existing if isinstance(existing, dict) else {}
+    review_payload = {"items": []}
+    if existing.get("paused_messages"):
+        review_payload["paused_messages"] = existing["paused_messages"]
+        review_payload["turn_id"] = existing.get("turn_id", "")
+    save_session_state(session_id=session_id, refined_resume_obj=refined, suggestion_resume_obj=persisted, review_payload=review_payload)
     _record_version(session_id=session_id, refined_document_obj=refined, suggestion_document_obj=persisted, source="apply", turn_id=turn_id, note=f"accepted={len(resolved_item_keys)}")
 
     duration_ms = int((time.perf_counter() - started) * 1000)
@@ -996,11 +1039,6 @@ def apply_changes(*, session_id: str, human_review_decision: Dict[str, Any] | No
     finish_turn(turn_id=turn_id, status="completed", assistant_message_id=str(assistant_row.get("id", "")))
 
     # Background: update user profile with accepted/rejected patterns
-    accepted = [c for c in applied_changes if c.get("status") == "applied"]
-    rejected = [c for c in failed_changes]
-    if accepted or rejected:
-        update_profile_background(refined, accepted_items=accepted, rejected_items=rejected)
-
     return _build_action_turn_payload(session_id=session_id, turn_id=turn_id, assistant_message=assistant_message, refined_document_obj=refined, suggestion_document_obj=persisted, applied_changes=all_changes, termination_reason="applied")
 
 
@@ -1042,7 +1080,13 @@ def reject_changes(*, session_id: str, rejected_item_keys: List[str] | None = No
         if key in target_keys:
             item["status"] = "rejected"
 
-    save_session_state(session_id=session_id, suggestion_resume_obj=normalized, review_payload={"items": []})
+    existing_rp = (session.get("state", {}) if isinstance(session, dict) else {}).get("review_payload", {}) if isinstance(session.get("state", {}), dict) else {}
+    existing_rp = existing_rp if isinstance(existing_rp, dict) else {}
+    rp = {"items": []}
+    if existing_rp.get("paused_messages"):
+        rp["paused_messages"] = existing_rp["paused_messages"]
+        rp["turn_id"] = existing_rp.get("turn_id", "")
+    save_session_state(session_id=session_id, suggestion_resume_obj=normalized, review_payload=rp)
     _record_version(session_id=session_id, refined_document_obj=snapshot.get("refined_document_obj", {}), suggestion_document_obj=normalized, source="reject", turn_id=turn_id, note=f"rejected={len(target_keys)}")
 
     duration_ms = int((time.perf_counter() - started) * 1000)

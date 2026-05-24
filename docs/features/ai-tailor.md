@@ -46,7 +46,7 @@ AI Tailor 是基于对话的界面。你描述想对简历做的修改，AI agen
 ### AI Agent Pipeline / Agent 流水线
 
 ```
-User Message → IntentResolver (LLM) → ChainPlanner → Tool Execution → SelfChecker → Response
+User Message → Agent Loop (LLM picks tools: read_resume, edit_field, add_entry, compose, etc.) → Response
 ```
 
 | Stage | Description | 说明 |

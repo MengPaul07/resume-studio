@@ -29,7 +29,7 @@ Resume Studio 是一个全栈应用，帮助你从零构建专业简历、用 AI
 |-------|-----------|
 | Frontend | React 19 + TypeScript + Tailwind CSS v4 + Vite |
 | Backend | Python 3.13 + FastAPI + LiteLLM |
-| AI/ML | LLM agent pipeline (IntentResolver → ChainPlanner → Tool Execution → SelfChecker) |
+| AI/ML | Function-calling agent loop with autonomous tool selection |
 | Search | FAISS vector store + BGE-small-zh embedding for JD matching |
 | Desktop | Tauri (optional) for native Windows builds |
 

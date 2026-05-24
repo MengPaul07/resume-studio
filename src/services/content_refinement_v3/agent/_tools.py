@@ -163,7 +163,7 @@ def tool_read_resume(*, session_id: str, **kwargs: Any) -> ToolResult:
         )
         is_empty = not any(
             resume.get(k) and (isinstance(resume[k], list) and len(resume[k]) > 0 or isinstance(resume[k], str) and resume[k].strip())
-            for k in ["workExperience", "education", "personalProjects", "summary"]
+            for k in ["workExperience", "education", "personalProjects", "research", "summary"]
         )
         return ToolResult(success=True, tool_name="read_resume",
                           data={"resume": resume, "is_empty": is_empty},
@@ -278,11 +278,23 @@ def tool_edit_field(*, session_id: str, path: str, value: Any,
                 except (json.JSONDecodeError, ValueError):
                     pass  # keep as string if not valid JSON
 
-        # For upsert into array sections, wrap single objects in a list
+        # For upsert into array sections: append to existing array, don't replace
+        written = None
         if op == "upsert" and isinstance(resolved_value, dict) and not path.endswith("]"):
-            resolved_value = [resolved_value]
-
-        if op in ("update", "upsert"):
+            existing = _get_by_path_local(resume, path)
+            if isinstance(existing, list) and len(existing) > 0:
+                # Array already has entries — append, don't replace
+                existing.append(resolved_value)
+                written = resolved_value
+            else:
+                # Empty or new array — wrap in list and set
+                resolved_value = [resolved_value]
+                result = _set_by_path_local(resume, path, resolved_value, upsert=True)
+                if not result:
+                    return ToolResult(success=False, tool_name="edit_field",
+                        data={}, error=f"Invalid path: '{path}' — index out of bounds or path does not exist")
+                written = _get_by_path_local(resume, path)
+        elif op in ("update", "upsert"):
             result = _set_by_path_local(resume, path, resolved_value, upsert=(op == "upsert"))
             if not result:
                 return ToolResult(success=False, tool_name="edit_field",
@@ -324,6 +336,192 @@ def tool_ask_user(*, items: list | None = None, **kwargs: Any) -> ToolResult:
         data={"items": items},
         meta={"tool": "ask_user", "paused": True, "item_count": len(items)},
     )
+
+
+# ── Simplified edit tools (preferred over edit_field) ───────────────
+
+def _load_resume(session_id: str) -> tuple[dict, dict]:
+    """Load session state and resume dict. Returns (state, resume)."""
+    from ..session.service import get_session_content
+    snapshot = get_session_content(session_id=session_id, message_limit=1, event_limit=1)
+    state = snapshot.get("state", {}) if isinstance(snapshot.get("state", {}), dict) else {}
+    resume = (
+        state.get("refined_document_obj", {}) if isinstance(state.get("refined_document_obj", {}), dict)
+        else state.get("refined_resume_obj", {}) if isinstance(state.get("refined_resume_obj", {}), dict)
+        else {}
+    )
+    return state, resume
+
+
+def _save_resume(session_id: str, resume: dict) -> None:
+    from ..session.service import save_session_state
+    try:
+        save_session_state(session_id=session_id, refined_resume_obj=resume)
+    except Exception:
+        pass
+
+
+@tool("add_entry",
+      "Add a new entry to a resume section. Automatically appends — never overwrites existing entries. "
+      "The section MUST be an array field: education, workExperience, personalProjects, research.",
+      {"type": "object", "properties": {
+          "section": {"type": "string", "enum": ["education", "workExperience", "personalProjects", "research"], "description": "Array section to append to"},
+          "value": {"type": "string", "description": "JSON object string with ALL fields. Example: '{\"institution\":\"Tsinghua\",\"degree\":\"Master\",\"years\":\"2024-2026\",\"description\":[\"scholarship\"]}'"},
+          "reason": {"type": "string", "description": "Brief reason in Chinese, under 30 chars."},
+          "actionability": {"type": "string", "enum": ["apply_ready", "confirm_required"], "description": "confirm_required for fact-sensitive fields (institution, degree, years)."},
+          "confidence": {"type": "number", "description": "Confidence 0.0-1.0."},
+      }, "required": ["section", "value"]})
+def tool_add_entry(*, session_id: str, section: str, value: str = "",
+                   reason: str = "", actionability: str = "apply_ready",
+                   confidence: float = 0.8, **kwargs: Any) -> ToolResult:
+    _, resume = _load_resume(session_id)
+    if not resume:
+        return ToolResult(success=False, tool_name="add_entry", data={}, error="No resume loaded")
+
+    # Parse JSON value
+    entry = value
+    if isinstance(value, str) and value.strip():
+        stripped = value.strip()
+        if stripped.startswith("{"):
+            try:
+                entry = json.loads(stripped)
+            except (json.JSONDecodeError, ValueError):
+                return ToolResult(success=False, tool_name="add_entry", data={},
+                    error=f"Invalid JSON value. Must be a JSON object string like {{\"title\":\"...\",\"company\":\"...\"}}. Got: {value[:100]}")
+
+    if not isinstance(entry, dict):
+        return ToolResult(success=False, tool_name="add_entry", data={},
+            error=f"Value must be a JSON object, got {type(entry).__name__}: {str(value)[:100]}")
+
+    # Ensure section array exists
+    arr = resume.get(section, [])
+    if not isinstance(arr, list):
+        arr = []
+    arr.append(entry)
+    resume[section] = arr
+    _save_resume(session_id, resume)
+
+    return ToolResult(success=True, tool_name="add_entry",
+                      data={"section": section, "index": len(arr) - 1, "written": entry, "reason": reason},
+                      meta={"actionability": actionability, "confidence": confidence})
+
+
+@tool("update_field",
+      "Update a LEAF field (plain text or simple value). For structured entries use set_entry or add_entry.",
+      {"type": "object", "properties": {
+          "path": {"type": "string", "description": "Dot-path to a leaf field: 'summary', 'personalInfo.email', 'workExperience[0].description[1]', 'additional.technicalSkills'"},
+          "value": {"type": "string", "description": "New text value. Plain text only — NOT a JSON object string."},
+          "reason": {"type": "string", "description": "Brief reason in Chinese, under 30 chars."},
+          "actionability": {"type": "string", "enum": ["apply_ready", "confirm_required"], "description": "confirm_required for fact-sensitive fields (name, email, phone, dates, gpa)."},
+          "confidence": {"type": "number", "description": "Confidence 0.0-1.0."},
+      }, "required": ["path", "value"]})
+def tool_update_field(*, session_id: str, path: str, value: str = "",
+                      reason: str = "", actionability: str = "apply_ready",
+                      confidence: float = 0.8, **kwargs: Any) -> ToolResult:
+    from ..session.service import _set_by_path_local, _get_by_path_local
+    _, resume = _load_resume(session_id)
+    if not resume:
+        return ToolResult(success=False, tool_name="update_field", data={}, error="No resume loaded")
+
+    ok = _set_by_path_local(resume, path, value)
+    if not ok:
+        return ToolResult(success=False, tool_name="update_field", data={},
+            error=f"Invalid path: '{path}' — path does not exist")
+
+    written = _get_by_path_local(resume, path)
+    _save_resume(session_id, resume)
+
+    return ToolResult(success=True, tool_name="update_field",
+                      data={"path": path, "written": written, "reason": reason},
+                      meta={"actionability": actionability, "confidence": confidence})
+
+
+@tool("set_entry",
+      "Replace an entire entry in an array section (identified by index). "
+      "For example, replace education[0] or workExperience[1] with a new complete JSON object.",
+      {"type": "object", "properties": {
+          "path": {"type": "string", "description": "Full path with array index. Examples: 'education[0]', 'workExperience[1]', 'personalProjects[0]'"},
+          "value": {"type": "string", "description": "Complete JSON object string with ALL fields of that entry. Example: '{\"institution\":\"MIT\",\"degree\":\"PhD\",\"years\":\"2020-2024\",\"description\":[\"published 3 papers\"]}'"},
+          "reason": {"type": "string", "description": "Brief reason in Chinese, under 30 chars."},
+          "actionability": {"type": "string", "enum": ["apply_ready", "confirm_required"], "description": "confirm_required for fact-sensitive fields."},
+          "confidence": {"type": "number", "description": "Confidence 0.0-1.0."},
+      }, "required": ["path", "value"]})
+def tool_set_entry(*, session_id: str, path: str, value: str = "",
+                   reason: str = "", actionability: str = "apply_ready",
+                   confidence: float = 0.8, **kwargs: Any) -> ToolResult:
+    from ..session.service import _set_by_path_local, _get_by_path_local
+    _, resume = _load_resume(session_id)
+    if not resume:
+        return ToolResult(success=False, tool_name="set_entry", data={}, error="No resume loaded")
+
+    # Parse JSON value
+    entry = value
+    if isinstance(value, str) and value.strip():
+        stripped = value.strip()
+        if stripped.startswith("{"):
+            try:
+                entry = json.loads(stripped)
+            except (json.JSONDecodeError, ValueError):
+                return ToolResult(success=False, tool_name="set_entry", data={},
+                    error=f"Invalid JSON value: {value[:100]}")
+
+    if not isinstance(entry, dict):
+        return ToolResult(success=False, tool_name="set_entry", data={},
+            error=f"Value must be a JSON object string, got {type(entry).__name__}: {str(value)[:100]}")
+
+    ok = _set_by_path_local(resume, path, entry)
+    if not ok:
+        return ToolResult(success=False, tool_name="set_entry", data={},
+            error=f"Invalid path: '{path}' — index out of bounds or path does not exist")
+
+    written = _get_by_path_local(resume, path)
+    _save_resume(session_id, resume)
+
+    return ToolResult(success=True, tool_name="set_entry",
+                      data={"path": path, "written": written, "reason": reason},
+                      meta={"actionability": actionability, "confidence": confidence})
+
+
+@tool("delete_entry",
+      "Delete an entry from a resume array section, or clear a leaf field.",
+      {"type": "object", "properties": {
+          "path": {"type": "string", "description": "Path to delete: 'education[0]' to remove an entry, 'summary' to clear a field"},
+          "reason": {"type": "string", "description": "Brief reason in Chinese, under 30 chars."},
+      }, "required": ["path"]})
+def tool_delete_entry(*, session_id: str, path: str, reason: str = "", **kwargs: Any) -> ToolResult:
+    from ..session.service import _get_by_path_local
+    _, resume = _load_resume(session_id)
+    if not resume:
+        return ToolResult(success=False, tool_name="delete_entry", data={}, error="No resume loaded")
+
+    # Find parent array and index for array entries
+    import re
+    m = re.match(r'^(\w+)\[(\d+)\]$', path)
+    if m:
+        arr_name, idx_str = m.groups()
+        idx = int(idx_str)
+        arr = resume.get(arr_name, [])
+        if not isinstance(arr, list):
+            return ToolResult(success=False, tool_name="delete_entry", data={},
+                error=f"'{arr_name}' is not an array")
+        if idx >= len(arr):
+            return ToolResult(success=False, tool_name="delete_entry", data={},
+                error=f"Index {idx} out of bounds for '{arr_name}' (length {len(arr)})")
+        arr.pop(idx)
+        _save_resume(session_id, resume)
+        return ToolResult(success=True, tool_name="delete_entry",
+                          data={"path": path, "written": "(deleted)", "reason": reason})
+
+    # Leaf field: just set to empty
+    current = _get_by_path_local(resume, path)
+    if current is None:
+        return ToolResult(success=False, tool_name="delete_entry", data={},
+            error=f"Path '{path}' does not exist")
+    from ..session.service import _set_by_path_local
+    _set_by_path_local(resume, path, "")
+    _save_resume(session_id, resume)
+    return ToolResult(success=True, tool_name="delete_entry",
+                      data={"path": path, "written": "(cleared)", "reason": reason})
 
 
 @tool("set_target_jd",

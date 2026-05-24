@@ -234,4 +234,4 @@ class TestResolveTargetScopes:
     def test_default_scopes_for_edit_intent(self, resolve):
         observed = {}
         result = resolve("优化一下", observed)
-        assert len(result) == 4  # main sections
+        assert len(result) == 5  # summary, workExperience, education, personalProjects, research

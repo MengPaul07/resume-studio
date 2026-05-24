@@ -38,8 +38,8 @@ def extract_json_dict(text: str) -> Dict[str, Any]:
         return {}
 
 
-def invoke_llm(messages: List[Tuple[str, str]]) -> Any:
+def invoke_llm(messages: List[Tuple[str, str]], response_format: dict | None = None) -> Any:
     llm = build_llm()
     if llm is None:
         raise RuntimeError("LLM is not initialized. Check your model configuration.")
-    return llm.invoke(messages)
+    return llm.invoke(messages, response_format=response_format)

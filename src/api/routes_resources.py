@@ -100,6 +100,7 @@ def _run_resume_pipeline_from_text(
         "design_spec": {},
         "output_markdown": "",
         "output_html": "",
+        "parse_warning": parsed.get("parse_warning", ""),
     }
 
 

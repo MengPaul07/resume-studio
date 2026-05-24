@@ -50,10 +50,10 @@ function flattenFields(obj: Record<string, unknown>, prefix = ''): EditableField
   return fields;
 }
 
-const SECTION_ORDER = ['personalInfo', 'summary', 'workExperience', 'education', 'personalProjects', 'additional'];
+const SECTION_ORDER = ['personalInfo', 'summary', 'workExperience', 'education', 'personalProjects', 'research', 'additional'];
 const SECTION_LABELS: Record<string, string> = {
   personalInfo: 'Personal Info', summary: 'Summary', workExperience: 'Work',
-  education: 'Education', personalProjects: 'Projects', additional: 'Additional',
+  education: 'Education', personalProjects: 'Projects', research: 'Research', additional: 'Additional',
 };
 
 export function LayoutEditor({ resumeObj, onChange, disabled }: Props) {

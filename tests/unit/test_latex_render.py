@@ -6,7 +6,7 @@ from src.services.latex_gen import render_tex
 
 def test_render_tex_matches_css_html_mode_with_full_stack_fixture():
     resume_obj = json.loads(
-        Path("tests/fixtures/resumes/full_stack_en.json").read_text(encoding="utf-8")
+        (Path(__file__).parent.parent / "fixtures/resumes/full_stack_en.json").read_text(encoding="utf-8")
     )
     guidance = {
         "pageFormat": "A4",
@@ -142,7 +142,7 @@ def test_render_tex_matches_css_html_mode_with_full_stack_fixture():
 
 def test_render_tex_honors_section_order_field_when_input_is_shuffled():
     resume_obj = json.loads(
-        Path("tests/fixtures/resumes/full_stack_en.json").read_text(encoding="utf-8")
+        (Path(__file__).parent.parent / "fixtures/resumes/full_stack_en.json").read_text(encoding="utf-8")
     )
     guidance = {
         "columnMode": "double",

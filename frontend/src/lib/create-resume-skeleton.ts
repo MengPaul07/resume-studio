@@ -22,6 +22,7 @@ export function buildResumeSkeleton(params: ResumeBrief): Record<string, unknown
     personalProjects: [
       { name: '', description: [''] },
     ],
+    research: [],
     additional: {
       technicalSkills: params.skills,
     },

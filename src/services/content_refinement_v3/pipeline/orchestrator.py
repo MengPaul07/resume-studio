@@ -15,13 +15,15 @@ def json_parse_document(
     if str(doc_type or "resume").strip().lower() != "resume":
         raise ValueError(f"unsupported doc_type: {doc_type}")
     state = {"raw_input": raw_input}
-    state = {**state, **raw_text_categorizer(state)}
+    extract_result = raw_text_categorizer(state)
+    state = {**state, **extract_result}
     state = {**state, **normalize_resume_json(state)}
     return {
         "trace_id": str(uuid4()),
         "doc_type": "resume",
         "raw_document_obj": state.get("raw_resume_obj", {}),
         "normalized_document_obj": state.get("normalized_resume_obj", {}),
+        "parse_warning": extract_result.get("parse_warning", ""),
     }
 
 

@@ -224,12 +224,14 @@ If using port 8001, update `frontend/vite.config.ts` proxy accordingly.
 ### Backend Tests / 后端测试
 
 ```bash
-# Run all tests (excluding slow API tests)
-cd resume-builder
-.venv/Scripts/python.exe -m pytest tests/ --ignore=tests/test_api.py -q
+# Run unit + integration tests (no API key needed)
+python -m pytest tests/unit tests/integration -q
 
-# Run specific test file
-.venv/Scripts/python.exe -m pytest tests/test_interview.py -q
+# Run LLM tests (requires API key in .env)
+python -m pytest tests/llm -n auto -q
+
+# Run everything
+python -m pytest tests -q
 ```
 
 ### Agent Eval / Agent 评估
@@ -282,8 +284,10 @@ resume-builder/
 │   │   └── data/            # File-based storage
 │   └── config.py            # Settings
 ├── tests/                   # Test suite
-│   ├── fixtures/jds/        # JD seed data
-│   └── ...
+│   ├── unit/                 # Pure logic, no API needed
+│   ├── integration/          # Mocked LLM + TestClient
+│   ├── llm/                  # Real LLM API required
+│   └── fixtures/             # Shared test data (resumes, jds, expected)
 ├── scripts/                 # Utility scripts
 │   ├── seed_jds.py          # JD database seeding
 │   ├── agent_eval.py        # Agent evaluation

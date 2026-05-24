@@ -70,6 +70,9 @@ function SelectorButtons<T extends string>({ label, value, onChange, options }: 
   );
 }
 
+function Divider() { return <div className="my-3 border-t border-[var(--brand-line)]" />; }
+function SectionLabel({ children }: { children: React.ReactNode }) { return <h4 className="mb-2 font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--brand-signal)]">{children}</h4>; }
+
 function NumberSlider({ label, min, max, value, suffix = '', step, onChange }: SliderProps) {
   const safeValue = Number.isFinite(value) ? value : min;
   const formatValue = Number.isInteger(safeValue) ? String(safeValue) : safeValue.toFixed(1).replace(/\.0$/, '');
@@ -319,7 +322,7 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
             <div className="border border-[var(--brand-line)] p-3">
               {activeGroup === 'page' ? (
                 <div className="space-y-3">
-                  <h4 className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--brand-signal)]">{t('editorPanel.page')}</h4>
+                  <SectionLabel>Format</SectionLabel>
                   <div className="border border-[var(--brand-line)] bg-[var(--brand-paper)] px-2 py-1 font-sans text-xs font-medium">
                     {t('editorPanel.pageFormat')}
                   </div>
@@ -349,14 +352,19 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
                         : pageCountOptions}
                     />
                   )}
+                  <Divider />
+                  <SectionLabel>Spacing</SectionLabel>
                   <NumberSlider label={t('editorPanel.sectionGap')} min={10} max={30} value={guidance.sectionGapPx} suffix="px" onChange={(value) => updateGuidance('sectionGapPx', clamp(value, 10, 30))} />
                   <NumberSlider label={t('editorPanel.itemGap')} min={6} max={18} value={guidance.itemGapPx} suffix="px" onChange={(value) => updateGuidance('itemGapPx', clamp(value, 6, 18))} />
                   <NumberSlider label={t('editorPanel.headingContentGap')} min={2} max={14} value={guidance.headingMarginBottomPx} suffix="px" onChange={(value) => updateGuidance('headingMarginBottomPx', clamp(value, 2, 14))} />
-                  <h4 className="font-mono text-[11px] font-bold uppercase tracking-wider text-gray-600 dark:text-[var(--brand-ink-muted)]">{t('editorPanel.margins')}</h4>
+                  <Divider />
+                  <SectionLabel>Margins</SectionLabel>
                   <NumberSlider label={t('editorPanel.top')} min={6} max={18} value={guidance.margins.top} onChange={(value) => updateMargin('top', value)} />
                   <NumberSlider label={t('editorPanel.bottom')} min={6} max={18} value={guidance.margins.bottom} onChange={(value) => updateMargin('bottom', value)} />
                   <NumberSlider label={t('editorPanel.left')} min={6} max={18} value={guidance.margins.left} onChange={(value) => updateMargin('left', value)} />
                   <NumberSlider label={t('editorPanel.right')} min={6} max={18} value={guidance.margins.right} onChange={(value) => updateMargin('right', value)} />
+                  <Divider />
+                  <SectionLabel>Header Colors</SectionLabel>
                   <div className="flex items-center gap-2">
                     <span className="w-28 font-sans text-xs text-gray-500 dark:text-[var(--brand-ink-muted)]">{t('editorPanel.headerBgColor')}</span>
                     <input type="color" value={guidance.headerBgColor} onChange={(e) => updateGuidance('headerBgColor', e.target.value)} className="h-6 w-8 cursor-pointer border border-gray-300 dark:border-[var(--brand-line)]" />
@@ -485,7 +493,7 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
 
               {activeGroup === 'typography' ? (
                 <div className="space-y-3">
-                  <h4 className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--brand-signal)]">{t('editorPanel.typography')}</h4>
+                  <SectionLabel>Font Family & Layout</SectionLabel>
                   <SelectorButtons<'serif' | 'sans-serif' | 'mono'>
                     label={t('editorPanel.headerFont')}
                     value={guidance.headerFont}
@@ -508,12 +516,16 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
                       { value: 'split' as const, text: t('editorPanel.split') },
                     ]}
                   />
+                  <Divider />
+                  <SectionLabel>Font Sizes</SectionLabel>
                   <NumberSlider label={t('editorPanel.nameSize')} min={26} max={44} value={guidance.nameFontSizePx} suffix="px" onChange={(value) => updateGuidance('nameFontSizePx', clamp(value, 26, 44))} />
                   <NumberSlider label={t('editorPanel.nameWeight')} min={300} max={900} step={100} value={guidance.nameFontWeight} suffix="" onChange={(value) => updateGuidance('nameFontWeight', clamp(value, 300, 900))} />
                   <NumberSlider label={t('editorPanel.roleSize')} min={12} max={20} value={guidance.roleFontSizePx} suffix="px" onChange={(value) => updateGuidance('roleFontSizePx', clamp(value, 12, 20))} />
                   <NumberSlider label={t('editorPanel.metaSize')} min={10} max={14} value={guidance.metaFontSizePx} suffix="px" onChange={(value) => updateGuidance('metaFontSizePx', clamp(value, 10, 14))} />
                   <NumberSlider label={t('editorPanel.bodySize')} min={11} max={15} value={guidance.bodyFontSizePx} suffix="px" onChange={(value) => updateGuidance('bodyFontSizePx', clamp(value, 11, 15))} />
                   <NumberSlider label={t('editorPanel.lineHeight')} min={140} max={185} value={guidance.lineHeightPercent} suffix="%" onChange={(value) => updateGuidance('lineHeightPercent', clamp(value, 140, 185))} />
+                  <Divider />
+                  <SectionLabel>Colors</SectionLabel>
                   <div className="flex items-center gap-2">
                     <span className="w-28 font-sans text-xs text-gray-500 dark:text-[var(--brand-ink-muted)]">{t('editorPanel.bodyTextColor')}</span>
                     <input type="color" value={guidance.bodyTextColor} onChange={(e) => updateGuidance('bodyTextColor', e.target.value)} className="h-6 w-8 cursor-pointer border border-gray-300 dark:border-[var(--brand-line)]" />
@@ -524,6 +536,8 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
                     <input type="color" value={guidance.metaTextColor} onChange={(e) => updateGuidance('metaTextColor', e.target.value)} className="h-6 w-8 cursor-pointer border border-gray-300 dark:border-[var(--brand-line)]" />
                     <span className="font-mono text-[11px] text-gray-500 dark:text-[var(--brand-ink-muted)]">{guidance.metaTextColor}</span>
                   </div>
+                  <Divider />
+                  <SectionLabel>Header Spacing</SectionLabel>
                   <NumberSlider label={t('editorPanel.contactGap')} min={2} max={8} value={guidance.contactGapPx} suffix="px" onChange={(value) => updateGuidance('contactGapPx', clamp(value, 2, 8))} />
                   <NumberSlider label={t('editorPanel.roleMarginTop')} min={2} max={14} value={guidance.roleMarginTopPx} suffix="px" onChange={(value) => updateGuidance('roleMarginTopPx', clamp(value, 2, 14))} />
                   <NumberSlider label={t('editorPanel.headerPadBtm')} min={4} max={20} value={guidance.headerPaddingBottomPx} suffix="px" onChange={(value) => updateGuidance('headerPaddingBottomPx', clamp(value, 4, 20))} />
@@ -544,7 +558,7 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
 
               {activeGroup === 'layout' ? (
                 <div className="space-y-3">
-                  <h4 className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--brand-signal)]">{t('editorPanel.layout')}</h4>
+                  <SectionLabel>Columns</SectionLabel>
                   <SelectorButtons<ColumnMode>
                     label={t('editorPanel.columnMode')}
                     value={guidance.columnMode}
@@ -562,6 +576,8 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
                   />
                   <NumberSlider label={t('editorPanel.leftColumn')} min={24} max={42} value={guidance.leftWidthPercent} suffix="%" onChange={(value) => updateGuidance('leftWidthPercent', clamp(value, 24, 42))} />
                   <NumberSlider label={t('editorPanel.columnGap')} min={10} max={28} value={guidance.columnGapPx} suffix="px" onChange={(value) => updateGuidance('columnGapPx', clamp(value, 10, 28))} />
+                  <Divider />
+                  <SectionLabel>Sidebar</SectionLabel>
                   <NumberSlider label={t('editorPanel.sidebarPadding')} min={0} max={18} value={guidance.sidebarPaddingPx} suffix="px" onChange={(value) => updateGuidance('sidebarPaddingPx', clamp(value, 0, 18))} />
                   <NumberSlider label={t('editorPanel.sidebarRadius')} min={0} max={12} value={guidance.sidebarRadiusPx} suffix="px" onChange={(value) => updateGuidance('sidebarRadiusPx', clamp(value, 0, 12))} />
                   <div className="flex items-center gap-2">
@@ -575,7 +591,7 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
 
               {activeGroup === 'sections' ? (
                 <div className="space-y-3">
-                  <h4 className="font-mono text-[11px] font-bold uppercase tracking-wider text-[var(--brand-signal)]">{t('editorPanel.headingAndLists')}</h4>
+                  <SectionLabel>Headings</SectionLabel>
                   <SelectorButtons<SectionHeadingStyle>
                     label={t('editorPanel.headingStyle')}
                     value={guidance.sectionHeadingStyle}
@@ -591,6 +607,8 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
                   <NumberSlider label={t('editorPanel.headingSize')} min={11} max={16} value={guidance.sectionHeadingSizePx} suffix="px" onChange={(value) => updateGuidance('sectionHeadingSizePx', clamp(value, 11, 16))} />
                   <NumberSlider label={t('editorPanel.headingRuleGap')} min={0} max={10} value={guidance.sectionUnderlineGapPx} suffix="px" onChange={(value) => updateGuidance('sectionUnderlineGapPx', clamp(value, 0, 10))} />
                   <NumberSlider label={t('editorPanel.headingRuleThick')} min={0} max={3} step={0.5} value={guidance.sectionUnderlineThicknessPx} suffix="px" onChange={(value) => updateGuidance('sectionUnderlineThicknessPx', clamp(value, 0, 3))} />
+                  <Divider />
+                  <SectionLabel>List Items</SectionLabel>
                   <SelectorButtons<DateStyle>
                     label={t('editorPanel.datePosition')}
                     value={guidance.dateStyle}
@@ -627,12 +645,16 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
                     onChange={(value) => updateGuidance('awardsLayout', value)}
                     options={layoutOptions}
                   />
+                  <Divider />
+                  <SectionLabel>Tag Styling</SectionLabel>
                   <NumberSlider label={t('editorPanel.tagFontSize')} min={8} max={14} value={guidance.tagFontSizePx} suffix="px" onChange={(value) => updateGuidance('tagFontSizePx', clamp(value, 8, 14))} />
                   <NumberSlider label={t('editorPanel.tagGap')} min={2} max={12} value={guidance.tagGapPx} suffix="px" onChange={(value) => updateGuidance('tagGapPx', clamp(value, 2, 12))} />
                   <NumberSlider label={t('editorPanel.tagPaddingX')} min={2} max={14} value={guidance.tagPaddingXPx} suffix="px" onChange={(value) => updateGuidance('tagPaddingXPx', clamp(value, 2, 14))} />
                   <NumberSlider label={t('editorPanel.tagPaddingY')} min={0} max={8} value={guidance.tagPaddingYPx} suffix="px" onChange={(value) => updateGuidance('tagPaddingYPx', clamp(value, 0, 8))} />
                   <NumberSlider label={t('editorPanel.tagRadius')} min={0} max={18} value={guidance.tagRadiusPx} suffix="px" onChange={(value) => updateGuidance('tagRadiusPx', clamp(value, 0, 18))} />
                   <NumberSlider label={t('editorPanel.tagBorderWidth')} min={0} max={2} step={0.5} value={guidance.tagBorderWidthPx} suffix="px" onChange={(value) => updateGuidance('tagBorderWidthPx', clamp(value, 0, 2))} />
+                  <Divider />
+                  <SectionLabel>Bullet Spacing</SectionLabel>
                   <NumberSlider label={t('editorPanel.bulletIndent')} min={10} max={30} value={guidance.bulletIndentPx} suffix="px" onChange={(value) => updateGuidance('bulletIndentPx', clamp(value, 10, 30))} />
                   <NumberSlider label={t('editorPanel.bulletListTopGap')} min={0} max={10} value={guidance.bulletListTopGapPx} suffix="px" onChange={(value) => updateGuidance('bulletListTopGapPx', clamp(value, 0, 10))} />
                   <NumberSlider label={t('editorPanel.bulletItemGap')} min={2} max={12} value={guidance.bulletItemGapPx} suffix="px" onChange={(value) => updateGuidance('bulletItemGapPx', clamp(value, 2, 12))} />

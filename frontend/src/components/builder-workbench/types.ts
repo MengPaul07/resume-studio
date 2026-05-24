@@ -176,6 +176,7 @@ export const DEFAULT_SECTIONS: BuilderSectionDraft[] = [
   { id: 'workExperience', key: 'workExperience', title: 'Work Experience', visible: true, column: 'right', page: 1 },
   { id: 'education', key: 'education', title: 'Education', visible: true, column: 'right', page: 1 },
   { id: 'personalProjects', key: 'personalProjects', title: 'Projects', visible: true, column: 'right', page: 1 },
+  { id: 'research', key: 'research', title: 'Research', visible: true, column: 'right', page: 1 },
   { id: 'technicalSkills', key: 'technicalSkills', title: 'Skills', visible: true, column: 'left', page: 1 },
   { id: 'languages', key: 'languages', title: 'Languages', visible: true, column: 'left', page: 1 },
   { id: 'certifications', key: 'certifications', title: 'Certifications', visible: true, column: 'left', page: 1 },

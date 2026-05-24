@@ -9,6 +9,8 @@ src/data/chroma/*
 # Frontend build/deps
 frontend/node_modules/
 frontend/dist/
+*.tsbuildinfo
+*.bak
 node_modules/
 
 # Runtime/session data

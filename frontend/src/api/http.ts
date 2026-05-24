@@ -1,6 +1,21 @@
 const API_BASE = import.meta.env.VITE_API_BASE || '/api/v1';
 const JSON_HEADERS: Record<string, string> = { 'Content-Type': 'application/json' };
 
+const USER_ID_KEY = 'resume_user_id';
+
+function getUserId(): string {
+  let uid = localStorage.getItem(USER_ID_KEY);
+  if (!uid) {
+    uid = crypto.randomUUID();
+    localStorage.setItem(USER_ID_KEY, uid);
+  }
+  return uid;
+}
+
+export function withUserId(headers: Record<string, string> = {}): Record<string, string> {
+  return { ...headers, 'X-User-Id': getUserId() };
+}
+
 export function buildApiUrl(path: string): string {
   return `${API_BASE}${path}`;
 }
@@ -20,7 +35,7 @@ export async function requestJson<T>(
   init: RequestInit,
   messagePrefix: string,
 ): Promise<T> {
-  const resp = await fetch(buildApiUrl(path), init);
+  const resp = await fetch(buildApiUrl(path), { ...init, headers: withUserId(init.headers as Record<string, string> | undefined) });
   await ensureOk(resp, messagePrefix);
   return (await resp.json()) as T;
 }
@@ -54,6 +69,6 @@ export async function postForm<T>(
 }
 
 export async function deleteRequest(path: string, messagePrefix: string): Promise<void> {
-  const resp = await fetch(buildApiUrl(path), { method: 'DELETE' });
+  const resp = await fetch(buildApiUrl(path), { method: 'DELETE', headers: withUserId() });
   await ensureOk(resp, messagePrefix);
 }
