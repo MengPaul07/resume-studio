@@ -1,0 +1,459 @@
+{
+  "version": "jd_library.v2",
+  "source": "tencent_campus_2026",
+  "items": [
+    {
+      "id": "TENCENT_SOFTDEV",
+      "url": "https://join.qq.com",
+      "title": "软件开发工程师-腾讯集团",
+      "company": "腾讯",
+      "location": "深圳/北京/上海/广州/成都",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "C++",
+        "Java",
+        "Go",
+        "后端",
+        "算法",
+        "操作系统",
+        "数据库",
+        "网络",
+        "高并发",
+        "Linux"
+      ],
+      "responsibilities": [
+        "负责实现和优化公司的产品功能，构建和维护关键服务与基础设施",
+        "深入理解业务需求和产品设计，高效实现并优化产品功能",
+        "持续优化架构，提升关键服务和基础设施的稳定性与可用性",
+        "通过引入新的工具和流程，提升团队的开发效率和代码质量",
+        "参与新技术的研究和探索，为团队的技术进步和产品创新提供支持"
+      ],
+      "requirements": [
+        "本科/硕士/博士，计算机相关专业",
+        "扎实的编程能力，熟练掌握C/C++/Java/Go等其中一门开发语言",
+        "TCP/UDP网络协议及相关编程、进程间通讯编程",
+        "专业软件知识：算法、操作系统、软件工程、设计模式、数据结构、数据库系统、网络安全",
+        "加分：Python/Shell/Perl等脚本语言、MySQL及SQL、NoSQL原理"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_CSIG_BACKEND",
+      "url": "https://join.qq.com",
+      "title": "后台开发工程师-CSIG",
+      "company": "腾讯",
+      "location": "深圳/北京/上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "C++",
+        "Go",
+        "Java",
+        "云服务",
+        "分布式",
+        "后端",
+        "AI"
+      ],
+      "responsibilities": [
+        "参与腾讯云产品后端开发",
+        "负责云基础架构的设计与优化",
+        "参与AI+云技术的融合创新",
+        "探索前沿技术在产品中的应用"
+      ],
+      "requirements": [
+        "本科及以上学历",
+        "精通C++/Go/Java至少一种",
+        "熟悉分布式系统原理",
+        "了解云计算相关技术优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_CLOUD_BACKEND",
+      "url": "https://join.tencent-cloud.com",
+      "title": "后台开发工程师-腾讯云智",
+      "company": "腾讯",
+      "location": "西安/武汉/长沙/重庆/厦门",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "C++",
+        "Java",
+        "后端",
+        "云计算",
+        "数据库",
+        "Linux"
+      ],
+      "responsibilities": [
+        "负责腾讯云核心产品后端开发",
+        "参与云服务架构设计与优化",
+        "负责系统性能调优和稳定性保障"
+      ],
+      "requirements": [
+        "本科及以上学历",
+        "掌握C/C++、Java等相关编程语言",
+        "扎实的编程能力和计算机基础知识",
+        "善于学习，有团队协作精神"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_CSIG_ALGO",
+      "url": "https://join.qq.com",
+      "title": "技术研究-自然语言处理-CSIG",
+      "company": "腾讯",
+      "location": "深圳/北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "NLP",
+        "大模型",
+        "深度学习",
+        "Python",
+        "PyTorch",
+        "预训练",
+        "Transformer"
+      ],
+      "responsibilities": [
+        "参与腾讯云NLP方向的技术研究",
+        "探索大模型在云服务中的应用",
+        "负责语言模型的预训练和微调",
+        "跟踪NLP领域前沿技术动态"
+      ],
+      "requirements": [
+        "硕士及以上学历",
+        "扎实的ML和NLP基础",
+        "精通Python和PyTorch",
+        "有顶会论文发表经验优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "硕士及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_CSIG_ALGO_MM",
+      "url": "https://join.qq.com",
+      "title": "技术研究-多模态-CSIG",
+      "company": "腾讯",
+      "location": "深圳/北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "多模态",
+        "CV",
+        "NLP",
+        "大模型",
+        "Python",
+        "深度学习",
+        "PyTorch"
+      ],
+      "responsibilities": [
+        "参与腾讯多模态算法研究",
+        "探索多模态大模型训练和应用",
+        "负责图像/视频/文本理解等方向的技术研发",
+        "跟踪多模态前沿技术动态"
+      ],
+      "requirements": [
+        "硕士及以上学历",
+        "扎实的CV或NLP基础",
+        "精通Python和深度学习框架",
+        "有CV/多模态顶会论文优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "硕士及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_ALGO_REC",
+      "url": "https://join.qq.com",
+      "title": "技术研究-推荐算法-CSIG",
+      "company": "腾讯",
+      "location": "深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "推荐算法",
+        "机器学习",
+        "深度学习",
+        "Python",
+        "C++",
+        "召回",
+        "排序"
+      ],
+      "responsibilities": [
+        "参与推荐系统算法研发与优化",
+        "负责召回/排序模型的设计与训练",
+        "探索大模型在推荐系统中的应用"
+      ],
+      "requirements": [
+        "硕士及以上学历",
+        "扎实ML基础和编码能力",
+        "精通Python/C++",
+        "有推荐系统相关经验优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "硕士及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_FE",
+      "url": "https://join.qq.com",
+      "title": "前端开发工程师-腾讯集团",
+      "company": "腾讯",
+      "location": "深圳/北京/上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-前端",
+      "keywords": [
+        "React",
+        "Vue",
+        "TypeScript",
+        "JavaScript",
+        "CSS",
+        "前端",
+        "Node.js"
+      ],
+      "responsibilities": [
+        "负责腾讯产品前端功能开发",
+        "参与前端架构设计与优化",
+        "探索前端+AI创新方案",
+        "提升用户体验和页面性能"
+      ],
+      "requirements": [
+        "本科及以上学历",
+        "精通HTML/CSS/JavaScript",
+        "熟练React/Vue等前端框架",
+        "了解Node.js和有构建工具经验优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "frontend_engineer",
+        "education": "本科及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_CLIENT",
+      "url": "https://join.qq.com",
+      "title": "移动客户端开发工程师-腾讯集团",
+      "company": "腾讯",
+      "location": "深圳/北京/上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-客户端",
+      "keywords": [
+        "Java",
+        "Kotlin",
+        "Swift",
+        "Android",
+        "iOS",
+        "移动端"
+      ],
+      "responsibilities": [
+        "负责腾讯移动端产品开发",
+        "参与客户端架构设计",
+        "优化移动端性能和用户体验"
+      ],
+      "requirements": [
+        "本科及以上学历",
+        "精通Java/Kotlin或Swift/Objective-C",
+        "熟悉Android或iOS平台开发",
+        "了解跨平台技术（Flutter/RN）优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "client_engineer",
+        "education": "本科及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_TEST",
+      "url": "https://join.qq.com",
+      "title": "测试开发工程师-腾讯集团",
+      "company": "腾讯",
+      "location": "深圳/北京/上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-测试",
+      "keywords": [
+        "测试",
+        "自动化",
+        "Python",
+        "Java",
+        "CI/CD",
+        "质量保障"
+      ],
+      "responsibilities": [
+        "负责产品质量保障和测试方案设计",
+        "开发自动化测试框架和工具",
+        "参与CI/CD流水线建设",
+        "推动质量左移和持续改进"
+      ],
+      "requirements": [
+        "本科及以上学历",
+        "熟练掌握Python/Java等至少一门编程语言",
+        "了解自动化测试框架",
+        "有项目和实习经验优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "test_engineer",
+        "education": "本科及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_CLOUD_ALGO",
+      "url": "https://join.tencent-cloud.com",
+      "title": "算法工程师-腾讯云智",
+      "company": "腾讯",
+      "location": "西安/武汉",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "算法",
+        "机器学习",
+        "Python",
+        "数据",
+        "AI"
+      ],
+      "responsibilities": [
+        "参与腾讯云AI产品算法研发",
+        "负责模型训练和优化",
+        "参与数据处理和分析"
+      ],
+      "requirements": [
+        "本科及以上学历",
+        "熟悉Python和相关算法框架",
+        "了解机器学习/深度学习基础",
+        "有团队协作精神"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_CSIG_DATA",
+      "url": "https://join.qq.com",
+      "title": "数据工程-CSIG",
+      "company": "腾讯",
+      "location": "深圳/北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-数据",
+      "keywords": [
+        "数据工程",
+        "Python",
+        "Hadoop",
+        "Spark",
+        "数据仓库",
+        "ETL"
+      ],
+      "responsibilities": [
+        "参与腾讯云数据平台建设",
+        "负责数据管线和数据仓库开发",
+        "参与数据治理和质量保障"
+      ],
+      "requirements": [
+        "本科及以上学历",
+        "熟悉Python/Java/Scala至少一种",
+        "了解Hadoop/Spark等大数据技术",
+        "了解数据仓库和数据建模"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "data_engineer",
+        "education": "本科及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "TENCENT_YUANBAO_ALGO",
+      "url": "https://join.qq.com",
+      "title": "大模型算法工程师-腾讯元宝",
+      "company": "腾讯",
+      "location": "深圳/北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "大模型",
+        "AIGC",
+        "SFT",
+        "RLHF",
+        "Python",
+        "PyTorch",
+        "NLP",
+        "语音",
+        "多模态"
+      ],
+      "responsibilities": [
+        "参与腾讯元宝产品大模型技术研发",
+        "负责大模型后训练（SFT/RLHF）",
+        "探索AIGC技术在AI助手产品中的应用",
+        "参与语音多模态等前沿方向研究"
+      ],
+      "requirements": [
+        "硕士及以上学历",
+        "扎实的NLP或CV基础",
+        "精通Python和PyTorch",
+        "有大模型相关项目经验优先",
+        "对AI产品/AIGC技术有热情"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "硕士及以上",
+        "company": "tencent",
+        "job_type": "校园招聘正式"
+      }
+    }
+  ]
+}

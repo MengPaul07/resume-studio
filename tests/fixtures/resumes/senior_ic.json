@@ -1,0 +1,92 @@
+{
+  "$schema": "fixture:v1",
+  "description": "资深 IC（无管理经验）— 12年+深度技术积累，测试 Agent 对资深专家的呈现方式",
+  "difficulty": "medium",
+  "personalInfo": {
+    "name": "Thomas Berg",
+    "title": "Staff Software Engineer",
+    "email": "thomas.berg@tech.com",
+    "phone": "555-4001",
+    "location": "Amsterdam, Netherlands"
+  },
+  "summary": "Staff-level backend engineer with 12 years building distributed systems at scale. Deep expertise in Go, Rust, and database internals. Open source contributor to CockroachDB and TiKV. Prefer staying hands-on as a technical leader rather than people management.",
+  "workExperience": [
+    {
+      "title": "Staff Software Engineer",
+      "company": "Databricks",
+      "location": "Amsterdam",
+      "years": "2021-04 to present",
+      "description": [
+        "Technical lead for the Delta Lake storage engine serving 10K+ Databricks customers",
+        "Designed and implemented a new compaction algorithm reducing storage costs by 35% across the fleet",
+        "Mentored 15+ engineers through design reviews and Pair Programming without formal management responsibility",
+        "Drove adoption of Rust for performance-critical components, wrote internal Rust training curriculum",
+        "Represented Databricks at VLDB 2023 and SIGMOD 2024"
+      ]
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "Uber (Amsterdam office)",
+      "location": "Amsterdam",
+      "years": "2017-09 to 2021-03",
+      "description": [
+        "Core contributor to Uber's MySQL sharding layer (Schemaless), managing 10K+ database instances",
+        "Built an online schema migration tool that reduced DBA intervention by 90%",
+        "On-call for mission-critical storage systems serving all Uber products globally",
+        "Filed 2 patents on distributed query optimization"
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Bol.com",
+      "location": "Utrecht, Netherlands",
+      "years": "2014-03 to 2017-08",
+      "description": [
+        "Backend developer for search and recommendations platform",
+        "Migrated search infrastructure from Solr to Elasticsearch, reducing query latency by 50%",
+        "Built real-time inventory indexing pipeline processing 100K+ updates/minute"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "TU Delft",
+      "degree": "M.Sc. Computer Science (Distributed Systems)",
+      "years": "2012-09 to 2014-02",
+      "description": "Thesis: 'Consensus Protocols for Geo-Replicated Databases.' Graduated cum laude."
+    },
+    {
+      "institution": "University of Amsterdam",
+      "degree": "B.Sc. Computer Science",
+      "years": "2009-09 to 2012-08",
+      "description": "GPA 8.2/10. Minor in Mathematics."
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "rust-btree",
+      "role": "Maintainer",
+      "years": "2019-present",
+      "description": [
+        "High-performance B-tree implementation in Rust, 2K+ GitHub stars",
+        "Used in production by 3 database startups"
+      ]
+    }
+  ],
+  "additional": {
+    "technicalSkills": ["Rust（Expert）", "Go（Expert）", "C++（Proficient）", "Java（Proficient）", "Distributed Systems", "Database Internals", "Storage Engines", "Kubernetes", "AWS"],
+    "languages": ["English (Fluent)", "Dutch (Native)", "German (Basic)"],
+    "certificationsTraining": [],
+    "awards": ["VLDB Best Paper Award (2023)", "Uber Engineering Excellence Award"]
+  },
+  "customSections": {
+    "open_source": [
+      "CockroachDB — Core Contributor (50+ merged PRs)",
+      "TiKV — CNCF Maintainer"
+    ],
+    "patents": [
+      "US 11,234,567 — Distributed Query Optimization (2021)",
+      "US 11,456,789 — Online Schema Migration for Sharded Databases (2022)"
+    ]
+  }
+}

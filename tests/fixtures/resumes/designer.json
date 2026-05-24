@@ -1,0 +1,74 @@
+{
+  "$schema": "fixture:v1",
+  "description": "设计师（非技术岗）— 测试 Agent 对非开发岗位的适应能力，设计术语和成果描述",
+  "difficulty": "medium",
+  "personalInfo": {
+    "name": "林小凡",
+    "title": "UI/UX 设计师",
+    "email": "linxf@design.studio",
+    "phone": "15212349876",
+    "location": "杭州"
+  },
+  "summary": "5 年产品设计经验，横跨 B 端 SaaS 和 C 端电商。擅长从用户研究到高保真交付的全流程设计。Figma 重度用户，Design Tokens 和 Design System 的坚定推行者。",
+  "workExperience": [
+    {
+      "title": "高级 UI/UX 设计师",
+      "company": "网易",
+      "location": "杭州",
+      "years": "2022-04 至今",
+      "description": [
+        "负责网易云音乐创作者后台的整体体验设计，服务 50 万音乐人",
+        "主导 Design System 从 0 到 1 建设，统一 3 条产品线的视觉规范，组件复用率提升至 70%",
+        "通过用户访谈和可用性测试发现 30+ 体验问题，推动修复使 NPS 从 42 提升到 58",
+        "引入 Design Tokens 体系，设计师-开发协作效率提升 40%"
+      ]
+    },
+    {
+      "title": "UI/UX 设计师",
+      "company": "有赞",
+      "location": "杭州",
+      "years": "2020-01 至 2022-03",
+      "description": [
+        "负责电商 SaaS 后台的商家端设计，覆盖订单管理、客户管理、数据分析 3 大模块",
+        "推动移动端适配，将 15 个核心操作流程的移动端完成率从 60% 提升至 85%",
+        "产出交互原型和用户流程图，与 PM 和前端紧密协作，保证设计还原度 > 95%"
+      ]
+    },
+    {
+      "title": "视觉设计师",
+      "company": "蘑菇街",
+      "location": "杭州",
+      "years": "2018-08 至 2019-12",
+      "description": [
+        "负责电商详情页和营销活动页的视觉设计",
+        "双 11 活动落地页设计，CTR 较上一年提升 18%"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "中国美术学院",
+      "degree": "学士 视觉传达设计",
+      "years": "2014-09 至 2018-06",
+      "description": "毕业设计获优秀作品奖。在校期间完成 5 个校企合作项目。"
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "DesignKit",
+      "role": "创作者",
+      "years": "2023",
+      "description": [
+        "在 Figma Community 发布的 UI 组件库，5000+ 下载",
+        "包含 200+ 组件变体和自动布局模板"
+      ]
+    }
+  ],
+  "additional": {
+    "technicalSkills": ["Figma（精通）", "Framer", "Principle", "Adobe Creative Suite", "HTML/CSS（能写）", "Notion", "Maze", "UserTesting"],
+    "languages": ["中文（母语）", "英语（读写）"],
+    "certificationsTraining": ["Google UX Design Certificate", "IDEO — Design Thinking Facilitation"],
+    "awards": ["站酷推荐设计师", "UI 中国年度十佳 UI 作品（2022）"]
+  },
+  "customSections": {}
+}

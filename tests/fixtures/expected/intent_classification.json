@@ -1,0 +1,156 @@
+{
+  "$schema": "fixture:v1",
+  "description": "Expected intent classification results for unit testing IntentResolver. Each entry maps a user message to the expected intent_class and optional scope.",
+  "cases": [
+    {
+      "message": "优化一下个人 summary，控制在 90 字以内，突出管理能力。",
+      "expected_intent": "explicit_edit",
+      "expected_scope": "summary",
+      "note": "Names a specific section with edit verb"
+    },
+    {
+      "message": "把最近一段工作经历改成 STAR 风格要点，每条要有量化结果。",
+      "expected_intent": "explicit_edit",
+      "expected_scope": "workExperience",
+      "note": "Specific section + specific editing instruction"
+    },
+    {
+      "message": "丰富教育经历部分，突出课程项目与学术成果。",
+      "expected_intent": "explicit_edit",
+      "expected_scope": "education",
+      "note": "Explicitly names education section"
+    },
+    {
+      "message": "优化项目经历，每个项目加一句技术栈和一句业务成果。",
+      "expected_intent": "explicit_edit",
+      "expected_scope": "personalProjects",
+      "note": "Project section with specific requirements"
+    },
+    {
+      "message": "技术技能里如果有重复的帮我合并去重。",
+      "expected_intent": "explicit_edit",
+      "expected_scope": "additional",
+      "note": "Skills dedup in additional section"
+    },
+    {
+      "message": "整体润色一下简历，语气更专业克制，去掉夸张表达。",
+      "expected_intent": "broad_edit",
+      "expected_scope": "global",
+      "note": "Whole-resume polish, no specific section"
+    },
+    {
+      "message": "强化 ATS 关键词覆盖，目标岗位是高级产品经理。",
+      "expected_intent": "broad_edit",
+      "expected_scope": "global",
+      "note": "ATS enhancement applies globally"
+    },
+    {
+      "message": "每段经历至少补一条可量化的结果指标。",
+      "expected_intent": "broad_edit",
+      "expected_scope": "global",
+      "note": "Applies to every experience entry"
+    },
+    {
+      "message": "把我的手机号改成 13800138000。",
+      "expected_intent": "fact_edit",
+      "expected_scope": "personalInfo",
+      "note": "Phone number is factual data"
+    },
+    {
+      "message": "更新邮箱为 new.email@example.com。",
+      "expected_intent": "fact_edit",
+      "expected_scope": "personalInfo",
+      "note": "Email is contact info"
+    },
+    {
+      "message": "第一段工作经历的起止时间不对，改成 2020-06 到 2023-08。",
+      "expected_intent": "fact_edit",
+      "expected_scope": "workExperience",
+      "note": "Date correction is fact_edit"
+    },
+    {
+      "message": "只分析这份简历的风险点和短板，不要修改任何内容。",
+      "expected_intent": "analysis_only",
+      "expected_scope": "global",
+      "note": "Has both analysis word + explicit no-modify"
+    },
+    {
+      "message": "分析简历的 ATS 关键词覆盖情况，告诉我缺了什么，不要改内容。",
+      "expected_intent": "analysis_only",
+      "expected_scope": "global",
+      "note": "Analysis request with explicit refusal"
+    },
+    {
+      "message": "你好，你能帮我做什么？",
+      "expected_intent": "general_chat",
+      "expected_scope": "",
+      "note": "Greeting, no editing intent"
+    },
+    {
+      "message": "What resume formats do you support?",
+      "expected_intent": "general_chat",
+      "expected_scope": "",
+      "note": "Capability question, no editing intent"
+    },
+    {
+      "message": "帮我把简历改好一点。",
+      "expected_intent": "broad_edit",
+      "expected_scope": "global",
+      "note": "Vague improvement request → broad_edit"
+    },
+    {
+      "message": "优化工作经历和项目经历，统一用 STAR 格式。",
+      "expected_intent": "explicit_edit",
+      "expected_scope": "workExperience",
+      "note": "Multi-section but explicitly named"
+    },
+    {
+      "message": "Please polish the summary section, 用中文写。",
+      "expected_intent": "explicit_edit",
+      "expected_scope": "summary",
+      "note": "Mixed language, explicitly names summary"
+    },
+    {
+      "message": "",
+      "expected_intent": "general_chat",
+      "expected_scope": "",
+      "note": "Empty message — should default to general_chat"
+    },
+    {
+      "message": "谢谢你的帮助！",
+      "expected_intent": "general_chat",
+      "expected_scope": "",
+      "note": "Thanks, no editing intent"
+    },
+    {
+      "message": "把summary和workExperience都重写一下，要更简洁。",
+      "expected_intent": "broad_edit",
+      "expected_scope": "global",
+      "note": "Multiple sections → broad_edit with global scope"
+    },
+    {
+      "message": "GPA 改成 3.9。",
+      "expected_intent": "fact_edit",
+      "expected_scope": "education",
+      "note": "GPA is numeric factual data"
+    },
+    {
+      "message": "在技能里加上 Kubernetes 和 Terraform。",
+      "expected_intent": "explicit_edit",
+      "expected_scope": "additional",
+      "note": "Add specific skills to additional section"
+    },
+    {
+      "message": "帮我看看简历有什么问题。",
+      "expected_intent": "broad_edit",
+      "expected_scope": "global",
+      "note": "Review request that implies edits → broad_edit"
+    },
+    {
+      "message": "Analyze my resume for gaps but don't modify anything.",
+      "expected_intent": "analysis_only",
+      "expected_scope": "global",
+      "note": "English analysis_only with explicit no-modify"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "fixture:v1",
+  "description": "Minimal resume with only required fields — used for smoke tests",
+  "difficulty": "easy",
+  "personalInfo": {
+    "name": "Jane Doe",
+    "title": "Junior Developer",
+    "email": "jane@example.com",
+    "phone": "555-0001",
+    "location": "San Francisco, CA"
+  },
+  "summary": "Recent CS graduate seeking an entry-level software engineering role.",
+  "workExperience": [
+    {
+      "title": "Intern",
+      "company": "StartupCo",
+      "location": "Remote",
+      "years": "2024-06 to 2024-09",
+      "description": ["Built internal dashboard with React", "Wrote unit tests for API endpoints"]
+    }
+  ],
+  "education": [
+    {
+      "institution": "State University",
+      "degree": "B.S. Computer Science",
+      "years": "2020-09 to 2024-06",
+      "description": "GPA 3.5"
+    }
+  ],
+  "personalProjects": [],
+  "additional": {
+    "technicalSkills": ["Python", "JavaScript", "React"],
+    "languages": ["English (Fluent)"],
+    "certificationsTraining": [],
+    "awards": []
+  },
+  "customSections": {}
+}

@@ -1,0 +1,23 @@
+[project]
+name = "resume-studio"
+version = "0.1.0"
+description = "Resume Studio — AI resume builder, optimizer, and mock interview platform"
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "litellm",
+    "python-dotenv",
+    "pydantic",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "httpx",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

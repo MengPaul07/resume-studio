@@ -1,0 +1,75 @@
+{
+  "$schema": "fixture:v1",
+  "description": "自由职业/独立开发者 — 非传统职业路径，项目制经历，测试 Agent 对非标经历的提炼能力",
+  "difficulty": "medium",
+  "personalInfo": {
+    "name": "Marcus Tan",
+    "title": "Independent Software Consultant",
+    "email": "marcus@indie.dev",
+    "phone": "555-7771",
+    "location": "Remote (Bali, Indonesia)"
+  },
+  "summary": "Independent software consultant with 7+ years building web and mobile products for startups and agencies. Shipped 30+ projects across fintech, e-commerce, and healthtech. Looking to join a product team for more impact and collaboration.",
+  "workExperience": [
+    {
+      "title": "Independent Software Consultant",
+      "company": "Self-Employed",
+      "location": "Remote",
+      "years": "2020-03 to present",
+      "description": [
+        "Built MVPs for 12 early-stage startups, 8 went on to raise seed funding",
+        "Developed a telehealth platform (React Native + AWS) serving 5K+ patients monthly",
+        "Maintained long-term retainer relationships with 3 agencies, delivering features on 2-week sprint cycles",
+        "Managed client relationships end-to-end: scoping, contracts, delivery, and handoff"
+      ]
+    },
+    {
+      "title": "Full-Stack Developer",
+      "company": "RocketLab Agency",
+      "location": "Kuala Lumpur, Malaysia",
+      "years": "2018-01 to 2020-02",
+      "description": [
+        "Lead developer on 15+ client projects ranging from landing pages to complex SaaS dashboards",
+        "Introduced CI/CD pipeline and automated testing, reducing client-reported bugs by 40%",
+        "Mentored 3 junior developers through pair programming and code reviews"
+      ]
+    },
+    {
+      "title": "Frontend Developer",
+      "company": "StartupXYZ",
+      "location": "Penang, Malaysia",
+      "years": "2016-06 to 2017-12",
+      "description": [
+        "Sole frontend developer for a B2B procurement platform",
+        "Rebuilt legacy jQuery app in React, improving page load time by 60%",
+        "Designed and implemented responsive component library used across 3 products"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "University of Malaya",
+      "degree": "B.Sc. Information Technology",
+      "years": "2013-09 to 2016-06",
+      "description": "Graduated top 10% of class. Final year project: E-commerce recommendation engine."
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "SaaS Micro-tools",
+      "role": "Creator",
+      "years": "2021-present",
+      "description": [
+        "Collection of 6 niche SaaS micro-tools (PDF editor, invoice generator, form builder)",
+        "$3K MRR combined, 2K+ total users, fully bootstrapped"
+      ]
+    }
+  ],
+  "additional": {
+    "technicalSkills": ["React", "React Native", "Vue.js", "Node.js", "Python", "PostgreSQL", "MongoDB", "AWS (EC2, Lambda, S3)", "Firebase", "Stripe API", "Figma"],
+    "languages": ["English (Fluent)", "Malay (Native)", "Mandarin (Conversational)"],
+    "certificationsTraining": ["AWS Solutions Architect Associate"],
+    "awards": ["Product Hunt #3 Product of the Day — BudgetBuddy (2023)"]
+  },
+  "customSections": {}
+}

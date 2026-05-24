@@ -1,0 +1,364 @@
+@import 'tailwindcss';
+
+@source "../index.html";
+@source "./**/*.{js,ts,jsx,tsx,mdx}";
+
+/* Wire Tailwind dark: variant to the .dark class (not prefers-color-scheme) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Brand Tokens (Paper + Signal) */
+  --color-canvas: var(--brand-paper);
+  --color-ink: var(--brand-ink);
+  --color-success: var(--status-done);
+  --color-warning: var(--status-warning);
+
+  /* Semantic color mappings — use these instead of raw gray-500 / blue-400 etc */
+  --color-surface-elevated: var(--brand-surface);
+  --color-surface-muted: var(--brand-surface-soft);
+  --color-text-secondary: var(--brand-ink-muted);
+  --color-text-link: var(--brand-signal);
+  --color-border-subtle: var(--brand-line);
+  --color-border-default: var(--brand-line-strong);
+
+  /* Diff / review colors */
+  --color-diff-before-bg: #f7f2e5;
+  --color-diff-before-border: #d9d2bf;
+  --color-diff-before-text: #403620;
+  --color-diff-after-bg: #edf3ff;
+  --color-diff-after-border: #c8d6e5;
+  --color-diff-after-text: #1e293b;
+
+  /* Badge backgrounds */
+  --color-badge-success-bg: #e9f8ef;
+  --color-badge-error-bg: #ffe9e5;
+  --color-badge-warning-bg: #fff2df;
+
+  --shadow-sw-sm: 0 1px 3px rgba(0,0,0,0.08);
+  --shadow-sw-default: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-sw-card: 0 8px 24px rgba(0,0,0,0.06);
+
+  /* Fonts */
+  --font-sans: 'Inter', sans-serif;
+  --font-mono: 'Space Grotesk', monospace;
+
+  /* Animations */
+  --animate-gradient: gradient 8s linear infinite;
+
+  @keyframes gradient {
+    to {
+      background-position: 200% center;
+    }
+  }
+}
+
+:root {
+  --font-mono: 'Space Grotesk', monospace;
+  --font-sans: 'Inter', sans-serif;
+  --radius: 0.625rem;
+
+  --brand-paper: #fafafa;
+  --brand-surface: #ffffff;
+  --brand-surface-soft: #f5f5f5;
+  --brand-ink: #1d1d1f;
+  --brand-ink-muted: #86868b;
+  --brand-signal: #0071e3;
+  --brand-signal-soft: #e8f2fd;
+  --brand-line: #e5e5e5;
+  --brand-line-strong: #d1d1d1;
+  --status-running: #0071e3;
+  --status-done: #30b158;
+  --status-failed: #e03a3a;
+  --status-warning: #f0a020;
+
+  /* Swiss 2.0 palette */
+  --background: var(--brand-paper);
+  --foreground: var(--brand-ink);
+
+  --card: var(--brand-surface);
+  --card-foreground: var(--brand-ink);
+
+  --popover: var(--brand-paper);
+  --popover-foreground: var(--brand-ink);
+
+  --primary: var(--brand-signal);
+  --primary-foreground: #ffffff;
+
+  --secondary: var(--brand-surface-soft);
+  --secondary-foreground: var(--brand-ink);
+
+  --muted: var(--brand-surface-soft);
+  --muted-foreground: var(--brand-ink-muted);
+
+  --accent: var(--brand-signal-soft);
+  --accent-foreground: var(--brand-signal);
+
+  --destructive: var(--status-failed);
+  --destructive-foreground: #ffffff;
+
+  --border: var(--brand-line);
+  --input: var(--brand-paper);
+  --ring: var(--brand-signal);
+
+  --chart-1: var(--brand-signal);
+  --chart-2: var(--status-done);
+  --chart-3: var(--status-warning);
+  --chart-4: var(--status-failed);
+  --chart-5: var(--brand-ink);
+
+  --sidebar: var(--brand-surface-soft);
+  --sidebar-foreground: var(--brand-ink);
+  --sidebar-primary: var(--brand-signal);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e8e8ed;
+  --sidebar-accent-foreground: var(--brand-ink);
+  --sidebar-border: var(--brand-line);
+  --sidebar-ring: var(--brand-signal);
+}
+
+.dark {
+  /* Brand tokens */
+  --brand-paper: #111111;
+  --brand-surface: #1e1e1e;
+  --brand-surface-soft: #282828;
+  --brand-ink: #e5e5e5;
+  --brand-ink-muted: #a0a0a0;
+  --brand-signal: #4d94ff;
+  --brand-signal-soft: rgba(77, 148, 255, 0.15);
+  --brand-line: #3a3a3a;
+  --brand-line-strong: #505050;
+
+  /* Status colors — slightly brightened for dark bg */
+  --status-running: #60a5fa;
+  --status-done: #4ade80;
+  --status-failed: #f87171;
+  --status-warning: #fbbf24;
+
+  /* Semantic tokens derived from brand */
+  --background: var(--brand-paper);
+  --foreground: var(--brand-ink);
+  --card: var(--brand-surface);
+  --card-foreground: var(--brand-ink);
+  --popover: var(--brand-surface);
+  --popover-foreground: var(--brand-ink);
+  --primary: var(--brand-signal);
+  --primary-foreground: #ffffff;
+  --secondary: var(--brand-surface-soft);
+  --secondary-foreground: var(--brand-ink);
+  --muted: var(--brand-surface-soft);
+  --muted-foreground: var(--brand-ink-muted);
+  --accent: var(--brand-signal-soft);
+  --accent-foreground: var(--brand-signal);
+  --destructive: var(--status-failed);
+  --destructive-foreground: #ffffff;
+  --border: var(--brand-line);
+  --input: var(--brand-surface);
+  --ring: var(--brand-signal);
+  --sidebar: var(--brand-surface-soft);
+  --sidebar-foreground: var(--brand-ink);
+  --sidebar-primary: var(--brand-signal);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2a2a2a;
+  --sidebar-accent-foreground: var(--brand-ink);
+  --sidebar-border: var(--brand-line);
+  --sidebar-ring: var(--brand-signal);
+
+  /* Diff colors for dark */
+  --color-diff-before-bg: #2a2418;
+  --color-diff-before-border: #4a4030;
+  --color-diff-before-text: #d4c8a8;
+  --color-diff-after-bg: #1a2235;
+  --color-diff-after-border: #2a3a55;
+  --color-diff-after-text: #a8c0e0;
+
+  /* Badge backgrounds for dark */
+  --color-badge-success-bg: #1a3a2a;
+  --color-badge-error-bg: #3a1a1a;
+  --color-badge-warning-bg: #3a301a;
+
+  /* Chart colors */
+  --chart-1: var(--brand-signal);
+  --chart-2: var(--status-done);
+  --chart-3: var(--status-warning);
+  --chart-4: var(--status-failed);
+  --chart-5: var(--brand-ink);
+
+  /* Shadow — softer on dark */
+  --shadow-sw-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-sw-default: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-sw-card: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "calt" 1, "liga" 1;
+    line-height: 1.6;
+  }
+  button {
+    font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  .brand-grid-bg {
+    background:
+      radial-gradient(1000px 420px at 16% -10%, rgba(0, 113, 227, 0.06), transparent 70%),
+      radial-gradient(860px 360px at 95% -20%, rgba(48, 177, 88, 0.04), transparent 70%),
+      linear-gradient(180deg, #fafafa 0%, #f2f2f2 100%);
+  }
+
+  .dark .brand-grid-bg {
+    background:
+      radial-gradient(1000px 420px at 16% -10%, rgba(77, 148, 255, 0.04), transparent 70%),
+      radial-gradient(860px 360px at 95% -20%, rgba(74, 222, 128, 0.02), transparent 70%),
+      linear-gradient(180deg, #1a1a1a 0%, #151515 100%);
+  }
+
+  .ui-input {
+    @apply w-full border rounded-lg px-3 py-2 font-sans text-sm bg-[var(--brand-paper)] text-[var(--brand-ink)] outline-none;
+    border-color: var(--brand-line);
+  }
+
+  .ui-input:focus {
+    border-color: var(--brand-signal);
+    box-shadow: 0 0 0 3px var(--brand-signal-soft);
+  }
+
+  .status-running {
+    color: var(--status-running);
+  }
+  .status-done {
+    color: var(--status-done);
+  }
+  .status-failed {
+    color: var(--status-failed);
+  }
+}
+
+.writing-studio .border-black {
+  border-color: var(--brand-line-strong) !important;
+}
+
+.dark.writing-studio .border-black,
+.dark .writing-studio .border-black {
+  border-color: var(--brand-line-strong) !important;
+}
+
+.writing-studio [class*='shadow-\\['] {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06) !important;
+}
+
+.writing-studio .font-mono.uppercase {
+  letter-spacing: 0.08em;
+}
+
+.writing-studio button,
+.writing-studio a {
+  transition: all 160ms ease;
+}
+
+.writing-studio button:hover,
+.writing-studio a:hover {
+  filter: saturate(1.04);
+}
+
+@media print {
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .resume-print,
+  .resume-print *,
+  .cover-letter-print,
+  .cover-letter-print * {
+    visibility: visible !important;
+  }
+
+  .resume-print,
+  .cover-letter-print {
+    width: 100% !important;
+    max-width: 210mm !important;
+    min-height: 0 !important;
+    position: static !important;
+    margin: 0 auto !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  .resume-body {
+    box-shadow: none !important;
+    background: #ffffff !important;
+  }
+
+  .resume-scale {
+    transform: none !important;
+    scale: 1 !important;
+  }
+
+  a {
+    color: #000000 !important;
+    text-decoration: none !important;
+  }
+}
+
+@keyframes swissReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px) translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(0);
+  }
+}

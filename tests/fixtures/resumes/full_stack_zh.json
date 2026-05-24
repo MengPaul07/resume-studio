@@ -1,0 +1,122 @@
+{
+  "$schema": "fixture:v1",
+  "description": "全字段中文简历 — 测试中文润色、关键词匹配、多段落处理",
+  "difficulty": "medium",
+  "personalInfo": {
+    "name": "张明",
+    "title": "高级后端工程师",
+    "email": "zhangming@example.com",
+    "phone": "13800138000",
+    "location": "北京"
+  },
+  "summary": "8 年后端开发经验，专注高并发分布式系统设计。主导过日均千万级请求的微服务架构升级，将系统可用性从 99.5% 提升至 99.95%。精通 Go 和 Python，熟悉云原生技术栈。",
+  "workExperience": [
+    {
+      "title": "技术负责人 / 高级后端工程师",
+      "company": "字节跳动",
+      "location": "北京",
+      "years": "2021-03 至今",
+      "description": [
+        "带领 8 人团队负责内容推荐引擎的后端服务，日均处理 5000 万次推荐请求",
+        "将核心推荐链路延迟从 120ms 优化至 45ms，通过缓存分层和算法优化实现",
+        "主导服务从 Python 到 Go 的迁移，部署成本降低 60%，QPS 提升 3 倍",
+        "搭建全链路压测平台，覆盖 200+ 微服务，提前发现 15 个性能瓶颈",
+        "制定团队技术规范，推行 Code Review 和设计评审制度，代码缺陷率下降 40%"
+      ]
+    },
+    {
+      "title": "高级后端工程师",
+      "company": "阿里巴巴",
+      "location": "杭州",
+      "years": "2018-07 至 2021-02",
+      "description": [
+        "参与电商交易核心链路开发，负责订单和支付模块，日均处理 100 万笔订单",
+        "设计并实现分布式事务方案（Saga + 本地消息表），数据一致性达 99.99%",
+        "优化商品搜索服务，引入 Elasticsearch 替代 MySQL 全文检索，搜索耗时从 800ms 降至 80ms",
+        "大促期间保障系统稳定，双 11 峰值 QPS 达 50 万，零故障"
+      ]
+    },
+    {
+      "title": "后端开发工程师",
+      "company": "美团",
+      "location": "北京",
+      "years": "2016-06 至 2018-06",
+      "description": [
+        "负责骑手调度系统的订单分配模块，日均分配 200 万订单",
+        "优化分配算法，将平均配送时长缩短 8 分钟",
+        "开发实时监控大盘，关键指标异常自动告警，故障发现时间从 30 分钟缩短至 5 分钟"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "清华大学",
+      "degree": "硕士 计算机科学与技术",
+      "years": "2014-09 至 2016-07",
+      "description": "研究方向：分布式系统。发表 CCF-A 类论文 2 篇。GPA 3.8/4.0。",
+      "gpa": "3.7/4.0"
+    },
+    {
+      "institution": "华中科技大学",
+      "degree": "学士 软件工程",
+      "years": "2010-09 至 2014-06",
+      "description": "国家奖学金（2 次）。ACM-ICPC 亚洲区银牌。GPA 3.7/4.0。",
+      "gpa": "3.7/4.0"
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "DistCache",
+      "role": "作者",
+      "years": "2023",
+      "description": [
+        "开源分布式缓存中间件，支持多级缓存和自动失效",
+        "GitHub 3K Stars，被 50+ 企业在生产环境使用"
+      ]
+    },
+    {
+      "name": "Go-Micro",
+      "role": "核心贡献者",
+      "years": "2022",
+      "description": [
+        "Go 微服务脚手架项目，集成服务发现、链路追踪、熔断限流",
+        "贡献了 gRPC 拦截器和中间件模块"
+      ]
+    }
+  ],
+  "additional": {
+    "technicalSkills": [
+      "Go（精通）",
+      "Python（精通）",
+      "Java（熟练）",
+      "Rust（了解）",
+      "MySQL",
+      "Redis",
+      "Elasticsearch",
+      "Kafka",
+      "TiDB",
+      "Docker",
+      "Kubernetes",
+      "Istio",
+      "Prometheus",
+      "Grafana",
+      "gRPC",
+      "Protobuf",
+      "RESTful API"
+    ],
+    "languages": [
+      "中文（母语）",
+      "英语（流利，CET-6 600分）"
+    ],
+    "certificationsTraining": [
+      "Kubernetes CKA 认证",
+      "AWS Solutions Architect Associate"
+    ],
+    "awards": [
+      "字节跳动 Spot Bonus（3 次）",
+      "阿里巴巴双 11 技术保障奖",
+      "ACM-ICPC 亚洲区银牌"
+    ]
+  },
+  "customSections": {}
+}

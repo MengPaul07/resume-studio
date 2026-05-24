@@ -1,0 +1,53 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.vscode/
+src/data/chroma/*
+!src/data/chroma/.gitkeep
+
+# Frontend build/deps
+frontend/node_modules/
+frontend/dist/
+node_modules/
+
+# Runtime/session data
+src/data/session_memory/
+src/data/recent_resumes/
+src/data/imports/
+src/data/job_descriptions/
+src/services/data/user_profiles/
+src/services/data/recent_resumes/
+*.sqlite3
+*.db
+outputs/
+uploads/
+
+# Tauri
+frontend/src-tauri/target/
+
+# Personal cache / AI tool configs
+.chroma/
+.claude/
+.codex/
+.pytest_cache/
+
+# Personal docs
+AGENTS.md
+CHANGELOG.md
+
+# Logs
+*.log
+logs/
+
+# Runtime data (user-generated, never tracked)
+src/services/data/imports/
+src/services/data/recent_resumes/
+
+# Local test artifacts
+test.docx
+scripts/quick_test.py
+
+# Generated LaTeX
+*.tex
+!config/doc_types/*.tex

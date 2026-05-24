@@ -1,0 +1,23 @@
+#!/bin/bash
+# D-Resume pre-push hook — runs Layer 1 unit tests before push.
+# Install: ln -s ../../scripts/git-hooks/pre-push .git/hooks/pre-push
+#
+# To skip (NOT recommended): git push --no-verify
+
+set -e
+
+echo "[dres-bench] Running pre-push checks..."
+
+# Run unit tests
+echo "[dres-bench] Layer 1: Unit Tests..."
+python -m pytest tests/ -v --tb=short -x -m "not integration and not slow" 2>&1
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "ERROR: Unit tests failed. Push aborted."
+    echo "Fix the failing tests or use --no-verify to bypass (not recommended)."
+    exit 1
+fi
+
+echo "[dres-bench] Pre-push checks passed."
+exit 0

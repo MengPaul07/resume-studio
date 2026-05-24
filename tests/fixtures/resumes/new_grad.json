@@ -1,0 +1,82 @@
+{
+  "$schema": "fixture:v1",
+  "description": "New graduate resume with limited work experience, heavy on education and projects",
+  "difficulty": "easy",
+  "personalInfo": {
+    "name": "Emily Park",
+    "title": "Computer Science Graduate",
+    "email": "emily.park@university.edu",
+    "phone": "555-6789",
+    "location": "Boston, MA"
+  },
+  "summary": "Recent Computer Science graduate with internship experience in full-stack development. Strong foundation in algorithms, data structures, and machine learning. Seeking a software engineering position where I can contribute to impactful products.",
+  "workExperience": [
+    {
+      "title": "Software Engineering Intern",
+      "company": "BigTech Co.",
+      "location": "Mountain View, CA",
+      "years": "2024-06 to 2024-09",
+      "description": [
+        "Developed a real-time notification service using WebSocket and Redis pub/sub, handling 10K concurrent connections",
+        "Built React components for the admin dashboard, reducing page load time by 30%",
+        "Wrote 50+ unit and integration tests, improving code coverage from 45% to 72%"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "MIT",
+      "degree": "B.S. Computer Science & Mathematics",
+      "years": "2021-09 to 2025-05",
+      "description": "GPA 3.9/4.0. Dean's List all semesters. Teaching assistant for CS 6.006 (Algorithms).",
+      "gpa": "3.8/4.0"
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "StudyGPT",
+      "role": "Solo Developer",
+      "years": "2024",
+      "description": [
+        "AI-powered study assistant using RAG over lecture notes and textbooks",
+        "1K+ active users across 5 universities, voted 'Best Student Hack' at MIT Hackathon"
+      ]
+    },
+    {
+      "name": "Distributed KV Store",
+      "role": "Team Lead (3 members)",
+      "years": "2023",
+      "description": [
+        "Implemented a Raft-consensus distributed key-value store in Go as course project",
+        "Achieved linearizable consistency with 99.9% availability in Jepsen tests"
+      ]
+    }
+  ],
+  "additional": {
+    "technicalSkills": [
+      "Python",
+      "TypeScript",
+      "Go",
+      "C++",
+      "React",
+      "Node.js",
+      "PostgreSQL",
+      "MongoDB",
+      "Docker",
+      "Git",
+      "Linux"
+    ],
+    "languages": [
+      "English (Native)",
+      "Korean (Native)",
+      "Spanish (Intermediate)"
+    ],
+    "certificationsTraining": [],
+    "awards": [
+      "Dean's List (2021-2025)",
+      "MIT Hackathon — Best Student Hack 2024",
+      "National Merit Scholar"
+    ]
+  },
+  "customSections": {}
+}

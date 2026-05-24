@@ -1,0 +1,63 @@
+{
+  "$schema": "fixture:v1",
+  "description": "描述薄弱的初级简历 — 大量短句、无量化、无亮点，测试 Agent 的润色和扩充能力",
+  "difficulty": "easy",
+  "personalInfo": {
+    "name": "小李",
+    "title": "Java 开发",
+    "email": "xiaoli@qq.com",
+    "phone": "13500001111",
+    "location": "成都"
+  },
+  "summary": "2 年 Java 开发经验，做过一些项目。",
+  "workExperience": [
+    {
+      "title": "Java 开发工程师",
+      "company": "某科技公司",
+      "location": "成都",
+      "years": "2024-03 至今",
+      "description": [
+        "负责后端接口开发",
+        "写 CRUD",
+        "改 bug",
+        "参与需求评审",
+        "写技术文档"
+      ]
+    },
+    {
+      "title": "初级 Java 开发",
+      "company": "另一个公司",
+      "location": "成都",
+      "years": "2023-07 至 2024-02",
+      "description": [
+        "维护老系统",
+        "写了一些接口",
+        "数据库增删改查",
+        "配合前端联调"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "某二本学院",
+      "degree": "本科 计算机科学与技术",
+      "years": "2019-09 至 2023-06",
+      "description": "学过 Java、数据库"
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "xx 管理系统",
+      "role": "开发者",
+      "years": "2022",
+      "description": ["Spring Boot 写的后台管理系统", "有登录、增删改查"]
+    }
+  ],
+  "additional": {
+    "technicalSkills": ["Java", "Spring Boot", "MySQL", "Redis（了解）", "Git"],
+    "languages": ["中文"],
+    "certificationsTraining": [],
+    "awards": []
+  },
+  "customSections": {}
+}

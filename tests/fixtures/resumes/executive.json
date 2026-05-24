@@ -1,0 +1,120 @@
+{
+  "$schema": "fixture:v1",
+  "description": "Executive-level resume with extensive experience and leadership focus — tests handling of large, complex resumes",
+  "difficulty": "hard",
+  "personalInfo": {
+    "name": "Dr. Sarah Mitchell",
+    "title": "VP of Engineering",
+    "email": "sarah.mitchell@enterprise.com",
+    "phone": "555-9999",
+    "location": "New York, NY",
+    "linkedin": "linkedin.com/in/sarahmitchell"
+  },
+  "summary": "Engineering executive with 15+ years of experience leading high-growth engineering organizations from 10 to 200+ engineers. Track record of scaling SaaS platforms to $100M+ ARR. Expertise in organizational design, engineering strategy, and building inclusive engineering cultures. PhD in Computer Science with 20+ publications.",
+  "workExperience": [
+    {
+      "title": "VP of Engineering",
+      "company": "CloudScale Inc. (Series D, $500M raised)",
+      "location": "New York, NY",
+      "years": "2021-01 to present",
+      "description": [
+        "Lead 180-person engineering organization across Platform, Product, Data, and SRE teams",
+        "Drove platform reliability from 99.5% to 99.99% through SRE transformation and chaos engineering program",
+        "Scaled annual recurring revenue from $30M to $120M while maintaining gross margin of 78%",
+        "Established engineering career ladder, performance review process, and mentorship program — reduced attrition from 25% to 8%",
+        "Led acquisition integration of 2 startups (30 engineers total), completed within 90 days each",
+        "Championed diversity initiatives: 45% of engineering managers are from underrepresented groups"
+      ]
+    },
+    {
+      "title": "Senior Director of Engineering",
+      "company": "DataFlow Systems",
+      "location": "San Francisco, CA",
+      "years": "2016-06 to 2020-12",
+      "description": [
+        "Managed 80 engineers across 5 teams building a real-time data processing platform serving 500+ enterprise customers",
+        "Led re-architecture from monolith to event-driven microservices, improving deployment velocity 4x",
+        "Reduced infrastructure costs by $3M/year through workload right-sizing and spot instance adoption",
+        "Launched managed service offering on AWS Marketplace, generating $15M in new revenue in first year"
+      ]
+    },
+    {
+      "title": "Engineering Manager → Director of Engineering",
+      "company": "SearchLogic (acquired by Google)",
+      "location": "Mountain View, CA",
+      "years": "2012-03 to 2016-05",
+      "description": [
+        "Promoted from manager (8 engineers) to director (45 engineers) over 4 years",
+        "Built the search relevance team from scratch, improving NDCG scores by 22%",
+        "Led ML infrastructure migration from on-premise to cloud, reducing training pipeline runtime by 60%"
+      ]
+    },
+    {
+      "title": "Senior Software Engineer",
+      "company": "Google",
+      "location": "Mountain View, CA",
+      "years": "2008-06 to 2012-02",
+      "description": [
+        "Tech lead for Google News personalization, serving 100M+ daily active users",
+        "Designed and launched collaborative filtering algorithm that increased click-through rate by 15%",
+        "Filed 3 patents in recommendation systems and natural language processing"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Stanford University",
+      "degree": "Ph.D. Computer Science",
+      "years": "2004-09 to 2008-06",
+      "description": "Thesis: 'Scalable Collaborative Filtering for Large-Scale Recommendation Systems.' Advisor: Prof. John Smith. 15+ publications, 2000+ citations."
+    },
+    {
+      "institution": "MIT",
+      "degree": "B.S. Computer Science & Mathematics (summa cum laude)",
+      "years": "2000-09 to 2004-06",
+      "description": "GPA 4.0/4.0. Phi Beta Kappa. Undergraduate thesis on distributed graph algorithms."
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "Engineering Leadership Blog",
+      "role": "Author",
+      "years": "2018-present",
+      "description": [
+        "Weekly newsletter on engineering management reaching 15K subscribers",
+        "Published 200+ articles on hiring, team structure, and technical strategy"
+      ]
+    }
+  ],
+  "additional": {
+    "technicalSkills": [
+      "Organizational Design", "Engineering Strategy", "Technical Due Diligence",
+      "Python", "Go", "Java", "AWS", "GCP", "Kubernetes", "Terraform",
+      "Machine Learning", "Recommendation Systems", "Natural Language Processing"
+    ],
+    "languages": ["English (Native)", "French (Fluent)", "German (Basic)"],
+    "certificationsTraining": [
+      "Board Member — AnitaB.org",
+      "Technical Advisory Board — 3 VC firms",
+      "AWS Solutions Architect Professional",
+      "Keynote Speaker — KubeCon, QCon, Grace Hopper"
+    ],
+    "awards": [
+      "Forbes 30 Under 30 — Enterprise Technology (2013)",
+      "Google Founders' Award",
+      "ACM Doctoral Dissertation Award Honorable Mention",
+      "MIT EECS Departmental Scholar"
+    ]
+  },
+  "customSections": {
+    "publications": [
+      "Mitchell, S. et al. (2008). 'Scalable Collaborative Filtering.' KDD.",
+      "Mitchell, S. & Smith, J. (2007). 'Graph Partitioning for Distributed ML.' NIPS."
+    ],
+    "speaking": [
+      "KubeCon NA 2025 — Keynote: 'Scaling Engineering Culture'",
+      "QCon SF 2024 — 'The SRE Transformation Playbook'",
+      "Grace Hopper 2023 — 'Building Inclusive Engineering Teams'"
+    ]
+  }
+}

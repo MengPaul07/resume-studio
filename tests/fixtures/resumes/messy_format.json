@@ -1,0 +1,77 @@
+{
+  "$schema": "fixture:v1",
+  "description": "格式混乱的简历 — 包含错别字、不一致时态、糟糕标点、重复内容，测试 Agent 的纠错和规范化能力",
+  "difficulty": "medium",
+  "personalInfo": {
+    "name": "Jhon Smith",
+    "title": "Fullstack Devoloper",
+    "email": "jhon.smith@gmail.com",
+    "phone": "555-0000",
+    "location": "remote"
+  },
+  "summary": "i am a fullstack developer with 5 years experiance. i have worked on many projects and i am very passionate about coding and technology. i like to learn new things and i am a team player. i have done many projects.",
+  "workExperience": [
+    {
+      "title": "Sr. Software Enginer",
+      "company": "TechCompany Inc.",
+      "location": "New York",
+      "years": "2022 - now",
+      "description": [
+        "Lead a team of developers to build web applications",
+        "Worked with React and Node.js for building applications",
+        "Did code reviews and mentored junior developers",
+        "Participated in daily standups and sprint planning",
+        "worked on improving the performance of the application"
+      ]
+    },
+    {
+      "title": "Software Developer",
+      "company": "StartUp LLC",
+      "location": "Boston",
+      "years": "2020 - 2022",
+      "description": [
+        "Developed features for the company's main product",
+        "write code in JavaScript and Python",
+        "worked with databases like MongoDB and postgres",
+        "Fixed bugs and improved application stability",
+        "Collaborated with the design team to implement UI mockups",
+        "Developed features for the company's main product"
+      ]
+    },
+    {
+      "title": "Junior Developer",
+      "company": "WebAgency Co.",
+      "location": "Boston",
+      "years": "2019 - 2020",
+      "description": [
+        "helped senior developers with tasks",
+        "Learned React and Node.js on the job",
+        "wrote some tests",
+        "Fixed minor bugs in production application"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "University of Massachusetts",
+      "degree": "BS Computer Science",
+      "years": "2015 - 2019",
+      "description": "graduated with 3.2 gpa. did some projects."
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "my-awesome-project",
+      "role": "creator",
+      "years": "2021",
+      "description": ["A web application built with React and Node", "It does cool stuff"]
+    }
+  ],
+  "additional": {
+    "technicalSkills": ["react", "node", "javascript", "python", "Mongo", "SQL", "git", "HTML", "CSS", "Docker(基本)"],
+    "languages": ["English"],
+    "certificationsTraining": ["Udemy - React course"],
+    "awards": []
+  },
+  "customSections": {}
+}

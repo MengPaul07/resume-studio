@@ -1,0 +1,332 @@
+{
+  "version": "jd_library.v2",
+  "source": "huawei_baidu_jd_netease_campus_2026",
+  "items": [
+    {
+      "id": "HW_BACKEND",
+      "url": "https://career.huawei.com",
+      "title": "AI/软件开发工程师-后端方向",
+      "company": "华为",
+      "location": "南京/苏州/上海/北京/杭州/深圳/长沙",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Java",
+        "C++",
+        "Python",
+        "Go",
+        "微服务",
+        "分布式",
+        "Linux",
+        "MySQL",
+        "Redis",
+        "Kafka",
+        "SpringBoot"
+      ],
+      "responsibilities": [
+        "负责产品/平台的软件需求分析、架构设计、代码开发、单元测试",
+        "负责相关系统/模块的代码看护及重构，持续优化提升代码质量",
+        "负责后端故障诊断和项目支持技术活动",
+        "应用前沿技术（分布式系统、性能调优、可靠性、数据库等）提升产品核心竞争力"
+      ],
+      "requirements": [
+        "本科及以上学历，计算机、软件、通信等相关专业",
+        "热爱编程，熟练JAVA/C++/C/Python/JS/HTML/GO/Rust等至少一种",
+        "熟悉SpringBoot、SpringMVC、Spring、MyBatis等框架",
+        "熟悉Linux系统常用命令",
+        "对数据结构、算法有一定了解",
+        "熟悉Redis、Kafka、MySQL、Zookeeper、MongoDB等技术优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "huawei",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "HW_ALGO",
+      "url": "https://career.huawei.com",
+      "title": "AI工程师-算法方向",
+      "company": "华为",
+      "location": "南京/苏州/上海/北京/杭州/深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "大模型",
+        "CV",
+        "NLP",
+        "Python",
+        "C++",
+        "PyTorch",
+        "TensorFlow",
+        "MindSpore",
+        "vLLM",
+        "DeepSpeed"
+      ],
+      "responsibilities": [
+        "负责大语言模型、多模态模型或垂直领域模型的算法设计与优化",
+        "探索前沿技术（模型压缩、稀疏化训练、强化学习等）",
+        "优化模型在分布式系统中的训练与推理性能",
+        "负责AI领域的软件工程化和产品开发"
+      ],
+      "requirements": [
+        "本科及以上学历，计算机科学、人工智能、机器学习、统计学、应用数学等相关专业",
+        "精通Python/C++/Java/Rust至少一门编程语言",
+        "熟悉PyTorch、TensorFlow、MindSpore等主流深度学习框架",
+        "熟悉大模型训练与推理全流程",
+        "有vLLM/Megatron/DeepSpeed等框架经验者优先",
+        "在NeurIPS/ICML/AAAI等顶会发表过论文优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "company": "huawei",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "BD_BACKEND",
+      "url": "https://talent.baidu.com",
+      "title": "软件开发工程师-后端方向",
+      "company": "百度",
+      "location": "北京/上海/深圳/广州",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "C++",
+        "PHP",
+        "Go",
+        "Java",
+        "分布式",
+        "后端",
+        "Linux"
+      ],
+      "responsibilities": [
+        "负责百度核心产品功能和架构开发",
+        "负责核心技术算法的研究、实现和优化",
+        "负责前瞻技术的跟踪调研和产品创新",
+        "参与分布式云化软件、互联网软件的设计开发",
+        "设计开发百度应用运维基础组件及平台"
+      ],
+      "requirements": [
+        "本科及以上学历",
+        "熟练C++/PHP/GO/Java等编程语言",
+        "熟悉操作系统、计算机网络、数据结构与算法等计算机基础",
+        "有互联网相关项目开发经验优先",
+        "熟悉分布式系统、大规模并发系统设计优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "baidu",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "BD_ALGO",
+      "url": "https://talent.baidu.com",
+      "title": "算法/机器学习工程师",
+      "company": "百度",
+      "location": "北京/上海/深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "机器学习",
+        "深度学习",
+        "NLP",
+        "CV",
+        "大模型",
+        "Python",
+        "C++",
+        "PyTorch",
+        "TensorFlow"
+      ],
+      "responsibilities": [
+        "负责百度核心AI算法的研究、实现和优化，覆盖多模态、跨模态等方向",
+        "负责大模型各专项相关的数据分析和规范制定",
+        "参与AI最前沿新兴领域的算法研发，推动技术创新"
+      ],
+      "requirements": [
+        "本科及以上学历，计算机、人工智能、数学、统计等相关专业",
+        "扎实的机器学习/深度学习理论基础",
+        "熟练掌握Python/C++等编程语言",
+        "熟悉PyTorch/TensorFlow等主流深度学习框架",
+        "在NLP/CV/推荐系统/大模型等至少一个方向有深入研究",
+        "在顶级会议发表过论文优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "company": "baidu",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "JD_BACKEND",
+      "url": "https://campus.jd.com",
+      "title": "软件开发工程师-后端方向",
+      "company": "京东",
+      "location": "北京/上海/成都/深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Java",
+        "C++",
+        "Go",
+        "MySQL",
+        "Redis",
+        "微服务",
+        "分布式",
+        "SpringBoot",
+        "SpringCloud"
+      ],
+      "responsibilities": [
+        "参与京东核心业务系统的设计与研发",
+        "负责高并发、高可用系统的架构设计与优化",
+        "参与技术方案评审、代码Review、性能调优等工作",
+        "结合业务场景进行技术创新，推动系统升级迭代"
+      ],
+      "requirements": [
+        "本科及以上学历",
+        "精通Java/C++/Go等至少一种后端开发语言",
+        "熟悉常见的数据结构与算法",
+        "熟悉MySQL、Redis、消息队列等中间件",
+        "了解分布式系统、微服务架构设计",
+        "熟悉SpringBoot/SpringCloud等框架优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "jd",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "JD_ALGO_LLM",
+      "url": "https://campus.jd.com",
+      "title": "大模型算法工程师",
+      "company": "京东",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "大模型",
+        "LLM",
+        "多模态",
+        "RLHF",
+        "RAG",
+        "Agent",
+        "Python",
+        "PyTorch",
+        "Spark"
+      ],
+      "responsibilities": [
+        "主导大语言模型/多模态大模型的技术研发与工程化落地",
+        "负责用户行为理解、个性化推荐、智能导购等系统的算法优化",
+        "探索大模型在电商领域的创新应用场景",
+        "持续迭代Prompt Engineering、RAG、Agent等前沿技术方案"
+      ],
+      "requirements": [
+        "硕士及以上学历，计算机/人工智能/NLP相关专业",
+        "深入理解Transformer架构，在RLHF、RAG、Agent有实战经验",
+        "熟悉PyTorch/TensorFlow框架，具备分布式训练优化经验",
+        "掌握Python/Java/Scala中两种以上",
+        "熟悉Spark/Flink等大数据处理工具",
+        "在ACL/EMNLP/CVPR等顶会发表过论文优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "硕士及以上",
+        "company": "jd",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "NE_BACKEND",
+      "url": "https://campus.163.com",
+      "title": "后端开发工程师",
+      "company": "网易",
+      "location": "北京/杭州/合肥/广州",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Java",
+        "C++",
+        "SpringBoot",
+        "后端",
+        "分布式",
+        "数据库"
+      ],
+      "responsibilities": [
+        "参与网易产品后端系统设计与开发",
+        "负责业务模块的编码、测试和文档编写",
+        "参与系统性能优化和稳定性保障"
+      ],
+      "requirements": [
+        "本科及以上学历，计算机相关专业",
+        "精通Java/C++等编程语言",
+        "熟悉主流后端开发框架（SpringBoot等）",
+        "了解分布式系统、数据库、缓存等相关技术"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "netease",
+        "job_type": "校园招聘正式"
+      }
+    },
+    {
+      "id": "NE_ALGO_LLM",
+      "url": "https://campus.163.com",
+      "title": "大模型算法工程师-网易有道",
+      "company": "网易",
+      "location": "北京/合肥/杭州",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "大模型",
+        "NLP",
+        "Python",
+        "PyTorch",
+        "Agent",
+        "多模态",
+        "ASR",
+        "TTS"
+      ],
+      "responsibilities": [
+        "参与有道大模型算法研发",
+        "探索大模型在教育场景的应用",
+        "参与语音识别/语音合成等AI技术研发"
+      ],
+      "requirements": [
+        "本科及以上学历，计算机、人工智能相关专业",
+        "熟练掌握Python，熟悉PyTorch/TensorFlow等框架",
+        "在大语言模型/多模态/Agent等方向有深入研究",
+        "有相关项目经验或顶会论文者优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "company": "netease",
+        "job_type": "校园招聘正式"
+      }
+    }
+  ]
+}

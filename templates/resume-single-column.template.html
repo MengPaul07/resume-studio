@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en" data-template-id="swiss-single" data-template-format="html-template">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ personalInfo.name | default('Resume') }}</title>
+</head>
+<body>
+  <main class="resume single-column">
+    <header class="resume-header" data-section="personalInfo">
+      <h1>{{ personalInfo.name }}</h1>
+      <h2>{{ personalInfo.title }}</h2>
+      <p>
+        {{ personalInfo.email }}
+        {% if personalInfo.phone %}, {{ personalInfo.phone }}{% endif %}
+        {% if personalInfo.location %}, {{ personalInfo.location }}{% endif %}
+        {% if personalInfo.website %}, {{ personalInfo.website }}{% endif %}
+        {% if personalInfo.linkedin %}, {{ personalInfo.linkedin }}{% endif %}
+        {% if personalInfo.github %}, {{ personalInfo.github }}{% endif %}
+      </p>
+    
+      <p class="resume-field">{ personalInfo.name }</p>
+    
+      <p class="resume-field">{ personalInfo.title }</p>
+    
+      <p class="resume-field">{ personalInfo.email }</p>
+    
+      <p class="resume-field">{ personalInfo.phone }</p>
+    
+      <p class="resume-field">{ personalInfo.location }</p>
+    
+      <p class="resume-field">{ personalInfo.website }</p>
+    
+      <p class="resume-field">{ personalInfo.linkedin }</p>
+    
+      <p class="resume-field">{ personalInfo.github }</p>
+    
+      <p class="resume-field">{ personalInfo.jobIntention }</p>
+    
+      <p class="resume-field">{ personalInfo.wechat }</p>
+    
+      <p class="resume-field">{ personalInfo.jobIntention }</p>
+    
+      <p class="resume-field">{ personalInfo.wechat }</p>
+    </header>
+
+    {% if summary %}
+    <section data-section="summary">
+      <h3>Summary</h3>
+      <p>{{ summary }}</p>
+    </section>
+    {% endif %}
+
+    {% if workExperience %}
+    <section data-section="workExperience">
+      <h3>Experience</h3>
+      {% for exp in workExperience %}
+      <article>
+        <h4>{{ exp.title }}</h4>
+        <div>{{ exp.company }}{% if exp.location %} | {{ exp.location }}{% endif %} | {{ exp.years }}</div>
+        {% if exp.description %}
+        <ul>
+          {% for line in exp.description %}
+          <li>{{ line }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if personalProjects %}
+    <section data-section="personalProjects">
+      <h3>Projects</h3>
+      {% for project in personalProjects %}
+      <article>
+        <h4>{{ project.name }}</h4>
+        <div>{% if project.role %}{{ project.role }} | {% endif %}{{ project.years }}</div>
+        {% if project.description %}
+        <ul>
+          {% for line in project.description %}
+          <li>{{ line }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if education %}
+    <section data-section="education">
+      <h3>Education</h3>
+      {% for edu in education %}
+      <article>
+        <h4>{{ edu.institution }}</h4>
+        <div>{{ edu.degree }} | {{ edu.years }}</div>
+        {% if edu.description %}<p>{{ edu.description }}</p>{% endif %}
+      </article>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if additional %}
+    <section data-section="additional">
+      <h3>Skills & Awards</h3>
+      {% if additional.technicalSkills %}<p><strong>Technical Skills:</strong> {{ additional.technicalSkills | join(', ') }}</p>{% endif %}
+      {% if additional.languages %}<p><strong>Languages:</strong> {{ additional.languages | join(', ') }}</p>{% endif %}
+      {% if additional.certificationsTraining %}<p><strong>Certifications:</strong> {{ additional.certificationsTraining | join(', ') }}</p>{% endif %}
+      {% if additional.awards %}<p><strong>Awards:</strong> {{ additional.awards | join(', ') }}</p>{% endif %}
+    </section>
+    {% endif %}
+  </main>
+</body>
+</html>

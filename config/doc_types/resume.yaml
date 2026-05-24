@@ -1,0 +1,29 @@
+# Resume document type configuration
+
+display_name: "简历"
+description: "Structured resume with personal info, work experience, education, projects, and skills."
+
+sections: >
+  personalInfo (name, title, email, phone, location, website, linkedin, github),
+  summary,
+  workExperience[] (title, company, location, years, description[]),
+  education[] (institution, degree, years, gpa, description[]),
+  personalProjects[] (name, role, years, description[]),
+  research[] (name, role, institution, years, description[]),
+  additional { technicalSkills[], languages[], certificationsTraining[], awards[] }
+
+fact_sensitive: >
+  personalInfo.{name,email,phone,location,linkedin,github},
+  *.years, *.gpa, *.institution, *.degree, *.title, *.company
+
+path_examples: "'workExperience[0].description[1]', 'education[0].institution', 'summary'"
+
+upsert_example: >
+  workExperience: op='upsert', path='workExperience', value='{"title":"...","company":"...","years":"...","location":"...","description":["...","..."]}'
+  education: op='upsert', path='education', value='{"institution":"...","degree":"...","years":"...","gpa":"...","description":"..."}'
+  personalProjects: op='upsert', path='personalProjects', value='{"name":"...","role":"...","years":"...","description":["...","..."]}'
+  research: op='upsert', path='research', value='{"name":"...","role":"...","institution":"...","years":"...","description":["...","..."]}'
+
+naming_notes: >
+  Bachelor's → '学士'/'本科', Master's → '硕士'/'研究生', PhD → '博士'.
+  Do NOT flag these as errors.

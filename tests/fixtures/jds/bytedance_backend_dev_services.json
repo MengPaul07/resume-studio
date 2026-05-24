@@ -1,0 +1,36 @@
+{
+  "version": "jd_library.v2",
+  "source": "bytedance_campus_2026",
+  "scraped_at": "2026-05-17T00:00:00Z",
+  "items": [
+    {
+      "id": "A204617",
+      "url": "https://jobs.bytedance.com/campus/position/7532338912858147080/detail",
+      "title": "后端开发工程师-开发者服务",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招",
+      "year": "2026",
+      "category": "研发-后端",
+      "department": "开发者服务",
+      "description": "团队介绍：字节跳动开发者服务团队主要负责公司研发工具体系建设...",
+      "responsibilities": [
+        "探索并打造基于LLM的下一代生产力工具，重点围绕软件研发场景（包括代码托管、代码分析、IDE等各工具平台），实现LLM赋能",
+        "参与字节跳动公司级一站式研发平台相关能力开发，积极探索大型语言模型（LLM）在DevOps应用，通过LLM重构DevOps工具链"
+      ],
+      "requirements": [
+        "2026届获得本科及以上学历，计算机、软件工程等相关专业优先",
+        "熟悉至少一种编程语言（C/C++/Java/Go/Python等），熟悉常见的数据结构及算法，有过硬的编码能力",
+        "参与过中等复杂度以上后端系统开发经验，熟悉MySQL、Redis等存储中间件优先",
+        "熟悉K8S、Docker、Linux平台等优先",
+        "对LLM应用研发技术栈有了解者加分"
+      ],
+      "keywords": ["Go", "Python", "Java", "LLM", "DevOps", "K8S", "Docker", "MySQL", "Redis", "后端"],
+      "metadata": {
+        "lang": "zh",
+        "education": "本科及以上",
+        "role_category": "backend_engineer"
+      }
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "$schema": "fixture:v1",
+  "description": "Full-stack engineer with 5 years of experience — English resume with all sections populated",
+  "difficulty": "medium",
+  "personalInfo": {
+    "name": "Alex Chen",
+    "title": "Senior Full-Stack Engineer",
+    "email": "alex.chen@example.com",
+    "phone": "555-1234",
+    "location": "Seattle, WA",
+    "linkedin": "linkedin.com/in/alexchen",
+    "github": "github.com/alexchen"
+  },
+  "summary": "Full-stack engineer with 5+ years of experience building scalable web applications. Proficient in Python, TypeScript, React, and AWS. Led 3 major product launches serving 1M+ users. Passionate about developer experience and system reliability.",
+  "workExperience": [
+    {
+      "title": "Senior Software Engineer",
+      "company": "TechCorp Inc.",
+      "location": "Seattle, WA",
+      "years": "2022-03 to present",
+      "description": [
+        "Led a team of 6 engineers to rebuild the payment processing pipeline, reducing transaction latency by 40% and saving $200K/year in infrastructure costs",
+        "Architected a microservice migration from monolith to 12 services on AWS ECS, improving deployment frequency from bi-weekly to daily",
+        "Implemented comprehensive observability with OpenTelemetry and Grafana, reducing MTTR from 45min to 12min",
+        "Mentored 4 junior engineers through onboarding and code review, 2 promoted within 18 months"
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "StartupXYZ",
+      "location": "San Francisco, CA",
+      "years": "2020-07 to 2021-12",
+      "description": [
+        "Built RESTful APIs in FastAPI handling 500K daily requests with 99.9% uptime",
+        "Developed React dashboard with real-time data visualization using D3.js, adopted by 200+ enterprise clients",
+        "Designed PostgreSQL schema migration strategy with zero-downtime deploys for a 50GB database",
+        "Introduced Playwright E2E testing, increasing test coverage from 20% to 85%"
+      ]
+    },
+    {
+      "title": "Junior Developer",
+      "company": "CodeFactory",
+      "location": "Austin, TX",
+      "years": "2018-06 to 2020-06",
+      "description": [
+        "Developed internal tools and automation scripts in Python",
+        "Contributed to open-source projects with 500+ GitHub stars",
+        "Built CI/CD pipelines using GitHub Actions and Docker"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "University of Washington",
+      "degree": "M.S. Computer Science",
+      "years": "2016-09 to 2018-06",
+      "description": "Focus on distributed systems and machine learning. Thesis: 'Efficient Load Balancing in Microservice Architectures.' GPA 3.9.",
+      "gpa": "3.7/4.0"
+    },
+    {
+      "institution": "UC Berkeley",
+      "degree": "B.S. Electrical Engineering & Computer Science",
+      "years": "2012-09 to 2016-05",
+      "description": "Dean's List (4 semesters). Undergraduate research in NLP.",
+      "gpa": "3.7/4.0"
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "OpenAPI Codegen CLI",
+      "role": "Creator & Maintainer",
+      "years": "2022",
+      "description": [
+        "Built a CLI tool that generates type-safe API clients from OpenAPI specs",
+        "2.5K GitHub stars, 50+ contributors, used by 300+ teams"
+      ]
+    },
+    {
+      "name": "Resume Optimizer",
+      "role": "Co-creator",
+      "years": "2023",
+      "description": [
+        "Open-source tool for ATS-friendly resume optimization",
+        "Processes 1K+ resumes per month, 85% user satisfaction rate"
+      ]
+    }
+  ],
+  "additional": {
+    "technicalSkills": [
+      "Python",
+      "TypeScript",
+      "React",
+      "Node.js",
+      "FastAPI",
+      "PostgreSQL",
+      "Redis",
+      "AWS (ECS, Lambda, S3, RDS)",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "GitHub Actions",
+      "OpenTelemetry",
+      "Grafana"
+    ],
+    "languages": [
+      "English (Native)",
+      "Mandarin Chinese (Fluent)",
+      "Japanese (Basic)"
+    ],
+    "certificationsTraining": [
+      "AWS Solutions Architect Professional",
+      "Kubernetes CKAD",
+      "HashiCorp Terraform Associate"
+    ],
+    "awards": [
+      "TechCorp Engineering Excellence Award 2024",
+      "Best Paper Award — ACM Student Conference 2017"
+    ]
+  },
+  "customSections": {}
+}

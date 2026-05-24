@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en" data-template-id="swiss-two-column" data-template-format="html-template">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ personalInfo.name | default('Resume') }}</title>
+</head>
+<body>
+  <main class="resume two-column">
+    <header class="resume-header" data-section="personalInfo">
+      <h1>{{ personalInfo.name }}</h1>
+      <h2>{{ personalInfo.title }}</h2>
+      <p>
+        {{ personalInfo.email }}
+        {% if personalInfo.phone %}, {{ personalInfo.phone }}{% endif %}
+        {% if personalInfo.location %}, {{ personalInfo.location }}{% endif %}
+        {% if personalInfo.website %}, {{ personalInfo.website }}{% endif %}
+        {% if personalInfo.linkedin %}, {{ personalInfo.linkedin }}{% endif %}
+        {% if personalInfo.github %}, {{ personalInfo.github }}{% endif %}
+      </p>
+    </header>
+
+    <div class="resume-grid">
+      <section class="main-column">
+        {% if summary %}
+        <section data-section="summary">
+          <h3>Summary</h3>
+          <p>{{ summary }}</p>
+        </section>
+        {% endif %}
+
+        {% if workExperience %}
+        <section data-section="workExperience">
+          <h3>Experience</h3>
+          {% for exp in workExperience %}
+          <article>
+            <h4>{{ exp.title }}</h4>
+            <div>{{ exp.company }}{% if exp.location %} | {{ exp.location }}{% endif %} | {{ exp.years }}</div>
+            {% if exp.description %}
+            <ul>
+              {% for line in exp.description %}
+              <li>{{ line }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </article>
+          {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if personalProjects %}
+        <section data-section="personalProjects">
+          <h3>Projects</h3>
+          {% for project in personalProjects %}
+          <article>
+            <h4>{{ project.name }}</h4>
+            <div>{% if project.role %}{{ project.role }} | {% endif %}{{ project.years }}</div>
+            {% if project.description %}
+            <ul>
+              {% for line in project.description %}
+              <li>{{ line }}</li>
+              {% endfor %}
+            </ul>
+            {% endif %}
+          </article>
+          {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if additional.certificationsTraining %}
+        <section data-section="certifications">
+          <h3>Training & Certifications</h3>
+          <ul>
+            {% for cert in additional.certificationsTraining %}
+            <li>{{ cert }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+      </section>
+
+      <aside class="sidebar-column">
+        {% if education %}
+        <section data-section="education">
+          <h3>Education</h3>
+          {% for edu in education %}
+          <article>
+            <h4>{{ edu.institution }}{% if edu.years %} | {{ edu.years }}{% endif %}</h4>
+            <div>{{ edu.degree }}</div>
+            {% if edu.description %}<p>{{ edu.description }}</p>{% endif %}
+          </article>
+          {% endfor %}
+        </section>
+        {% endif %}
+
+        {% if additional.technicalSkills %}
+        <section data-section="technicalSkills">
+          <h3>Skills</h3>
+          <p>{{ additional.technicalSkills | join(' | ') }}</p>
+        </section>
+        {% endif %}
+
+        {% if additional.languages %}
+        <section data-section="languages">
+          <h3>Languages</h3>
+          <p>{{ additional.languages | join(' | ') }}</p>
+        </section>
+        {% endif %}
+
+        {% if additional.awards %}
+        <section data-section="awards">
+          <h3>Awards</h3>
+          <ul>
+            {% for award in additional.awards %}
+            <li>{{ award }}</li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

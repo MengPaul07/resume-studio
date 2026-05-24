@@ -1,0 +1,69 @@
+{
+  "$schema": "fixture:v1",
+  "description": "海归硕士 — 中英文混合风格，海外学历+国内实习，测试 Agent 对国际化背景的简历优化",
+  "difficulty": "medium",
+  "personalInfo": {
+    "name": "陈思远 / Ryan Chen",
+    "title": "数据分析师",
+    "email": "ryan.chen@outlook.com",
+    "phone": "15678901234",
+    "location": "上海"
+  },
+  "summary": "Columbia University 统计学硕士，1 年硅谷实习经验。擅长用 SQL 和 Python 做用户增长分析，搭建过从数据采集到可视化的完整 pipeline。Looking for a data analyst role in a fast-growing tech company.",
+  "workExperience": [
+    {
+      "title": "Data Analyst Intern",
+      "company": "Uber (San Francisco)",
+      "location": "San Francisco, CA",
+      "years": "2024-06 to 2024-09",
+      "description": [
+        "Analyzed rider churn patterns across 50+ markets using SQL and Python, identified 3 key drivers",
+        "Built automated dashboard in Tableau for weekly business review, used by VP of Growth",
+        "Designed A/B test for new rider onboarding flow, drove 12% increase in first-week retention"
+      ]
+    },
+    {
+      "title": "数据分析实习生",
+      "company": "字节跳动（TikTok 电商）",
+      "location": "上海",
+      "years": "2023-07 to 2023-09",
+      "description": [
+        "使用 SQL 提取和分析直播电商数据，构建 GMV 预测模型，MAPE < 8%",
+        "搭建商家分层体系，将 200 万商家分为 5 个等级，赋能差异化运营策略",
+        "独立完成 3 份深度分析报告，汇报给电商业务负责人"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Columbia University",
+      "degree": "M.S. Statistics",
+      "years": "2023-09 to 2025-02",
+      "description": "GPA 3.9/4.0. Coursework: Machine Learning, Causal Inference, Time Series Analysis. TA for Intro to Data Science."
+    },
+    {
+      "institution": "复旦大学",
+      "degree": "学士 数学与应用数学",
+      "years": "2019-09 to 2023-06",
+      "description": "GPA 3.7/4.0. 全国大学生数学建模竞赛一等奖。"
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "NYC Taxi Demand Predictor",
+      "role": "Author",
+      "years": "2024",
+      "description": [
+        "Predicted taxi demand across NYC zones using XGBoost + weather/external data",
+        "MAPE 12%, deployed as Streamlit app with interactive map visualization"
+      ]
+    }
+  ],
+  "additional": {
+    "technicalSkills": ["SQL（精通）", "Python（pandas, scikit-learn, XGBoost）", "R", "Tableau", "Looker", "Airflow（基础）", "Git"],
+    "languages": ["中文（母语）", "English (Fluent, TOEFL 110)", "日语（基础）"],
+    "certificationsTraining": ["Google Data Analytics Certificate", "DataCamp — Data Scientist Track"],
+    "awards": ["Uber Intern Hackathon — 2nd Place", "全国数学建模竞赛一等奖"]
+  },
+  "customSections": {}
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "fixture:v1",
+  "description": "金融转技术的转行者 — 测试 Agent 如何处理不相关过往经历、将转行叙事合理化",
+  "difficulty": "hard",
+  "personalInfo": {
+    "name": "Alex Chen",
+    "title": "Aspiring Software Engineer",
+    "email": "alex.chen@email.com",
+    "phone": "555-3456",
+    "location": "Singapore"
+  },
+  "summary": "Finance professional transitioning into software engineering. Completed full-stack bootcamp and built production-ready applications. Bringing analytical skills from investment banking to engineering.",
+  "workExperience": [
+    {
+      "title": "Software Engineer (Contract)",
+      "company": "FinLab Solutions",
+      "location": "Singapore",
+      "years": "2025-01 to present",
+      "description": [
+        "Built internal reconciliation tool in Python + React, replacing manual Excel process",
+        "Reduced monthly close time from 5 days to 1 day",
+        "Integrated with Bloomberg API for real-time market data ingestion"
+      ]
+    },
+    {
+      "title": "Investment Banking Analyst",
+      "company": "Goldman Sachs",
+      "location": "Hong Kong",
+      "years": "2021-08 to 2024-07",
+      "description": [
+        "Executed $2B+ in M&A and IPO transactions across TMT sector",
+        "Built financial models in Excel/VBA, analyzed company fundamentals",
+        "Led due diligence workstreams with cross-border teams of 20+ people"
+      ]
+    },
+    {
+      "title": "Summer Analyst",
+      "company": "Morgan Stanley",
+      "location": "Singapore",
+      "years": "2020-06 to 2020-08",
+      "description": [
+        "Rotated across equity research and fixed income desks",
+        "Automated daily P&L reporting using Python, saving 2 hours/day"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "National University of Singapore",
+      "degree": "B.B.A. Finance (Honors)",
+      "years": "2017-08 to 2021-06",
+      "description": "GPA 3.8/4.0. Minor in Computer Science. Dean's List 4 semesters."
+    }
+  ],
+  "personalProjects": [
+    {
+      "name": "TradeViz",
+      "role": "Solo Developer",
+      "years": "2024",
+      "description": [
+        "Real-time trading visualization dashboard using Python, FastAPI, and D3.js",
+        "Processes 10K+ trades/sec with WebSocket streaming"
+      ]
+    },
+    {
+      "name": "BudgetBuddy",
+      "role": "Full-Stack Developer",
+      "years": "2024",
+      "description": [
+        "Personal finance app with Plaid integration, built with Next.js and Supabase",
+        "200+ active users, featured on Product Hunt"
+      ]
+    }
+  ],
+  "additional": {
+    "technicalSkills": ["Python", "JavaScript", "TypeScript", "React", "Next.js", "FastAPI", "PostgreSQL", "MongoDB", "Docker", "Git"],
+    "languages": ["English (Native)", "Mandarin (Fluent)", "Cantonese (Conversational)"],
+    "certificationsTraining": ["General Assembly — Software Engineering Immersive (2024)", "CFA Level I"],
+    "awards": []
+  },
+  "customSections": {}
+}

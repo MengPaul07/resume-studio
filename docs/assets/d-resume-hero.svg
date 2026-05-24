@@ -1,0 +1,36 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" rx="36" fill="#F7F4EE"/>
+  <rect x="40" y="40" width="1120" height="550" rx="28" fill="#111827"/>
+  <rect x="72" y="72" width="1056" height="486" rx="22" fill="#FAFAF7"/>
+  <rect x="96" y="100" width="250" height="430" rx="16" fill="#F0EFE9" stroke="#111827" stroke-width="3"/>
+  <rect x="384" y="100" width="720" height="430" rx="16" fill="#FFFFFF" stroke="#111827" stroke-width="3"/>
+  <circle cx="144" cy="148" r="28" fill="#31457F"/>
+  <rect x="188" y="128" width="118" height="14" rx="7" fill="#111827"/>
+  <rect x="188" y="154" width="84" height="10" rx="5" fill="#5F6B7A"/>
+  <rect x="120" y="214" width="178" height="10" rx="5" fill="#31457F"/>
+  <rect x="120" y="238" width="154" height="8" rx="4" fill="#5F6B7A"/>
+  <rect x="120" y="258" width="186" height="8" rx="4" fill="#5F6B7A"/>
+  <rect x="120" y="306" width="76" height="24" rx="12" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <rect x="206" y="306" width="82" height="24" rx="12" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <rect x="120" y="342" width="100" height="24" rx="12" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <rect x="230" y="342" width="70" height="24" rx="12" fill="#FFFFFF" stroke="#D1D5DB"/>
+  <rect x="120" y="414" width="178" height="10" rx="5" fill="#31457F"/>
+  <rect x="120" y="438" width="154" height="8" rx="4" fill="#5F6B7A"/>
+  <rect x="420" y="132" width="230" height="22" rx="11" fill="#111827"/>
+  <rect x="420" y="170" width="338" height="10" rx="5" fill="#5F6B7A"/>
+  <rect x="420" y="190" width="292" height="10" rx="5" fill="#5F6B7A"/>
+  <rect x="420" y="246" width="156" height="12" rx="6" fill="#31457F"/>
+  <rect x="420" y="274" width="628" height="10" rx="5" fill="#111827"/>
+  <rect x="420" y="300" width="560" height="10" rx="5" fill="#5F6B7A"/>
+  <rect x="420" y="320" width="602" height="10" rx="5" fill="#5F6B7A"/>
+  <rect x="420" y="372" width="126" height="12" rx="6" fill="#31457F"/>
+  <rect x="420" y="400" width="650" height="10" rx="5" fill="#111827"/>
+  <rect x="420" y="426" width="584" height="10" rx="5" fill="#5F6B7A"/>
+  <rect x="420" y="446" width="520" height="10" rx="5" fill="#5F6B7A"/>
+  <rect x="802" y="124" width="258" height="92" rx="18" fill="#EAF0FF" stroke="#31457F" stroke-width="2"/>
+  <path d="M838 164H1014" stroke="#31457F" stroke-width="10" stroke-linecap="round"/>
+  <path d="M838 190H960" stroke="#5F6B7A" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="1032" cy="146" r="12" fill="#31457F"/>
+  <path d="M840 500C872 464 918 464 950 500C982 464 1028 464 1060 500" stroke="#31457F" stroke-width="8" stroke-linecap="round"/>
+  <text x="600" y="594" text-anchor="middle" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="24" font-weight="700" fill="#FAFAF7">D-Resume · AI Resume Workspace</text>
+</svg>

@@ -1,0 +1,1584 @@
+{
+  "version": "jd_library.v2",
+  "source": "bytedance_campus_2026",
+  "scraped_at": "2026-05-17T00:00:00Z",
+  "items": [
+    {
+      "id": "A204617",
+      "url": "https://jobs.bytedance.com/campus/position/7532338912858147080/detail",
+      "title": "后端开发工程师-开发者服务",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Go",
+        "Python",
+        "Java",
+        "LLM",
+        "DevOps",
+        "K8S",
+        "Docker",
+        "MySQL",
+        "Redis",
+        "后端",
+        "研发工具"
+      ],
+      "responsibilities": [
+        "探索并打造基于LLM的下一代生产力工具，重点围绕软件研发场景（代码托管、代码分析、IDE等）实现LLM赋能",
+        "参与一站式研发平台开发，通过LLM重构DevOps工具链，打造智能化研发效能平台",
+        "建设LLM应用研发基础设施和框架"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机/软件工程等相关专业",
+        "熟悉C/C++/Java/Go/Python至少一种，扎实的数据结构与算法",
+        "有中等复杂度以上后端系统开发经验，熟悉MySQL/Redis等",
+        "熟悉K8S/Docker/Linux优先",
+        "对LLM应用研发技术栈有了解者加分"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A43009",
+      "url": "https://jobs.bytedance.com/campus/position/7532417984779716871/detail",
+      "title": "后端开发工程师-AI Platform",
+      "company": "字节跳动",
+      "location": "深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Go",
+        "Python",
+        "C++",
+        "LLM",
+        "AI Agent",
+        "LangChain",
+        "AutoGPT",
+        "后端"
+      ],
+      "responsibilities": [
+        "负责LLM驱动的AI Agent框架的研究和实现",
+        "优化并提升AI Agent的算法性能和用户体验",
+        "持续追踪AI Agent领域的最新技术趋势和研究成果"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机/软件工程等相关专业",
+        "精通Go/Python/C++等一种或多种编程语言",
+        "对AI Agent技术有深入了解，熟悉AutoGPT/LangChain等框架",
+        "有LLM或AI Agent相关项目经验者加分"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A41354B",
+      "url": "https://jobs.bytedance.com/campus/position/7527245813573110023/detail",
+      "title": "后端开发工程师-国际支付",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Java",
+        "C++",
+        "Go",
+        "Python",
+        "高并发",
+        "分布式",
+        "支付",
+        "后端"
+      ],
+      "responsibilities": [
+        "负责字节跳动国际支付业务的后端开发工作",
+        "负责架构设计和开发，为亿级用户提供优质顺畅的信息服务",
+        "负责在线大流量高并发系统设计和性能调优",
+        "参与各专项技术调研、新技术引入等前瞻项目"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机相关专业",
+        "精通至少一门编程语言（Java/C/C++/PHP/Python/Go）",
+        "掌握扎实的计算机基础知识，深入理解数据结构、算法和操作系统",
+        "优秀的逻辑分析能力，能对业务逻辑进行合理的抽象和拆分"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A68179",
+      "url": "https://jobs.bytedance.com/campus/position/7530945835510778130/detail",
+      "title": "后端开发工程师-IT",
+      "company": "字节跳动",
+      "location": "深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Go",
+        "Python",
+        "Java",
+        "C++",
+        "Copilot",
+        "Agent",
+        "Redis",
+        "MySQL",
+        "后端"
+      ],
+      "responsibilities": [
+        "负责资产服务管理系统后端服务的需求设计和开发",
+        "负责Copilot、Agent等AI能力在业务场景的系统架构设计、优化和演进",
+        "参与系统基础设施建设，完成跨团队技术推动与落地",
+        "参与AI领域新技术的调研和落地"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机/软件工程等相关专业",
+        "精通至少一门开发语言（Go/Python/Java/C/C++）",
+        "掌握扎实的计算机基础知识，熟悉Redis/MySQL/NoSQL等",
+        "较好的产品意识和沟通能力"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A245344A",
+      "url": "https://jobs.bytedance.com/campus/position/7526957505013614866/detail",
+      "title": "服务端开发工程师-移动OS",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Go",
+        "C++",
+        "Python",
+        "LLM",
+        "AI",
+        "服务端"
+      ],
+      "responsibilities": [
+        "AI智能化产品的服务端开发",
+        "参与AI+智能硬件结合的研发"
+      ],
+      "requirements": [
+        "2026届本科及以上",
+        "精通Golang/C++/Python至少一种",
+        "有LLM相关开发经验者优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A258210",
+      "url": "https://jobs.bytedance.com/campus/position/7531606535316670727/detail",
+      "title": "后端研发工程师-国际化广告商业平台",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Java",
+        "C++",
+        "Go",
+        "Python",
+        "高并发",
+        "分布式",
+        "广告",
+        "后端"
+      ],
+      "responsibilities": [
+        "负责架构设计和开发，为亿级用户提供优质顺畅的信息服务",
+        "参与设计系统技术方案、核心代码开发和系统调优",
+        "协助团队攻克高并发、数据隔离、系统解耦等技术难关",
+        "参与机器学习与异构计算系统研发"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机相关专业",
+        "精通至少一门编程语言（Java/C/C++/PHP/Python/Go）",
+        "掌握扎实的计算机基础知识"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A94230",
+      "url": "https://jobs.bytedance.com/campus/position/7532035565018876168/detail",
+      "title": "后端开发工程师-搜索",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Go",
+        "Python",
+        "Java",
+        "C++",
+        "搜索",
+        "高并发",
+        "后端"
+      ],
+      "responsibilities": [
+        "搜索业务研发（业务抽象、技术方案设计）",
+        "搜索工程架构、性能稳定性、搜索平台等方向优化",
+        "攻克高并发、数据隔离、系统解耦等难关"
+      ],
+      "requirements": [
+        "2026届本科及以上",
+        "精通Golang/Python/Java/PHP/C++/C至少一种",
+        "熟悉MySQL/Redis/MQ等常用组件"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A77102",
+      "url": "https://jobs.bytedance.com/campus/position/7529517428642351378/detail",
+      "title": "后端开发工程师-Flow",
+      "company": "字节跳动",
+      "location": "杭州",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-后端",
+      "keywords": [
+        "Go",
+        "LLM",
+        "AI",
+        "豆包",
+        "后端"
+      ],
+      "responsibilities": [
+        "LLM在通用智能助手领域的应用与落地",
+        "LLM应用工程架构建设，保障快速迭代和稳定性",
+        "跟进LLM前沿技术与开源方案"
+      ],
+      "requirements": [
+        "2026届本科及以上",
+        "Go背景优先",
+        "有LLM相关经验者加分"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "backend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A200313",
+      "url": "https://jobs.bytedance.com/campus/position/7532804571775043858/detail",
+      "title": "算法工程师-AI Platform",
+      "company": "字节跳动",
+      "location": "深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "Python",
+        "C++",
+        "LLM",
+        "Prompt",
+        "SFT",
+        "RLHF",
+        "RAG",
+        "NLP",
+        "算法"
+      ],
+      "responsibilities": [
+        "参与AI应用开发平台核心模块的效果优化，包括Prompt自动生成与优化、AI应用效果评测、数据合成、模型训练的SFT/RLHF等",
+        "参与智能客服问答的算法微调训练，参与RAG等模块的效果优化",
+        "持续跟进LLM前沿技术，参与AI新产品功能设计"
+      ],
+      "requirements": [
+        "2026届硕士及以上，计算机/软件工程等相关专业",
+        "熟练掌握Python/C++/Java/Go等",
+        "拥有机器学习领域研究经历，尤其在LLM和生成式AI方面，顶会论文发表者优先",
+        "熟悉大模型领域的数据工程建设、预训练、SFT、RLHF等流程",
+        "熟悉Prompt Engineering、AI Agent、RAG等技术",
+        "ACM/ICPC、Kaggle等比赛获奖者优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "硕士及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A09033B",
+      "url": "https://jobs.bytedance.com/campus/position/7533161217600358663/detail",
+      "title": "算法工程师-中国广告应用技术",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "C++",
+        "Java",
+        "Python",
+        "CTR",
+        "CVR",
+        "LLM",
+        "广告",
+        "推荐",
+        "机器学习",
+        "算法"
+      ],
+      "responsibilities": [
+        "对CTR、CVR、召粗等核心广告模型进行调优，引入LLM/AIGC前沿技术",
+        "构建新一代广告投放系统，从模型和架构角度完善线上投放系统",
+        "利用ML及规划算法优化机器资源调度",
+        "利用因果推断建模、样式及策略优化构建客户/用户/平台三赢生态"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机/机器学习/模式识别等相关专业",
+        "熟练C++/Java/Python",
+        "熟悉机器学习基础理论知识，在广告/推荐/NLP/CV等领域有深度理解",
+        "顶会论文（ICML/NeurIPS/ICLR/CVPR/KDD等）、ACM/Kaggle获奖者加分"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A86858",
+      "url": "https://jobs.bytedance.com/campus/position/7530900035216804104/detail",
+      "title": "算法工程师-风控",
+      "company": "字节跳动",
+      "location": "深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "C++",
+        "Python",
+        "CV",
+        "NLP",
+        "大语言模型",
+        "多模态",
+        "深度学习",
+        "算法"
+      ],
+      "responsibilities": [
+        "负责字节跳动各产品（抖音、今日头条等）作弊风险的发现与治理",
+        "通过CV、NLP、大语言模型、多模态大模型、表征学习、图模型、深度学习等技术提升问题发现效率",
+        "挖掘和分析海量内容和用户行为进行画像建设"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机/机器学习/模式识别相关专业",
+        "熟悉Linux开发环境，熟悉C++和Python语言优先",
+        "扎实的数据结构和算法功底，熟悉机器学习/NLP/数据挖掘/CV",
+        "优秀的分析问题和解决问题的能力"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A228494B",
+      "url": "https://jobs.bytedance.com/campus/position/7532044447682726162/detail",
+      "title": "代码大模型算法研究员-搜索",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "LLM",
+        "预训练",
+        "SFT",
+        "RL",
+        "代码生成",
+        "算法"
+      ],
+      "responsibilities": [
+        "聚焦集团内研发提效场景，负责代码生成相关算法的设计与研发",
+        "深入研究LLM预训练、后训练等前沿技术",
+        "在模型训练范式、模型结构、数据配比方面探索最佳实践",
+        "持续跟踪LLM领域最新技术动态并应用于实际业务场景"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机/软件工程等相关专业",
+        "具备数据构建、指令微调及模型开发经验",
+        "熟悉大模型相关技术（预训练、指令微调、RL等）",
+        "顶会（ICML/ICLR/NeurIPS/ACL）第一作者论文加分",
+        "ACM/Kaggle获奖、参与有影响力的AI项目加分"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A144402",
+      "url": "https://jobs.bytedance.com/campus/position/7534613130942515474/detail",
+      "title": "AIGC算法工程师-Data AML",
+      "company": "字节跳动",
+      "location": "深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "Python",
+        "C++",
+        "AIGC",
+        "扩散模型",
+        "Transformer",
+        "GAN",
+        "图像生成",
+        "视频生成",
+        "算法"
+      ],
+      "responsibilities": [
+        "负责豆包模型AIGC相关技术的研究和开发，包括图像、视频或3D生成/编辑等",
+        "探索基于扩散和自回归的技术路线",
+        "解决生成视频/图像中的时间一致性、空间连贯性和可控性等核心研究难题",
+        "紧跟生成方向（扩散模型、Transformer、GAN等）最新研究动态"
+      ],
+      "requirements": [
+        "2026届硕士及以上，计算机等相关专业",
+        "在CV、多模态、AIGC、机器学习、渲染生成等领域有较深入研究",
+        "熟悉生成相关技术路线（扩散模型、自回归模型、GAN等）",
+        "CVPR/ECCV/ICCV/NeurIPS/ICLR/SIGGRAPH等顶会论文发表者优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "硕士及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A_BYTE_ALGO_GROWTH",
+      "url": "https://jobs.bytedance.com/campus/position/7530969193325349138/detail",
+      "title": "算法工程师-用户增长",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "Python",
+        "C++",
+        "机器学习",
+        "因果推断",
+        "运筹优化",
+        "AIGC",
+        "算法"
+      ],
+      "responsibilities": [
+        "用户增长场景的算法研发",
+        "机器学习、因果推断、运筹优化等技术在增长方向的应用",
+        "AIGC方向前沿技术在用户增长场景的落地"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机/机器学习等相关专业",
+        "精通Python/C++等编程语言",
+        "有机器学习/推荐系统/因果推断等领域研究经历",
+        "顶会论文发表者优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A_BYTE_ALGO_DOUYIN",
+      "url": "https://jobs.bytedance.com/campus/position/7532770358900082962/detail",
+      "title": "算法工程师-抖音",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "Python",
+        "C++",
+        "推荐算法",
+        "内容理解",
+        "大模型",
+        "算法"
+      ],
+      "responsibilities": [
+        "推荐算法、内容理解、大模型应用等方向",
+        "负责抖音核心推荐系统的算法优化",
+        "内容理解与多模态大模型研发"
+      ],
+      "requirements": [
+        "2026届本科及以上",
+        "精通Python/C++",
+        "扎实的机器学习/深度学习基础",
+        "有推荐系统/NLP/CV相关项目经验"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A_BYTE_FRONTEND_AIPLATFORM",
+      "url": "https://jobs.bytedance.com/campus/position/7532428417846987026/detail",
+      "title": "前端开发工程师-AI Platform",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-前端",
+      "keywords": [
+        "React",
+        "Vue",
+        "TypeScript",
+        "JavaScript",
+        "前端",
+        "AI",
+        "LLM"
+      ],
+      "responsibilities": [
+        "参与AI应用开发平台前端架构设计和开发",
+        "负责LLM驱动的AI产品的前端交互体验优化",
+        "探索前端+AI的融合技术方案"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机/软件工程等相关专业",
+        "精通HTML/CSS/JavaScript，熟练React/Vue",
+        "熟悉前端工程化和性能优化",
+        "对AI/LLM有兴趣者加分"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "frontend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A_BYTE_FRONTEND_DOUBAO",
+      "url": "https://jobs.bytedance.com/campus/position/7529522766400194823/detail",
+      "title": "前端开发工程师-豆包",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-前端",
+      "keywords": [
+        "React",
+        "TypeScript",
+        "前端",
+        "AI助手",
+        "豆包"
+      ],
+      "responsibilities": [
+        "豆包AI助手Web端和桌面端的前端开发",
+        "参与AI交互界面的设计和优化",
+        "提升前端性能和用户体验"
+      ],
+      "requirements": [
+        "2026届本科及以上",
+        "精通前端技术栈（React/Vue/TypeScript）",
+        "有Electron/跨端开发经验优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "frontend_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A_BYTE_CLIENT_DOUYIN",
+      "url": "https://jobs.bytedance.com/campus/position/7611527672371923253/detail",
+      "title": "客户端开发工程师-抖音研发",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-客户端",
+      "keywords": [
+        "Java",
+        "Kotlin",
+        "Swift",
+        "Android",
+        "iOS",
+        "客户端"
+      ],
+      "responsibilities": [
+        "负责抖音Android/iOS客户端功能开发",
+        "参与客户端架构设计和性能优化",
+        "探索跨平台技术和客户端AI能力落地"
+      ],
+      "requirements": [
+        "2026届本科及以上",
+        "精通Java/Kotlin或Objective-C/Swift",
+        "熟悉Android或iOS平台开发",
+        "有Hybrid/RN/Flutter经验优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "client_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A_BYTE_TEST_DEV",
+      "url": "https://jobs.bytedance.com/campus/position/7534607861813971207/detail",
+      "title": "测试开发工程师-业务中台",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-测试",
+      "keywords": [
+        "Java",
+        "Python",
+        "Go",
+        "测试",
+        "自动化",
+        "质量保障"
+      ],
+      "responsibilities": [
+        "负责业务中台产品质量保障，设计和开发自动化测试框架",
+        "参与CI/CD流水线建设，提升测试效率",
+        "开发测试工具和平台，推动质量左移"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机相关专业",
+        "熟悉Java/C/C++/Python/Go等至少一门语言",
+        "扎实的数据结构与算法功底",
+        "了解自动化测试框架和压测工具优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "test_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A_BYTE_PM_SECURITY",
+      "url": "https://jobs.bytedance.com/campus/position/7530846601217329426/detail",
+      "title": "产品经理-国际化内容安全平台",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "产品",
+      "keywords": [
+        "产品经理",
+        "内容安全",
+        "AI",
+        "国际化",
+        "产品"
+      ],
+      "responsibilities": [
+        "负责国际化产品内容安全平台的产品规划和设计",
+        "探索AI模型在内容审核领域的应用和策略制定",
+        "维护字节跳动国际化产品的安全可信赖环境"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机/管理学/经济学/应用数学等专业优先",
+        "英语流利",
+        "对AI/内容安全领域有热情"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "product_manager",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A_BYTE_PM_CIS",
+      "url": "https://jobs.bytedance.com/campus/position/7610686551490595077/detail",
+      "title": "产品经理-集团信息系统",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "产品",
+      "keywords": [
+        "产品经理",
+        "AIGC",
+        "企业信息系统",
+        "产品",
+        "AI"
+      ],
+      "responsibilities": [
+        "覆盖人事/财务/法务/采购/审批/职场/隐私安全等领域",
+        "聚焦AI场景的工具类产品规划与设计",
+        "参与AIGC创新孵化方向"
+      ],
+      "requirements": [
+        "2026届本科及以上",
+        "有研发背景或AI产品经验优先",
+        "优秀的逻辑分析和沟通能力"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "product_manager",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A_BYTE_DATA_BIGDATA",
+      "url": "https://jobs.bytedance.com/campus/position/7532390972501772562/detail",
+      "title": "大数据开发工程师-算力与AI基础设施",
+      "company": "字节跳动",
+      "location": "杭州",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-数据",
+      "keywords": [
+        "Hadoop",
+        "Spark",
+        "Flink",
+        "Java",
+        "Scala",
+        "大模型",
+        "数据"
+      ],
+      "responsibilities": [
+        "分布式计算框架和ML训练框架的研发",
+        "机器学习平台资源调度与优化",
+        "大数据处理管线和数据仓库建设"
+      ],
+      "requirements": [
+        "2026届本科及以上，计算机相关专业",
+        "精通Java/Scala/Python等至少一种",
+        "熟悉Hadoop/Spark/Flink等大数据技术栈",
+        "对分布式系统和ML训练框架有了解"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "data_engineer",
+        "education": "本科及以上",
+        "company": "bytedance",
+        "job_type": "校招正式"
+      }
+    },
+    {
+      "id": "A13100",
+      "url": "https://jobs.bytedance.com/campus/position/7532770929089186056/detail",
+      "title": "推荐大模型算法工程师-抖音",
+      "company": "字节跳动",
+      "location": "深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "推荐算法",
+        "大模型",
+        "Python",
+        "C++",
+        "机器学习",
+        "深度学习",
+        "表征学习",
+        "PyTorch"
+      ],
+      "responsibilities": [
+        "研究短视频和图文体裁下基于内容理解和用户行为的表征学习",
+        "在工业界最大数据规模模型上探索参数和算力Scaling up",
+        "研究百万级超长用户行为序列下的建模方案",
+        "探索生成式的推荐大模型技术落地"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "扎实的机器学习基础和编码能力",
+        "搜索/广告/推荐/大模型领域有主导项目经验优先",
+        "顶会论文(KDD/SIGIR/RecSys/ACL/NeurIPS等)优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A256903",
+      "url": "https://jobs.bytedance.com/campus/position/7530900603519748360/detail",
+      "title": "NLP算法工程师-抖音",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "NLP",
+        "大模型",
+        "Python",
+        "C++",
+        "深度学习",
+        "预训练",
+        "RAG",
+        "Agent",
+        "RLHF"
+      ],
+      "responsibilities": [
+        "负责抖音场景下内容安全、评论、数字分身、智能客服等方向通用NLP技术",
+        "建设大模型自动化数据流程",
+        "推动大模型基础研究和应用",
+        "跟进预训练、RAG、Agent、RLHF等前沿技术"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "扎实的机器学习基础，深度学习/NLP方向有深入研究",
+        "扎实编码能力",
+        "ACL/EMNLP/NeurIPS/ICML/ICLR等顶会论文优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A74269",
+      "url": "https://jobs.bytedance.com/campus/position/7529702120489011464/detail",
+      "title": "NLP算法工程师-搜索",
+      "company": "字节跳动",
+      "location": "珠海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "NLP",
+        "大模型",
+        "搜索",
+        "C++",
+        "Python",
+        "召回",
+        "排序"
+      ],
+      "responsibilities": [
+        "探索大模型和搜索结合的创新技术",
+        "参与搜索全链路研发",
+        "Query理解、召回、排序模型构建",
+        "探索大模型在AI搜索场景落地"
+      ],
+      "requirements": [
+        "2026届硕士及以上",
+        "扎实编码能力（C/C++和Python）",
+        "搜索/推荐/广告/NLP/多模态/ML等领域有深入研究者优先",
+        "KDD/SIGIR/ICML/ACL/EMNLP/CVPR等顶会论文优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "硕士及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A132468A",
+      "url": "https://jobs.bytedance.com/campus/position/7530916630483355911/detail",
+      "title": "计算机视觉工程师-抖音",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "CV",
+        "AIGC",
+        "Diffusion",
+        "VAE",
+        "GAN",
+        "Python",
+        "图像生成"
+      ],
+      "responsibilities": [
+        "负责图像与视频的AI生成算法模型研发与优化",
+        "AIGC图像生成模型底模研发",
+        "在抖音短视频、直播、社交、评论等场景的AIGC应用研发落地"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "熟悉Diffusion/Flow/VAE/GAN等生成方案",
+        "图像生成领域有经验者优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A90086",
+      "url": "https://jobs.bytedance.com/campus/position/7530930871635200274/detail",
+      "title": "多模态大模型算法工程师-国际电商",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "多模态",
+        "大模型",
+        "CV",
+        "Python",
+        "预训练",
+        "PyTorch",
+        "电商"
+      ],
+      "responsibilities": [
+        "构建电商领域多模态大模型底座",
+        "持续建设CV/多模态基础预训练算法",
+        "沉淀算法库并优化训练部署推理流程"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "扎实ML基础，高水平论文或竞赛经验优先",
+        "熟悉多模态大模型",
+        "CVPR/ICCV/ECCV等顶会论文优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A04451",
+      "url": "https://jobs.bytedance.com/campus/position/7532095636361300242/detail",
+      "title": "大模型算法工程师-剪映",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "大模型",
+        "SFT",
+        "RLHF",
+        "Python",
+        "C++",
+        "PyTorch",
+        "Agent",
+        "剪映"
+      ],
+      "responsibilities": [
+        "负责剪映/CapCut的AI视频编辑Agent模型训练与评测",
+        "使用SFT/RLHF/Post-training技术进行视频创作领域知识建模",
+        "提升视频创作Agent大模型的指令遵从能力"
+      ],
+      "requirements": [
+        "2026届硕士及以上",
+        "精通Python/C++，熟悉PyTorch等框架",
+        "NLP/CV/多模态项目经验",
+        "ACL/CVPR/SIGIR/KDD/NeurIPS等顶会论文优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "硕士及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A207931",
+      "url": "https://jobs.bytedance.com/campus/position/7532770358900082962/detail",
+      "title": "算法工程师-抖音",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "推荐算法",
+        "Python",
+        "C++",
+        "机器学习",
+        "深度学习",
+        "推荐系统"
+      ],
+      "responsibilities": [
+        "负责抖音APP推荐系统搭建",
+        "深入理解业务和机器学习技术，优化推荐策略",
+        "结合推荐系统和内容安全识别内容风险"
+      ],
+      "requirements": [
+        "2026届本科及以上",
+        "优秀编码能力和算法功底",
+        "熟悉ML/NLP/数据挖掘"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A100011",
+      "url": "https://jobs.bytedance.com/campus/position/7530935910108662024/detail",
+      "title": "内容理解算法工程师-抖音",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "多模态",
+        "内容理解",
+        "大模型",
+        "Python",
+        "C++",
+        "CV",
+        "NLP"
+      ],
+      "responsibilities": [
+        "支持抖音/直播/今日头条等业务线多模态内容理解",
+        "支持推荐算法、社区治理、安全审核等团队的内容理解能力",
+        "多模态内容理解算法前沿技术探索与研发"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "扎实ML基础，对LLM/多模态模型/生成式模型有深入理解",
+        "NIPS/ICML/CVPR/ICCV/ECCV/AAAI/KDD/ACL等顶会论文优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A57452",
+      "url": "https://jobs.bytedance.com/campus/position/7340976516275538203/detail",
+      "title": "多模态算法实习生-搜索",
+      "company": "字节跳动",
+      "location": "珠海",
+      "type": "校招实习",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "多模态",
+        "大模型",
+        "LLM",
+        "Python",
+        "RAG",
+        "强化学习",
+        "AIGC",
+        "搜索",
+        "实习"
+      ],
+      "responsibilities": [
+        "探索LLM/多模态理解/生成式/ML/强化学习/AIGC等前沿技术",
+        "探索大规模多模态理解与搜索模型",
+        "数据建设、指令微调、偏好对齐、模型优化",
+        "探索AI搜索、多模态、RAG、CoT等模型进阶能力"
+      ],
+      "requirements": [
+        "2026届本科及以上学历在读",
+        "搜广推/NLP/多模态/AIGC/ML等领域有深入研究",
+        "CVPR/ICCV/NeurIPS/ICLR等顶会论文优先",
+        "ACM/ICPC/Kaggle等竞赛获奖优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "intern_type": "ByteIntern",
+        "job_type": "校招实习",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A_BYTE_ALGO_REC_INTERN",
+      "url": "https://jobs.bytedance.com/campus/position/7594312879714126133/detail",
+      "title": "推荐算法实习生-抖音",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招实习",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "推荐算法",
+        "Python",
+        "C++",
+        "机器学习",
+        "深度学习",
+        "实习"
+      ],
+      "responsibilities": [
+        "参与抖音推荐系统算法优化",
+        "深入理解业务和ML技术，优化推荐策略",
+        "应用前沿推荐算法提升用户体验"
+      ],
+      "requirements": [
+        "2026届本科及以上学历在读",
+        "扎实ML基础和编码能力",
+        "搜索/推荐/广告相关经验优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "intern_type": "ByteIntern",
+        "job_type": "校招实习",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A_BYTE_LLM_ECOMM_INTERN",
+      "url": "https://jobs.bytedance.com/campus/position/7591779896604510517/detail",
+      "title": "大模型算法实习生-国际电商",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招实习",
+      "year": "2026",
+      "category": "研发-算法",
+      "keywords": [
+        "大模型",
+        "LLM",
+        "NLP",
+        "Python",
+        "PyTorch",
+        "电商",
+        "实习"
+      ],
+      "responsibilities": [
+        "参与国际电商大模型算法研发",
+        "探索LLM在电商场景的应用",
+        "模型训练、微调、评测"
+      ],
+      "requirements": [
+        "2026届本科及以上学历在读",
+        "熟悉LLM/NLP技术",
+        "扎实Python编码能力"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "algorithm_engineer",
+        "education": "本科及以上",
+        "intern_type": "ByteIntern",
+        "job_type": "校招实习",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A37770",
+      "url": "https://jobs.bytedance.com/campus/position/7529522766400194823/detail",
+      "title": "前端开发工程师-豆包",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-前端",
+      "keywords": [
+        "React",
+        "TypeScript",
+        "前端",
+        "AI助手"
+      ],
+      "responsibilities": [
+        "豆包AI助手Web端和桌面端前端开发",
+        "参与AI交互界面设计与优化",
+        "提升前端性能和用户体验"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "精通HTML/CSS/JavaScript，熟练React/Vue",
+        "熟悉前端工程化和性能优化"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "frontend_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A81425",
+      "url": "https://jobs.bytedance.com/campus/position/7531960723795167506/detail",
+      "title": "前端开发工程师-TikTok直播",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-前端",
+      "keywords": [
+        "React",
+        "TypeScript",
+        "前端",
+        "TikTok",
+        "直播"
+      ],
+      "responsibilities": [
+        "TikTok直播前端功能开发",
+        "参与直播互动体验优化",
+        "探索前端+AI创新方案"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "精通HTML/CSS/JS，熟练React/Vue"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "frontend_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A18332",
+      "url": "https://jobs.bytedance.com/campus/position/7529453600746162439/detail",
+      "title": "前端开发工程师-飞书",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-前端",
+      "keywords": [
+        "React",
+        "TypeScript",
+        "前端",
+        "飞书",
+        "Electron"
+      ],
+      "responsibilities": [
+        "飞书前端功能开发",
+        "参与协同办公产品体验优化",
+        "探索AI赋能办公场景"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "精通前端技术栈",
+        "有Electron/跨端经验优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "frontend_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A124238",
+      "url": "https://jobs.bytedance.com/campus/position/7533189023372970248/detail",
+      "title": "前端开发工程师-TRAE",
+      "company": "字节跳动",
+      "location": "深圳",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-前端",
+      "keywords": [
+        "React",
+        "TypeScript",
+        "前端",
+        "AI编程",
+        "TRAE"
+      ],
+      "responsibilities": [
+        "TRAE AI编程产品前端开发",
+        "参与AI辅助编码交互设计",
+        "探索AI+编程融合方案"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "精通React/Vue/TypeScript",
+        "对AI编程有热情"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "frontend_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A185848",
+      "url": "https://jobs.bytedance.com/campus/position/7527563481408801031/detail",
+      "title": "客户端开发工程师-移动OS",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-客户端",
+      "keywords": [
+        "Java",
+        "Kotlin",
+        "Swift",
+        "Android",
+        "iOS",
+        "移动端"
+      ],
+      "responsibilities": [
+        "AI+智能硬件结合的移动端研发",
+        "参与移动OS功能开发",
+        "探索AI在移动端的创新应用"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "精通Java/Kotlin或Objective-C/Swift"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "client_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A106785",
+      "url": "https://jobs.bytedance.com/campus/position/7528263352549771527/detail",
+      "title": "客户端开发工程师-TikTok Shop",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-客户端",
+      "keywords": [
+        "Java",
+        "Kotlin",
+        "Swift",
+        "Android",
+        "iOS",
+        "TikTok",
+        "电商"
+      ],
+      "responsibilities": [
+        "TikTok Shop客户端开发",
+        "参与国际电商App架构设计",
+        "优化用户体验和性能"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "精通Java/Kotlin或Swift",
+        "有Hybrid/RN/Flutter经验优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "client_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A145289A",
+      "url": "https://jobs.bytedance.com/campus/position/7533153951274043666/detail",
+      "title": "测试开发工程师-开发者服务",
+      "company": "字节跳动",
+      "location": "上海",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-测试",
+      "keywords": [
+        "测试",
+        "Java",
+        "Python",
+        "Go",
+        "自动化",
+        "质量保障"
+      ],
+      "responsibilities": [
+        "负责研发工具体系质量保障",
+        "设计开发自动化测试框架",
+        "参与CI/CD流水线建设"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "熟悉Java/Python/Go等至少一门语言",
+        "了解自动化测试框架优先"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "test_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A206574",
+      "url": "https://jobs.bytedance.com/campus/position/7534607861813971207/detail",
+      "title": "测试开发工程师-业务中台",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招正式",
+      "year": "2026",
+      "category": "研发-测试",
+      "keywords": [
+        "测试",
+        "Java",
+        "Python",
+        "自动化",
+        "CI/CD",
+        "中台"
+      ],
+      "responsibilities": [
+        "负责业务中台产品质量保障",
+        "设计开发自动化测试工具",
+        "参与平台化测试能力建设"
+      ],
+      "requirements": [
+        "2026届本科及以上学历",
+        "熟悉Java/C/C++/Python/Go至少一种",
+        "扎实数据结构和算法功底"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "test_engineer",
+        "education": "本科及以上",
+        "job_type": "校园招聘正式",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A_BYTE_FE_INTERN_DOUYIN",
+      "url": "https://jobs.bytedance.com/campus/position/7382102756728883482/detail",
+      "title": "前端开发实习生-抖音文娱",
+      "company": "字节跳动",
+      "location": "北京",
+      "type": "校招实习",
+      "year": "2026",
+      "category": "研发-前端",
+      "keywords": [
+        "React",
+        "TypeScript",
+        "前端",
+        "实习",
+        "抖音"
+      ],
+      "responsibilities": [
+        "抖音文娱前端功能开发",
+        "参与AI互动体验优化",
+        "提升前端性能"
+      ],
+      "requirements": [
+        "2026届本科及以上学历在读",
+        "精通HTML/CSS/JS",
+        "每周4天以上，实习3个月以上"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "frontend_engineer",
+        "education": "本科及以上",
+        "intern_type": "ByteIntern",
+        "job_type": "校招实习",
+        "company": "bytedance"
+      }
+    },
+    {
+      "id": "A_BYTE_FE_INTERN_CAPCUT",
+      "url": "https://jobs.bytedance.com/campus/position/7379590931932563721/detail",
+      "title": "前端开发实习生-剪映",
+      "company": "字节跳动",
+      "location": "广州",
+      "type": "校招实习",
+      "year": "2026",
+      "category": "研发-前端",
+      "keywords": [
+        "React",
+        "TypeScript",
+        "前端",
+        "实习",
+        "剪映"
+      ],
+      "responsibilities": [
+        "剪映/CapCut前端开发",
+        "参与视频编辑工具研发",
+        "探索AI+视频编辑融合方案"
+      ],
+      "requirements": [
+        "2026届本科及以上学历在读",
+        "精通前端基础",
+        "每周4天以上，实习3个月以上"
+      ],
+      "metadata": {
+        "lang": "zh",
+        "role": "frontend_engineer",
+        "education": "本科及以上",
+        "intern_type": "ByteIntern",
+        "job_type": "校招实习",
+        "company": "bytedance"
+      }
+    }
+  ]
+}

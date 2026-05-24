@@ -1,0 +1,16 @@
+[
+  {
+    "id": "swiss-single",
+    "name": "Resume Single Column",
+    "format": "html-template",
+    "file": "resume-single-column.template.html",
+    "converted_from": "resume-single-column.tsx"
+  },
+  {
+    "id": "swiss-two-column",
+    "name": "Resume Two Column",
+    "format": "html-template",
+    "file": "resume-two-column.template.html",
+    "converted_from": "resume-two-column.tsx"
+  }
+]

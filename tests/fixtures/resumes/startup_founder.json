@@ -1,0 +1,66 @@
+{
+  "$schema": "fixture:v1",
+  "description": "创业公司创始人转战职场 — 非传统 title、多角色混合经历，测试 Agent 如何提炼可迁移技能",
+  "difficulty": "hard",
+  "personalInfo": {
+    "name": "Ravi Patel",
+    "title": "Founder & CTO",
+    "email": "ravi@founder.dev",
+    "phone": "555-8882",
+    "location": "Bangalore, India"
+  },
+  "summary": "Technical founder with 6 years building startups from zero to scale. Raised $2.5M in venture funding, led product and engineering. Now seeking a senior IC or engineering leadership role where I can focus on building great products.",
+  "workExperience": [
+    {
+      "title": "Co-Founder & CTO",
+      "company": "PaySplit (YC W22)",
+      "location": "Bangalore",
+      "years": "2022-01 to 2025-12",
+      "description": [
+        "Built BNPL platform for Indian SMBs from scratch — React Native + Go + PostgreSQL on AWS",
+        "Grew to 50K merchants, $15M annual GMV, 12-person team (8 engineers)",
+        "Raised $2.5M seed round from Accel and Blume Ventures",
+        "Personally wrote 60% of backend code in first year, then transitioned to engineering management",
+        "Implemented PCI-DSS compliant payment infrastructure, 99.95% uptime"
+      ]
+    },
+    {
+      "title": "Founder & Solo Developer",
+      "company": "MenuNinja",
+      "location": "Remote",
+      "years": "2019-06 to 2021-12",
+      "description": [
+        "Built and launched a QR-code digital menu SaaS for restaurants during COVID",
+        "Acquired 500+ paying restaurants across 3 countries, $8K MRR at peak",
+        "Acquired by a POS company for $120K (asset sale)"
+      ]
+    },
+    {
+      "title": "Software Engineer",
+      "company": "Flipkart",
+      "location": "Bangalore",
+      "years": "2017-06 to 2019-05",
+      "description": [
+        "Backend engineer on the payments team, processing 1M+ transactions/day",
+        "Optimized payment gateway routing, improving success rate from 92% to 97%",
+        "Built fraud detection rule engine that reduced chargebacks by 30%"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "IIT Bombay",
+      "degree": "B.Tech Computer Science",
+      "years": "2013-08 to 2017-06",
+      "description": "GPA 8.5/10. ACM ICPC regionalist. Built hostel room booking system still in use today."
+    }
+  ],
+  "personalProjects": [],
+  "additional": {
+    "technicalSkills": ["Go", "Python", "TypeScript", "React", "React Native", "PostgreSQL", "Redis", "Kafka", "AWS", "Kubernetes", "Terraform"],
+    "languages": ["English (Fluent)", "Hindi (Native)", "Kannada (Conversational)"],
+    "certificationsTraining": ["Y Combinator — Winter 2022 Batch"],
+    "awards": ["Forbes India 30 Under 30 — Technology (2023)", "ET Startup Awards — Best Fintech Startup Nominee"]
+  },
+  "customSections": {}
+}

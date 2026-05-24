@@ -1,0 +1,63 @@
+{
+  "$schema": "fixture:v1",
+  "description": "有2年职业空窗期的简历 — 测试 Agent 如何处理 gaps、是否需要 confirm_required",
+  "difficulty": "hard",
+  "personalInfo": {
+    "name": "王丽",
+    "title": "产品经理",
+    "email": "wangli@example.com",
+    "phone": "13912345678",
+    "location": "深圳"
+  },
+  "summary": "5 年产品经验，擅长 B 端 SaaS 产品。2024 年回归职场，之前因家庭原因休息 2 年。",
+  "workExperience": [
+    {
+      "title": "产品经理",
+      "company": "金蝶软件",
+      "location": "深圳",
+      "years": "2024-03 至今",
+      "description": [
+        "负责企业 ERP 财务管理模块，服务 500+ 中大型客户",
+        "推动 SaaS 化迁移，客户从私有部署转云率达 60%",
+        "主导用户研究项目，深度访谈 50+ CFO，输出核心需求文档"
+      ]
+    },
+    {
+      "title": "产品经理",
+      "company": "用友网络",
+      "location": "北京",
+      "years": "2019-07 至 2022-03",
+      "description": [
+        "负责用友 U8 产品的供应链模块，年收入贡献 2 亿",
+        "从 0 到 1 搭建移动端审批功能，日活用户 3 万+",
+        "推动设计系统标准化，将 PRD 到开发交付周期缩短 30%"
+      ]
+    },
+    {
+      "title": "产品助理",
+      "company": "明源云",
+      "location": "深圳",
+      "years": "2017-07 至 2019-06",
+      "description": [
+        "协助地产 ERP 产品成本管理模块的需求设计和测试",
+        "编写产品手册和培训材料，面向 200+ 客户成功团队"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "中山大学",
+      "degree": "学士 信息管理与信息系统",
+      "years": "2013-09 至 2017-06",
+      "description": "GPA 3.5/4.0"
+    }
+  ],
+  "personalProjects": [],
+  "additional": {
+    "technicalSkills": ["Axure", "Figma", "Jira", "SQL（基础）", "Tableau"],
+    "languages": ["中文（母语）", "英语（读写）"],
+    "certificationsTraining": ["PMP 认证", "NPDP 产品经理认证"],
+    "awards": []
+  },
+  "customSections": {}
+}

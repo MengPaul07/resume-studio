@@ -1,0 +1,22 @@
+# Lesson plan document type configuration
+# Example of adding a new document type. Copy this pattern for any structured document.
+
+display_name: "教案"
+description: "Structured lesson plan with objectives, materials, procedure steps, assessment, and homework."
+
+sections: >
+  title (text), gradeLevel (text), subject (text), duration (text),
+  objectives[] (text), materials[] (text),
+  procedure[{step (text), time (text), description (text)}],
+  assessment (text), homework (text)
+
+fact_sensitive: "gradeLevel, duration, subject"
+
+path_examples: "'objectives[0]', 'procedure[2].description'"
+
+upsert_example: >
+  path='procedure',
+  value='{"step":"导入","time":"5分钟","description":"..."}'
+
+naming_notes: >
+  Grade levels: '一年级'/'Grade 1'. '分钟' is standard for duration.

@@ -1,0 +1,76 @@
+{
+  "$schema": "fixture:v1",
+  "description": "Expected scope detection results. Used for testing scope resolution from user messages.",
+  "cases": [
+    {
+      "message": "优化一下个人 summary，控制在 90 字以内。",
+      "expected_scope": "summary",
+      "method": "explicit_naming"
+    },
+    {
+      "message": "把工作经历改成 STAR 风格。",
+      "expected_scope": "workExperience",
+      "method": "chinese_keyword"
+    },
+    {
+      "message": "丰富教育经历。",
+      "expected_scope": "education",
+      "method": "chinese_keyword"
+    },
+    {
+      "message": "优化项目经历。",
+      "expected_scope": "personalProjects",
+      "method": "chinese_keyword"
+    },
+    {
+      "message": "技术技能去重。",
+      "expected_scope": "additional",
+      "method": "keyword_skills"
+    },
+    {
+      "message": "更新手机号为 13800138000。",
+      "expected_scope": "personalInfo",
+      "method": "phone_keyword"
+    },
+    {
+      "message": "修改邮箱地址。",
+      "expected_scope": "personalInfo",
+      "method": "email_keyword"
+    },
+    {
+      "message": "整体润色简历。",
+      "expected_scope": "global",
+      "method": "global_token"
+    },
+    {
+      "message": "Improve my resume summary to be more impactful.",
+      "expected_scope": "summary",
+      "method": "english_keyword"
+    },
+    {
+      "message": "Add more details to my work experience at Google.",
+      "expected_scope": "workExperience",
+      "method": "english_keyword"
+    },
+    {
+      "message": "List my AWS and Docker skills more prominently.",
+      "expected_scope": "additional",
+      "method": "english_keyword_skills"
+    },
+    {
+      "message": "Update my contact phone number.",
+      "expected_scope": "personalInfo",
+      "method": "contact_keyword"
+    },
+    {
+      "message": "你好。",
+      "expected_scope": "",
+      "method": "no_scope"
+    },
+    {
+      "message": "帮我看看。",
+      "expected_scope": "",
+      "method": "vague_no_scope"
+    }
+  ]
+}

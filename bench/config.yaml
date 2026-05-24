@@ -1,0 +1,29 @@
+# D-Resume Benchmark Configuration
+# Drag JSON files into fixtures/ directories and add paths here.
+# No code changes needed.
+
+# ── Resume samples: add paths to test against different resume profiles ──
+resumes: []
+  # Use --resume-fixtures to load ALL fixtures from tests/fixtures/resumes/
+  # Use --sample N to randomly pick N resumes from the fixtures
+  # Use --resume <name> to test against a single fixture
+  # Available fixtures:
+  #   minimal, full_stack_en, full_stack_zh, new_grad, executive,
+  #   career_gap, career_switcher, freelancer, overseas_returnee,
+  #   startup_founder, senior_ic, junior_weak, messy_format, designer
+
+# ── Scenario filtering ──
+scenarios:
+  include: [all]          # ["fact_edit", "broad_edit"] to filter
+  exclude: []             # ["edge-empty-message"] to skip
+
+# ── Quality thresholds (warn if below) ──
+thresholds:
+  pass_rate: 0.85
+  quality_overall: 3.5
+
+# ── Eval runtime options ──
+eval:
+  concurrency: 4
+  base_url: http://127.0.0.1:8000/api/v1
+  timeout_seconds: 300
