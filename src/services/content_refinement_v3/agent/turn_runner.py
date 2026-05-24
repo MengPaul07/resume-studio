@@ -284,8 +284,16 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
 
         # Capture LLM config in main thread before spawning — contextvars
         # are not inherited by threading.Thread workers.
-        from src.utils.context import get_llm_config as _get_llm_cfg
+        from src.utils.context import get_llm_config as _get_llm_cfg, get_user_id as _get_uid
         _captured_llm_config = _get_llm_cfg()
+        _captured_user_id = _get_uid()
+        if _captured_user_id:
+            from src.services.content_refinement_v3.backends.session import save_session_state as _save_ss
+            _ss = get_session(session_id, include_state=True) or {}
+            _st = _ss.get("state", {}) if isinstance(_ss.get("state", {}), dict) else {}
+            _rag = _st.get("rag_context_by_path", {}) if isinstance(_st.get("rag_context_by_path", {}), dict) else {}
+            _rag["__user_id__"] = _captured_user_id
+            _save_ss(session_id=session_id, rag_context_by_path=_rag)
 
         def _on_event(kind: str, data: Any) -> None:
             _q.put(("event", kind, data))

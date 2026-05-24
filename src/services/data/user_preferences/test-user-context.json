@@ -1,0 +1,21 @@
+{
+  "preferences": [
+    {
+      "key": "writing_style",
+      "value": "use concise bullets with quantified results",
+      "updated_at": "2026-01-01T00:00:00+00:00"
+    },
+    {
+      "key": "avoid",
+      "value": "do not add soft skills or communication-related content",
+      "updated_at": "2026-01-01T00:00:00+00:00"
+    }
+  ],
+  "key_facts": [
+    {
+      "key": "career_goal",
+      "value": "targeting Staff Engineer roles at FAANG",
+      "updated_at": "2026-01-01T00:00:00+00:00"
+    }
+  ]
+}

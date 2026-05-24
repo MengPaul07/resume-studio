@@ -16,18 +16,20 @@ if os.getenv("TEST_API_BASE"):
     LLM_CONFIG["api_base"] = os.getenv("TEST_API_BASE")
 
 
-def session(resume: dict) -> str:
+DEFAULT_USER_ID = "test-user-llm-suite"
+
+def session(resume: dict, user_id: str = DEFAULT_USER_ID) -> str:
     from fastapi.testclient import TestClient
     from src.main import app
-    r = TestClient(app).post("/api/v1/agent/v3/sessions", json={
-        "raw_document_obj": resume, "refined_document_obj": resume,
-        "llm_config": LLM_CONFIG,
-    })
+    r = TestClient(app).post("/api/v1/agent/v3/sessions",
+        json={"raw_document_obj": resume, "refined_document_obj": resume, "llm_config": LLM_CONFIG},
+        headers={"X-User-Id": user_id},
+    )
     assert r.status_code == 200, r.text
     return r.json()["session_id"]
 
 
-def run_turn(sid: str, msg: str, timeout: int = 180) -> dict:
+def run_turn(sid: str, msg: str, timeout: int = 180, user_id: str = DEFAULT_USER_ID) -> dict:
     from fastapi.testclient import TestClient
     from src.main import app
     client = TestClient(app)
@@ -36,6 +38,7 @@ def run_turn(sid: str, msg: str, timeout: int = 180) -> dict:
     with client.stream(
         "POST", f"/api/v1/agent/v3/sessions/{sid}/turns:run",
         json={"message": msg, "allow_mutation": True, "llm_config": LLM_CONFIG},
+        headers={"X-User-Id": user_id},
         timeout=timeout,
     ) as resp:
         ev = None

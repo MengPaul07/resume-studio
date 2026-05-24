@@ -34,9 +34,10 @@ def _build_context(session_id: str, message: str, target_jd: str = "") -> dict[s
             })
 
     # User memory — cross-session preferences & facts
-    from src.utils.context import get_user_id
+    # user_id stored in rag_context to survive agent thread (contextvar doesn't propagate)
+    rag_ctx = state.get("rag_context_by_path", {}) if isinstance(state.get("rag_context_by_path", {}), dict) else {}
+    user_id = str(rag_ctx.get("__user_id__", ""))
     from src.services.content_refinement_v3.memory.preference_store import memory_to_prompt
-    user_id = get_user_id()
     profile_text = memory_to_prompt(user_id) if user_id else ""
 
     rag_context = state.get("rag_context_by_path", {}) if isinstance(state.get("rag_context_by_path", {}), dict) else {}

@@ -1,0 +1,96 @@
+{
+  "preferences": [
+    {
+      "key": "writing_style",
+      "value": "prefers professional, impactful senior engineer tone",
+      "updated_at": "2026-05-24T13:32:20+00:00"
+    },
+    {
+      "key": "summary_style",
+      "value": "wants summary to highlight polyglot nature with specific languages",
+      "updated_at": "2026-05-24T13:32:39+00:00"
+    }
+  ],
+  "key_facts": [
+    {
+      "key": "email",
+      "value": "john.smith@email.com",
+      "updated_at": "2026-05-24T13:32:32+00:00"
+    },
+    {
+      "key": "target_role",
+      "value": "Fullstack Dev",
+      "updated_at": "2026-05-24T13:32:20+00:00"
+    },
+    {
+      "key": "target_jd_requirements",
+      "value": "Python, PyTorch, NLP, 5+ years, distributed training",
+      "updated_at": "2026-05-24T13:32:17+00:00"
+    },
+    {
+      "key": "current_role",
+      "value": "Senior Software Engineer @ Google (2019-Present)",
+      "updated_at": "2026-05-24T13:32:32+00:00"
+    },
+    {
+      "key": "skills",
+      "value": "Python, Java, Rust, React, PostgreSQL, Redis",
+      "updated_at": "2026-05-24T13:32:45+00:00"
+    },
+    {
+      "key": "project_experience",
+      "value": "Implemented custom LRU cache for trading system, reduced latency by 30%",
+      "updated_at": "2026-05-24T13:32:33+00:00"
+    },
+    {
+      "key": "education",
+      "value": "Master of Science, Computer Science @ Stanford University (incomplete)",
+      "updated_at": "2026-05-24T13:32:32+00:00"
+    },
+    {
+      "key": "current_title",
+      "value": "Engineer",
+      "updated_at": "2026-05-24T13:32:20+00:00"
+    },
+    {
+      "key": "speaking_talks",
+      "value": "Talk at Conf1, Talk at Conf2, Keynote at DevConf 2024",
+      "updated_at": "2026-05-24T13:32:29+00:00"
+    },
+    {
+      "key": "name",
+      "value": "Li Wei",
+      "updated_at": "2026-05-24T13:32:45+00:00"
+    },
+    {
+      "key": "phone",
+      "value": "+1 (555) 123-4567",
+      "updated_at": "2026-05-24T13:32:32+00:00"
+    },
+    {
+      "key": "location",
+      "value": "San Francisco, CA",
+      "updated_at": "2026-05-24T13:32:32+00:00"
+    },
+    {
+      "key": "past_role",
+      "value": "Staff Engineer @ Stripe (2022-2024)",
+      "updated_at": "2026-05-24T13:32:33+00:00"
+    },
+    {
+      "key": "languages",
+      "value": "Chinese (Native), English (Fluent), Japanese (Basic)",
+      "updated_at": "2026-05-24T13:32:45+00:00"
+    },
+    {
+      "key": "certifications",
+      "value": "AWS Solutions Architect, Kubernetes CKAD",
+      "updated_at": "2026-05-24T13:32:45+00:00"
+    },
+    {
+      "key": "awards",
+      "value": "Best Engineer 2022, Hackathon Winner 2021",
+      "updated_at": "2026-05-24T13:32:45+00:00"
+    }
+  ]
+}

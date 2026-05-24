@@ -1,0 +1,15 @@
+{
+  "preferences": [
+    {
+      "key": "writing_style",
+      "value": "short punchy bullet points, action verb start, include numbers, no soft skills",
+      "updated_at": "2026-05-24T13:29:25+00:00"
+    },
+    {
+      "key": "avoid_topics",
+      "value": "soft skills like communication or teamwork",
+      "updated_at": "2026-05-24T13:29:25+00:00"
+    }
+  ],
+  "key_facts": []
+}
