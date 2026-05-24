@@ -303,8 +303,6 @@ class TestAgentLoopIntegration:
             }
 
         monkeypatch.setattr(_context, "get_session_content", fake_get_session_content)
-        monkeypatch.setattr(_context, "load_profile", lambda resume: None)
-        monkeypatch.setattr(_context, "ensure_profile", lambda resume: None)
 
         result = _context._build_context("test_session", "optimize this")
 

@@ -9,18 +9,23 @@
       "key": "summary_style",
       "value": "wants summary to highlight polyglot nature with specific languages",
       "updated_at": "2026-05-24T13:32:39+00:00"
+    },
+    {
+      "key": "bullet_style",
+      "value": "prefers specific, quantified, professional STAR format",
+      "updated_at": "2026-05-24T15:05:13+00:00"
     }
   ],
   "key_facts": [
     {
       "key": "email",
-      "value": "john.smith@email.com",
-      "updated_at": "2026-05-24T13:32:32+00:00"
+      "value": "typo@gmail.com",
+      "updated_at": "2026-05-24T15:05:27+00:00"
     },
     {
       "key": "target_role",
-      "value": "Fullstack Dev",
-      "updated_at": "2026-05-24T13:32:20+00:00"
+      "value": "Senior ML Engineer at AI Lab",
+      "updated_at": "2026-05-24T15:06:04+00:00"
     },
     {
       "key": "target_jd_requirements",
@@ -30,22 +35,22 @@
     {
       "key": "current_role",
       "value": "Senior Software Engineer @ Google (2019-Present)",
-      "updated_at": "2026-05-24T13:32:32+00:00"
+      "updated_at": "2026-05-24T15:04:27+00:00"
     },
     {
       "key": "skills",
-      "value": "Python, Java, Rust, React, PostgreSQL, Redis",
-      "updated_at": "2026-05-24T13:32:45+00:00"
+      "value": "Python, JavaScript, Rust, Kubernetes, Terraform, Go",
+      "updated_at": "2026-05-24T15:06:46+00:00"
     },
     {
       "key": "project_experience",
       "value": "Implemented custom LRU cache for trading system, reduced latency by 30%",
-      "updated_at": "2026-05-24T13:32:33+00:00"
+      "updated_at": "2026-05-24T15:03:12+00:00"
     },
     {
       "key": "education",
-      "value": "Master of Science, Computer Science @ Stanford University (incomplete)",
-      "updated_at": "2026-05-24T13:32:32+00:00"
+      "value": "Bachelor of Software Engineering, Nanjing University, 2020-2024, GPA 3.8, Dean's List, ACM silver medal",
+      "updated_at": "2026-05-24T15:05:31+00:00"
     },
     {
       "key": "current_title",
@@ -60,22 +65,22 @@
     {
       "key": "name",
       "value": "Li Wei",
-      "updated_at": "2026-05-24T13:32:45+00:00"
+      "updated_at": "2026-05-24T15:04:47+00:00"
     },
     {
       "key": "phone",
       "value": "+1 (555) 123-4567",
-      "updated_at": "2026-05-24T13:32:32+00:00"
+      "updated_at": "2026-05-24T15:04:27+00:00"
     },
     {
       "key": "location",
       "value": "San Francisco, CA",
-      "updated_at": "2026-05-24T13:32:32+00:00"
+      "updated_at": "2026-05-24T15:04:27+00:00"
     },
     {
       "key": "past_role",
-      "value": "Staff Engineer @ Stripe (2022-2024)",
-      "updated_at": "2026-05-24T13:32:33+00:00"
+      "value": "Software Engineer @ Microsoft (2016-2019)",
+      "updated_at": "2026-05-24T15:04:27+00:00"
     },
     {
       "key": "languages",
@@ -91,6 +96,11 @@
       "key": "awards",
       "value": "Best Engineer 2022, Hackathon Winner 2021",
       "updated_at": "2026-05-24T13:32:45+00:00"
+    },
+    {
+      "key": "past_role_stripe",
+      "value": "Staff Engineer @ Stripe (2022-2024)",
+      "updated_at": "2026-05-24T15:07:28+00:00"
     }
   ]
 }
