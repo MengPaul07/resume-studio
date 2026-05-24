@@ -1,5 +1,16 @@
-<p align="center">
-  <h1 align="center">Resume Studio</h1>
+<h1 align="center">
+  <svg width="40" height="40" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" style="vertical-align: middle; margin-right: 8px;">
+    <rect x="0" y="0" width="48" height="48" rx="11" fill="#0071e3"/>
+    <g transform="translate(11,6)" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M3 3h14l6 6v22a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+      <path d="M17 3v6h6"/>
+      <path d="M7 17h12"/>
+      <path d="M7 22h10"/>
+      <path d="M7 27h8"/>
+    </g>
+  </svg>
+  Resume Studio
+</h1>
   <p align="center">
     <strong>Build, tailor, review, and rehearse your resume with an AI-native workspace.</strong>
   </p>
@@ -13,7 +24,8 @@
   <a href="#tech-stack"><img alt="FastAPI" src="https://img.shields.io/badge/FastAPI-Backend-009688?style=flat-square&logo=fastapi&logoColor=white"></a>
   <a href="#tech-stack"><img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=111"></a>
   <a href="#tech-stack"><img alt="Vite" src="https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white"></a>
-  <a href="#tests"><img alt="Tests" src="https://img.shields.io/badge/tests-123%20passing-2EA44F?style=flat-square"></a>
+  <a href="#tests"><img alt="Tests" src="https://img.shields.io/badge/tests-191%20unit%20%2B%2037%20LLM-2EA44F?style=flat-square"></a>
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-blue?style=flat-square"></a>
 </p>
 
 <p align="center">
@@ -55,17 +67,42 @@ It is designed as a practical product prototype and as an agent engineering play
 
 ## Preview
 
-### Built for the full application loop
-Resume Studio is designed around the real path from a rough resume to a targeted application: import, refine, align with a job description, tune the document, and rehearse the interview.
-
-> _Drop your upcoming screenshots into `docs/assets/` and replace this preview panel with real product captures._
-
-### Interviewer Presets
-
 <p align="center">
-  <img src="./frontend/src/assets/interview/interviewer-avatars.png" alt="Resume Studio interviewer avatar presets" width="48%">
-  <img src="./frontend/src/assets/interview/interviewer-avatars-extra.png" alt="Additional Resume Studio interviewer avatar presets" width="48%">
+  <img src="./docs/assets/screenshots/dashboard.png" alt="Resume Studio Dashboard" width="92%" />
 </p>
+
+<details open>
+<summary><b>AI Tailor — Chat-Driven Editing</b></summary>
+<br/>
+<p align="center"><img src="./docs/assets/screenshots/ai_tailor_1.png" width="92%" /></p>
+<p align="center"><img src="./docs/assets/screenshots/ai_tailor_2.png" width="92%" /></p>
+</details>
+
+<details>
+<summary><b>Layout Builder — Visual Design</b></summary>
+<br/>
+<p align="center"><img src="./docs/assets/screenshots/layout_builder_1.png" width="92%" /></p>
+<p align="center"><img src="./docs/assets/screenshots/layout_builder_2.png" width="92%" /></p>
+</details>
+
+<details>
+<summary><b>LaTeX Export</b></summary>
+<br/>
+<p align="center"><img src="./docs/assets/screenshots/overleaf_export.png" width="92%" /></p>
+</details>
+
+<details>
+<summary><b>Mock Interview — Setup & Coding</b></summary>
+<br/>
+<p align="center"><img src="./docs/assets/screenshots/interview_setup.png" width="92%" /></p>
+<p align="center"><img src="./docs/assets/screenshots/code_problem_1.png" width="92%" /></p>
+</details>
+
+<details>
+<summary><b>Interview Report</b></summary>
+<br/>
+<p align="center"><img src="./docs/assets/screenshots/finish_interview_1.png" width="92%" /></p>
+</details>
 
 ## Product Tour
 
@@ -170,19 +207,19 @@ Resume Studio uses a function-calling agent loop rather than a single prompt tha
 
 | Component | Role |
 | --- | --- |
-| Intent resolver | Classifies the user request into editing, analysis, fact change, or general chat categories. |
-| Chain planner | Maps intent to a deterministic tool chain such as observe, suggest, refine, and compose. |
-| Tool runner | Executes read, edit, confirm, and compose tools while streaming SSE events. |
-| Self-checker | Reviews the output and can request a retry or fail softly when the response is not good enough. |
-| Eval scripts | Run regression scenarios and produce reports for agent behavior changes. |
+| Agent loop | LLM picks tools autonomously (`read_resume`, `add_entry`, `update_field`, `compose`, etc.) — up to 6 rounds per turn |
+| Tool registry | All tools registered via `@tool` decorator; LLM selects based on JSON schema |
+| Self-check | Code-based verdict on output quality — no extra LLM call needed |
+| SSE streaming | Every tool call, reasoning step, and final result streamed to frontend in real time |
+| Turn logging | Full interaction trace saved to disk — LLM decisions, tool args, results, timing |
 
 ### Key Files
 
 | Path | Role |
 | --- | --- |
-| `src/services/content_refinement_v3/agent/turn_runner.py` | Turn orchestration, tool execution, and SSE output |
-| `src/services/content_refinement_v3/agent/_planner.py` | Intent classification and deterministic chain mapping |
-| `src/services/content_refinement_v3/agent/_self_check.py` | Response quality checks and retry decisions |
+| `src/services/content_refinement_v3/agent/_agent_loop.py` | Agent loop — LLM tool selection + execution |
+| `src/services/content_refinement_v3/agent/turn_runner.py` | Turn orchestration, SSE output, log saving |
+| `src/services/content_refinement_v3/agent/_tools.py` | Tool definitions (`add_entry`, `update_field`, `set_entry`, `delete_entry`, etc.) |
 | `src/services/content_refinement_v3/prompts/agent.py` | Agent and self-check prompts |
 | `src/services/layout_design/` | Resume layout rendering, pagination, and HTML/TeX generation |
 | `frontend/src/` | React app, chat UI, layout builder, and mock interview UI |
@@ -243,20 +280,20 @@ resume-studio/
 
 ## Tests
 
-Run the backend test suite:
-
 ```bash
-python -m pytest tests -q
-```
-*(Expects ~123 passing tests out-of-the-box; 12 skipped require LLM API key)*
+# Unit + integration — no API key needed (~191 tests)
+python -m pytest tests/unit tests/integration -q
 
-Run the frontend build check:
+# LLM scenarios — requires API key (37 tests, 16 concurrent)
+python -m pytest tests/llm -n auto -q
 
-```bash
+# Frontend build check
 npm --prefix frontend run build
 ```
 
-See [tests/README.md](./tests/README.md) for a more detailed testing guide.
+> **37 real-LLM tests** cover edit scenarios, parse pipeline, interview flow, refine patterns, JD search, multi-turn conversation, and preference memory extraction — all run concurrently on deepseek-v4-flash.
+
+See [tests/README.md](./tests/README.md) for the full guide.
 
 ## Agent Evaluation
 
