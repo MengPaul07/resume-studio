@@ -328,6 +328,7 @@
   },
   "autoApply": {
     "title": "Auto-applied",
+    "appliedCount": "Auto-applied {{count}} changes",
     "empty": "No auto-applied changes",
     "before": "Before",
     "after": "After",

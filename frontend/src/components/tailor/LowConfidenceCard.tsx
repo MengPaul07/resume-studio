@@ -18,9 +18,9 @@ export function LowConfidenceCard({ items, confirmedKeys, onToggleConfirm, onDis
       {/* Header */}
       <div className="flex items-start justify-between gap-2 border-b-2 border-black dark:border-zinc-600 bg-orange-100 dark:bg-orange-900/50 px-4 py-3">
         <div>
-          <h3 className="font-serif text-base font-bold text-slate-900 dark:text-slate-100">建议确认以下修改</h3>
+          <h3 className="font-serif text-base font-bold text-slate-900 dark:text-slate-100">{t('lowConfidence.title')}</h3>
           <p className="mt-0.5 font-sans text-[11px] text-slate-500 dark:text-slate-400">
-            以下修改确定性较低，确认后应用。修改已在预览区标出。
+            {t('lowConfidence.description')}
           </p>
         </div>
         <button onClick={onDismiss} className="shrink-0 p-1 text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300" title="关闭">

@@ -94,7 +94,7 @@ def build_agent_system_prompt(doc_type: str = "resume") -> str:
         "If you need conversation context, call read_history.\n"
         "2. EDIT: Use the SIMPLE tools below. Group related changes together.\n"
         "3. CONFIRM: Use ask_user for fact-sensitive changes or when confidence < 0.4.\n"
-        "4. COMPOSE: Call compose when done. Include a brief Chinese summary and 2-3 guide_prompts.\n\n"
+        "4. COMPOSE: Call compose when done. Include a brief summary (in the user's language) and 2-3 guide_prompts.\n\n"
         "SIMPLIFIED EDIT TOOLS (preferred):\n"
         "- add_entry(section, value): Append to education/workExperience/personalProjects/research. value is a JSON object string. NEVER need to know the index.\n"
         "- update_field(path, value): Update a leaf text field. path='summary', 'personalInfo.email', 'additional.technicalSkills'.\n"

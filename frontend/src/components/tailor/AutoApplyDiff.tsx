@@ -31,7 +31,7 @@ export function AutoApplyDiff({ changes }: Props) {
       >
         <GitCompare className="size-4 text-green-700 shrink-0" />
         <span className="font-serif text-base font-bold text-slate-900">
-          已自动应用 {changes.length} 条修改
+          {t('autoApply.appliedCount', { count: changes.length })}
         </span>
         <span className="ml-auto text-slate-500">
           {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}

@@ -328,6 +328,7 @@
   },
   "autoApply": {
     "title": "已自动应用",
+    "appliedCount": "已自动应用 {{count}} 条修改",
     "empty": "无自动应用的修改",
     "before": "修改前",
     "after": "修改后",

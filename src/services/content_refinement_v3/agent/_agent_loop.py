@@ -414,9 +414,9 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
     has_edits = len(all_items) > 0
     return {
         "assistant_message": (
-            f"已为您处理 {len(all_items)} 条修改，请检查预览区确认结果。"
+            f"Processed {len(all_items)} changes. Please review. / 已为您处理 {len(all_items)} 条修改，请检查预览区确认结果。"
             if has_edits else
-            "处理超时，请重新描述您的需求。"
+            "Process timed out. Please rephrase your request. / 处理超时，请重新描述您的需求。"
         ),
         "items": all_items,
         "fact_issues": fact_issues,

@@ -46,7 +46,7 @@ import type {
 } from '../lib/tailor/types';
 
 export function TailorChatPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const resumeId = searchParams.get('resumeId') || '';
 
@@ -1284,6 +1284,7 @@ export function TailorChatPage() {
                 <QuickPrompts
                   resumeObj={session.refinedResumeObj}
                   dynamicPrompts={dynamicGuides}
+                  language={i18n.language}
                   onSelect={(text) => {
                     session.setInputText(text);
                     const ta = document.querySelector<HTMLTextAreaElement>('.chat-input-area');

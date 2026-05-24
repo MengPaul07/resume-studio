@@ -84,7 +84,7 @@ def _save_compact_turn_log(
 def _compose_general_chat_message(message: str) -> str:
     user_text = str(message or "").strip()
     if not user_text:
-        return "我是你的简历优化助手，可以帮你分析、润色并生成可应用修改候选。"
+        return "I'm your resume assistant. I can help analyze, polish, and generate improvements. / 我是你的简历优化助手，可以帮你分析、润色并生成可应用修改候选。"
     llm = build_llm()
     system_prompt = (
         "你是简历优化助手。当前场景是聊天问答，不是执行润色。"
@@ -108,7 +108,7 @@ def _compose_general_chat_message(message: str) -> str:
             return answer
     except Exception:
         pass
-    return "我是你的简历优化助手，可以帮你分析、润色并生成可应用修改候选。"
+    return "I'm your resume assistant — I can analyze, polish, and generate improvements. / 我是你的简历优化助手，可以帮你分析、润色并生成可应用修改候选。"
 
 
 # _build_context imported from ._context (with target_jd support)
@@ -233,7 +233,7 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
 
     # Empty/whitespace-only message: return a generic greeting without the full pipeline
     if not clean_message:
-        assistant_msg = "你好，我是你的简历优化助手。你可以直接告诉我想要修改的内容，比如「优化工作经历部分，突出量化成果」或「分析简历的 ATS 关键词覆盖情况」。"
+        assistant_msg = "Hello! I'm your resume assistant. Tell me what you'd like to change — e.g. 'improve my work experience with quantified results' or 'check my resume for ATS compatibility.' / 你好，我是你的简历优化助手。你可以直接告诉我想要修改的内容，比如「优化工作经历部分，突出量化成果」或「分析简历的 ATS 关键词覆盖情况」。"
         add_message(session_id=session_id, turn_id=turn_id, role="assistant", content=assistant_msg)
         finish_turn(turn_id=turn_id, status="completed", assistant_message_id="")
         payload = _build_turn_payload(
@@ -269,7 +269,7 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
         yield from _sse.emit_plan_step(ctx, step_id, "agent_loop", "reasoning")
         yield from _sse.emit_step_started(ctx, step_id, "agent_loop")
 
-        yield from _sse.emit_thinking(ctx, "正在分析你的请求...")
+        yield from _sse.emit_thinking(ctx, "Analyzing your request... / 正在分析你的请求...")
 
         import queue
         import threading
@@ -483,7 +483,7 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
                     "step_reason_summary": step_reason_summary,
                     "self_check_result": {"result": "paused", "reason": "awaiting_user_confirmation"},
                     "planner_decision_trace": ctx.planner_decision_trace,
-                    "thought_summary": ["暂停等待用户确认"],
+                    "thought_summary": ["Paused — awaiting user confirmation / 暂停等待用户确认"],
                     "content_assessment": {"candidate_count": 0, "changed_count": 0, "material_change_count": 0, "fact_issue_count": len(fact_issues_paused), "style_variants": []},
                     "intent_state": ctx.intent_state,
                     "vague_actions": [],
@@ -1001,7 +1001,7 @@ def apply_changes(*, session_id: str, human_review_decision: Dict[str, Any] | No
                 applied_changes.append({"path": path, "item_key": key, "source": "suggestion", "op": op, "status": "applied", "reason": str(item.get("reason", "")).strip()})
                 item["status"] = "applied"
             else:
-                failed_changes.append({"path": path, "item_key": key, "source": "suggestion", "op": op, "status": "failed", "reason": str(item.get("reason", "")).strip(), "error": f"路径 {path} 无法应用{'新增' if op == 'upsert' else '修改'}，请检查路径是否正确。"})
+                failed_changes.append({"path": path, "item_key": key, "source": "suggestion", "op": op, "status": "failed", "reason": str(item.get("reason", "")).strip(), "error": f"Failed to {('add' if op == 'upsert' else 'update')} path '{path}'. Check path validity. / 路径 {path} 无法应用{'新增' if op == 'upsert' else '修改'}，请检查路径是否正确。"})
                 item["status"] = "failed"
 
     overrides = decision.get("overrides", []) if isinstance(decision.get("overrides", []), list) else []
@@ -1040,9 +1040,9 @@ def apply_changes(*, session_id: str, human_review_decision: Dict[str, Any] | No
     failed_count = len(failed_changes)
     all_changes = applied_changes + failed_changes
     if failed_count > 0:
-        assistant_message = f"已应用 {applied_count} 条候选，{failed_count} 条因路径不存在而失败。"
+        assistant_message = f"Applied {applied_count} change(s), {failed_count} failed (invalid path). / 已应用 {applied_count} 条候选，{failed_count} 条因路径不存在而失败。"
     else:
-        assistant_message = f"已应用 {applied_count} 条候选。"
+        assistant_message = f"Applied {applied_count} change(s). / 已应用 {applied_count} 条候选。"
     assistant_row = add_message(session_id=session_id, turn_id=turn_id, role="assistant", content=assistant_message)
     finish_turn(turn_id=turn_id, status="completed", assistant_message_id=str(assistant_row.get("id", "")))
 
@@ -1100,7 +1100,7 @@ def reject_changes(*, session_id: str, rejected_item_keys: List[str] | None = No
     duration_ms = int((time.perf_counter() - started) * 1000)
     add_node_event(session_id=session_id, turn_id=turn_id, node_name="tool:reject_changes", status="success", duration_ms=duration_ms, payload={"rejected_count": len(target_keys), "reject_all": bool(reject_all)})
 
-    assistant_message = f"已拒绝 {len(target_keys)} 条候选。"
+    assistant_message = f"Rejected {len(target_keys)} suggestion(s). / 已拒绝 {len(target_keys)} 条候选。"
     assistant_row = add_message(session_id=session_id, turn_id=turn_id, role="assistant", content=assistant_message)
     finish_turn(turn_id=turn_id, status="completed", assistant_message_id=str(assistant_row.get("id", "")))
     return _build_action_turn_payload(session_id=session_id, turn_id=turn_id, assistant_message=assistant_message, refined_document_obj=snapshot.get("refined_document_obj", {}), suggestion_document_obj=normalized, applied_changes=[], termination_reason="rejected")

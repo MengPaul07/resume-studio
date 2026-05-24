@@ -12,8 +12,13 @@ function getUserId(): string {
   return uid;
 }
 
+export function getLang(): string {
+  try { return localStorage.getItem('i18nextLng') || 'zh'; }
+  catch { return 'zh'; }
+}
+
 export function withUserId(headers: Record<string, string> = {}): Record<string, string> {
-  return { ...headers, 'X-User-Id': getUserId() };
+  return { ...headers, 'X-User-Id': getUserId(), 'X-User-Lang': getLang() };
 }
 
 export function buildApiUrl(path: string): string {

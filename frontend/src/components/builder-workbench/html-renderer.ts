@@ -315,14 +315,19 @@ export function renderResumeHtmlFromLayout(params: {
     : '';
   const metaHtml = raw.contactLayout === 'stacked' ? stackedMeta : inlineMeta;
 
-  const headerHasPhoto = raw.showPhoto && raw.photoUrl;
+  const photoPlaceholder = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="133" fill="none"><rect width="100" height="133" rx="4" fill="#e8e8e8"/><circle cx="50" cy="52" r="24" fill="#bbb"/><path d="M14 133 Q14 97 50 97 Q86 97 86 133" fill="#bbb"/></svg>'
+  );
+  const photoSrc = raw.showPhoto ? (raw.photoUrl || photoPlaceholder) : '';
+  const headerHasPhoto = raw.showPhoto;
   const headerFlexClass = headerHasPhoto ? 'header-with-photo' : '';
-  const isSplitHeader = raw.headerLayout === 'split';
+  const headerLayout = raw.headerLayout;
+  const isSplitHeader = headerLayout === 'split';
 
   const headerHtml = isSplitHeader
     ? `<header class="header-split">
       <div class="header-left">
-        ${headerHasPhoto && raw.photoPosition === 'left' ? `<img class="header-photo" src="${escapeHtml(raw.photoUrl)}" alt="photo" />` : ''}
+        ${headerHasPhoto && raw.photoPosition === 'left' ? `<img class="header-photo" src="${escapeHtml(photoSrc)}" alt="photo" />` : ''}
         <h1>${name}</h1>
         ${role ? `<p class="role">${role}</p>` : ''}
       </div>
@@ -332,13 +337,13 @@ export function renderResumeHtmlFromLayout(params: {
       </div>
     </header>`
     : `<header class="${headerFlexClass}">
-      ${headerHasPhoto && raw.photoPosition === 'left' ? `<img class="header-photo" src="${escapeHtml(raw.photoUrl)}" alt="photo" />` : ''}
+      ${headerHasPhoto && raw.photoPosition === 'left' ? `<img class="header-photo photo-${raw.photoPosition}" src="${escapeHtml(photoSrc)}" alt="photo" />` : ''}
       <div class="header-text">
         <h1>${name}</h1>
         ${role ? `<p class="role">${role}</p>` : ''}
         ${metaHtml}
       </div>
-      ${headerHasPhoto && raw.photoPosition === 'right' ? `<img class="header-photo" src="${escapeHtml(raw.photoUrl)}" alt="photo" />` : ''}
+      ${headerHasPhoto && raw.photoPosition === 'right' ? `<img class="header-photo photo-${raw.photoPosition}" src="${escapeHtml(photoSrc)}" alt="photo" />` : ''}
     </header>`;
 
   const orderedVisible = sections.filter((item) => item.visible).map((item) => item.key);
@@ -371,7 +376,6 @@ export function renderResumeHtmlFromLayout(params: {
   const headerBorderStyle = raw.showHeaderDivider
     ? `border-bottom: var(--r-divider-thick) solid var(--r-divider-color);`
     : 'border-bottom: none;';
-  const headerLayout = raw.headerLayout;
   const headerJustify = headerLayout === 'center' ? 'center' : 'flex-start';
   const headerTextAlign = headerLayout === 'center' ? 'center' : 'left';
   const pageClass = (extra = '') => [headingStyleClass, extra].filter(Boolean).join(' ');
@@ -427,11 +431,11 @@ export function renderResumeHtmlFromLayout(params: {
     body { margin: 0; color: var(--r-body-color); background: #fafafa; font-family: var(--r-body-font); }
     .page { width: 210mm; min-height: 297mm; margin: 0 auto 12px; background: #ffffff; padding: var(--r-page-padding); overflow-wrap: anywhere; }
     @media print { .page { margin: 0; page-break-after: always; } .page:last-child { page-break-after: auto; } }
-    header { ${headerBorderStyle} margin: 0 calc(-1 * var(--r-page-padding)) var(--r-header-margin); padding: calc(var(--r-page-padding) / 2) var(--r-page-padding); text-align: ${headerTextAlign}; background: var(--r-header-bg); color: var(--r-header-color); }
-    .header-with-photo { display: flex; align-items: center; gap: 16px; justify-content: ${headerJustify}; }
-    .header-with-photo .header-text { text-align: ${headerTextAlign}; }
-    .header-photo { width: var(--r-photo-width); height: var(--r-photo-height); border-radius: var(--r-photo-radius); object-fit: cover; flex-shrink: 0; }
-    .header-text { flex: 1; min-width: 0; }
+    header { ${headerBorderStyle} position: relative; box-sizing: content-box; margin: 0 calc(-1 * var(--r-page-padding)) var(--r-header-margin); padding: calc(var(--r-page-padding) / 2) var(--r-page-padding); text-align: ${headerTextAlign}; background: var(--r-header-bg); color: var(--r-header-color); }
+    .header-photo { width: var(--r-photo-width); height: var(--r-photo-height); border-radius: var(--r-photo-radius); object-fit: cover; }
+    .header-photo.photo-left { position: absolute; left: var(--r-page-padding); top: 50%; transform: translateY(-50%); }
+    .header-photo.photo-right { position: absolute; right: var(--r-page-padding); top: 50%; transform: translateY(-50%); }
+    .header-text { }
     .header-split { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding-bottom: var(--r-header-pad); }
     .header-split .header-left { flex: 0 1 auto; }
     .header-split .header-right { flex: 0 0 auto; text-align: right; }

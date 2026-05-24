@@ -414,8 +414,11 @@ export function EditorPanel({ guidance, onGuidanceChange, sections = [], onSecti
                           }}
                         >
                           {!guidance.photoUrl ? (
-                            <div className="flex h-full w-full items-center justify-center font-mono text-[10px] uppercase text-gray-400">
-                              Photo
+                            <div className="flex h-full w-full items-center justify-center">
+                              <svg width="24" height="32" viewBox="0 0 48 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="24" cy="20" r="14" fill="#ccc"/>
+                                <path d="M2 64 Q2 34 24 34 Q46 34 46 64" fill="#ccc"/>
+                              </svg>
                             </div>
                           ) : null}
                         </div>

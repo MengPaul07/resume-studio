@@ -11,101 +11,86 @@ interface Prompt {
  * Analyze the resume object and generate contextual quick-action prompts.
  * Pure function — no backend call.
  */
-function analyzeResumeForPrompts(obj: Record<string, unknown> | null | undefined): Prompt[] {
+function analyzeResumeForPrompts(obj: Record<string, unknown> | null | undefined, lang: string): Prompt[] {
   if (!obj || Object.keys(obj).length === 0) return [];
 
+  const isEn = lang === 'en';
   const prompts: Prompt[] = [];
   const summary = typeof obj.summary === 'string' ? obj.summary : '';
   const workExperience = Array.isArray(obj.workExperience) ? obj.workExperience : [];
   const personalProjects = Array.isArray(obj.personalProjects) ? obj.personalProjects : [];
   const additional = (obj.additional || {}) as Record<string, unknown>;
   const skills = Array.isArray(additional.technicalSkills) ? additional.technicalSkills : [];
-  const education = Array.isArray(obj.education) ? obj.education : [];
 
-  // 1. Summary analysis
   if (!summary || summary.length < 60) {
     prompts.push({
-      label: '完善 Summary',
-      text: '帮我写一段专业的个人总结，突出核心技术优势和业务影响力。',
-      reason: 'summary 缺失或过短',
+      label: isEn ? 'Write Summary' : '完善 Summary',
+      text: isEn ? 'Write a professional summary highlighting my core strengths and business impact.' : '帮我写一段专业的个人总结，突出核心技术优势和业务影响力。',
+      reason: 'summary too short or missing',
     });
   } else if (summary.length > 300) {
     prompts.push({
-      label: '精简 Summary',
-      text: '精简个人总结，控制在 100 字以内，保留最核心的亮点。',
-      reason: 'summary 过长',
+      label: isEn ? 'Trim Summary' : '精简 Summary',
+      text: isEn ? 'Trim my summary to under 100 words, keeping only the strongest points.' : '精简个人总结，控制在 100 字以内，保留最核心的亮点。',
+      reason: 'summary too long',
     });
   }
 
-  // 2. Quantifiable metrics
   const hasMetrics = workExperience.some((exp: Record<string, unknown>) => {
     const descs = Array.isArray(exp.description) ? exp.description : [];
-    return descs.some((d: string) => /\d+%|\d+\s*倍|\d+\s*万|\d+\s*k|\d+\s*M|\d+\s*ms|\d+\s*QPS/gim.test(d));
+    return descs.some((d: string) => /\d+%|\d+\s*倍|\d+\s*万|\d+\s*k|\d+\s*M|\d+\s*ms|\d+\s*QPS|\d+\s*users|\d+\s*DAU/gim.test(d));
   });
   if (!hasMetrics && workExperience.length > 0) {
     prompts.push({
-      label: '量化成果',
-      text: '为每段工作经历补充量化指标，让成果更具体可衡量。',
-      reason: '缺少量化数据',
+      label: isEn ? 'Add Metrics' : '量化成果',
+      text: isEn ? 'Add quantified metrics to my work experience — percentages, numbers, scale.' : '为每段工作经历补充量化指标，让成果更具体可衡量。',
+      reason: 'missing metrics',
     });
   }
 
-  // 3. Weak descriptions
   const hasWeakDesc = workExperience.some((exp: Record<string, unknown>) => {
     const descs = Array.isArray(exp.description) ? exp.description : [];
     return descs.length < 2 || descs.some((d: string) => d.length < 30);
   });
   if (hasWeakDesc) {
     prompts.push({
-      label: 'STAR 改写',
-      text: '用 STAR 方法改写工作经历，确保每条要点有情境、行动和结果。',
-      reason: '经历描述偏弱',
+      label: isEn ? 'STAR Rewrite' : 'STAR 改写',
+      text: isEn ? 'Rewrite my work experience using the STAR method (Situation, Task, Action, Result).' : '用 STAR 方法改写工作经历，确保每条要点有情境、行动和结果。',
+      reason: 'weak descriptions',
     });
   }
 
-  // 4. Skills
   if (skills.length < 5) {
     prompts.push({
-      label: '补充技能',
-      text: '根据我的工作经历，帮我补充相关技术和工具技能。',
-      reason: '技能列表偏少',
-    });
-  }
-  if (skills.length > 3 && skills.every((s: unknown) => typeof s === 'string' && !s.includes('（') && !s.includes('('))) {
-    // Skills have no proficiency levels
-    prompts.push({
-      label: '标注熟练度',
-      text: '帮我在技能后面标注熟练程度，如"精通""熟练""了解"。',
-      reason: '技能未标注掌握程度',
+      label: isEn ? 'Add Skills' : '补充技能',
+      text: isEn ? 'Suggest relevant technical and tool skills based on my work experience.' : '根据我的工作经历，帮我补充相关技术和工具技能。',
+      reason: 'too few skills',
     });
   }
 
-  // 5. Projects
   if (personalProjects.length === 0) {
     prompts.push({
-      label: '添加项目',
-      text: '根据工作经历，帮我补充 2-3 个有代表性的项目经历。',
-      reason: '缺少项目经历',
+      label: isEn ? 'Add Projects' : '添加项目',
+      text: isEn ? 'Suggest 2-3 representative projects based on my work experience.' : '根据工作经历，帮我补充 2-3 个有代表性的项目经历。',
+      reason: 'missing projects',
     });
   }
 
-  // 6. Mixed language
   const allText = JSON.stringify(obj);
   const hasChinese = /[一-鿿]/.test(allText);
   const hasEnglish = /[a-zA-Z]{3,}/.test(allText);
   if (hasChinese && hasEnglish) {
     prompts.push({
-      label: '统一格式',
-      text: '统一简历中的语言风格和标点格式，保持专业一致性。',
-      reason: '中英混合',
+      label: isEn ? 'Normalize Format' : '统一格式',
+      text: isEn ? 'Normalize language style and punctuation for professional consistency.' : '统一简历中的语言风格和标点格式，保持专业一致性。',
+      reason: 'mixed language',
     });
   }
 
-  // 7. ATS / risk check (always useful)
   prompts.push({
-    label: '风险检查',
-    text: '检查简历中是否有表达风险、格式问题或 ATS 不友好的地方。',
-    reason: '全面排查',
+    label: isEn ? 'ATS Check' : '风险检查',
+    text: isEn ? 'Check my resume for ATS compatibility, formatting issues, and risky phrasing.' : '检查简历中是否有表达风险、格式问题或 ATS 不友好的地方。',
+    reason: 'full audit',
   });
 
   return prompts.slice(0, 6);
@@ -116,10 +101,12 @@ interface Props {
   onSelect: (text: string) => void;
   disabled?: boolean;
   dynamicPrompts?: Array<{ label: string; text: string }>;
+  language?: string;
 }
 
-export function QuickPrompts({ resumeObj, onSelect, disabled, dynamicPrompts }: Props) {
-  const staticPrompts = useMemo(() => analyzeResumeForPrompts(resumeObj), [resumeObj]);
+export function QuickPrompts({ resumeObj, onSelect, disabled, dynamicPrompts, language }: Props) {
+  const lang = language || 'zh';
+  const staticPrompts = useMemo(() => analyzeResumeForPrompts(resumeObj, lang), [resumeObj, lang]);
   const hasDynamic = dynamicPrompts && dynamicPrompts.length > 0;
 
   if (staticPrompts.length === 0 && !hasDynamic) return null;
