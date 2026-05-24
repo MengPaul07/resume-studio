@@ -717,6 +717,7 @@ def partial_refine_content(
             "api_base": llm.api_base or None,
             "temperature": 0.1,
             "max_tokens": 420 if expected_type == "scalar" else 4096,
+            "timeout": 120,
         }
         try:
             resp = completion(**req, response_format={"type": "json_object"})
@@ -815,6 +816,7 @@ def partial_generate_suggest(
         "api_base": llm.api_base or None,
         "temperature": 0.15,
         "max_tokens": 4096,
+        "timeout": 120,
     }
     raw_content = ""
     raw_tasks: list[dict[str, Any]] = []
@@ -966,6 +968,7 @@ def partial_direct_edit(
         "api_base": llm.api_base or None,
         "temperature": 0.2,
         "max_tokens": 8192 if is_new_section else 4096,
+        "timeout": 120,
     }
 
     raw_content = ""
@@ -1108,6 +1111,7 @@ def partial_execute_task(
         "api_base": llm.api_base or None,
         "temperature": 0.2,
         "max_tokens": 420 if expected_type == "scalar" else 4096,
+        "timeout": 120,
     }
     try:
         resp = completion(**req, response_format={"type": "json_object"})

@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <a href="#why-d-resume"><strong>Why</strong></a>
+  <a href="#why-resume-studio"><strong>Why</strong></a>
   •
   <a href="#preview"><strong>Preview</strong></a>
   •

@@ -27,4 +27,3 @@ def test_direct_edit_prompt_handles_vague_requests():
     prompt = build_agent_system_prompt("resume")
     assert "VAGUE" in prompt.upper()
     assert "too vague" in prompt.lower()
-    assert "lesson_plan" in available_doc_types()

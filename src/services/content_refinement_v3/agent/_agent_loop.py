@@ -106,6 +106,7 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
                 api_base=llm.api_base or None,
                 temperature=0.2,
                 max_tokens=16384,
+                timeout=120,
             )
             llm_duration_ms = int((time.perf_counter() - t0) * 1000)
         except Exception as exc:

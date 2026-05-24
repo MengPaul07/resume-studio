@@ -1415,6 +1415,7 @@ export function TailorChatPage() {
     {showInterview && (
       <InterviewModal
         resumeObj={session.refinedResumeObj}
+        resumeId={resumeId}
         targetJd={targetJd?.text}
         onClose={() => setShowInterview(false)}
       />

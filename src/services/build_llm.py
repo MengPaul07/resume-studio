@@ -98,6 +98,7 @@ class LiteLLMAdapter:
             "messages": self._normalize_messages(messages),
             "temperature": self.temperature,
             "max_tokens": self.max_tokens,
+            "timeout": 120,
         }
         if self.api_key:
             payload["api_key"] = self.api_key

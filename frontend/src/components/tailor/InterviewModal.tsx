@@ -1,10 +1,21 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Check, ChevronLeft, ChevronRight, RotateCcw, History, Play, Code2, MessageCircle, Clock, Signal } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, RotateCcw, History, Play, Code2, MessageCircle, Clock, Signal, Send, X, GripHorizontal } from 'lucide-react';
+import Editor from 'react-simple-code-editor';
+import { highlight, languages } from 'prismjs';
+import 'prismjs/components/prism-python';
+import 'prismjs/components/prism-javascript';
+import 'prismjs/components/prism-java';
+import 'prismjs/components/prism-c';
+import 'prismjs/components/prism-cpp';
+import 'prismjs/components/prism-go';
+import 'prismjs/themes/prism.css';
 import { toolChat, toolSessionStart } from '../../api';
 import { renderAssistantMarkdown } from '../../lib/tailor/markdown';
 import { WritingPanel } from './WritingPanel';
+import { postJson } from '../../api';
 import type { EditorQuestion, EditorMode } from './WritingPanel';
+import { Button } from '../ui/button';
 import interviewerAvatars from '../../assets/interview/interviewer-avatars.png';
 import interviewerAvatarsExtra from '../../assets/interview/interviewer-avatars-extra.png';
 
@@ -111,23 +122,23 @@ const INDUSTRY_FILTER_IDS = ['all','internet','software','finance','healthcare',
 const DEFAULT_INTERACTION_PROFILE: InteractionProfile = {
   patience: 'medium',
   nudge_style: 'structured',
-  silence_threshold_sec: 90,
+  silence_threshold_sec: 300,
   max_proactive_nudges_per_question: 1,
 };
 
 const INTERACTION_PROFILES: Record<string, InteractionProfile> = {
-  'li-yan': { patience: 'low', nudge_style: 'pressure', silence_threshold_sec: 45, max_proactive_nudges_per_question: 1 },
-  'maya-chen': { patience: 'medium', nudge_style: 'structured', silence_threshold_sec: 90, max_proactive_nudges_per_question: 1 },
-  'helena-brooks': { patience: 'low', nudge_style: 'skeptical', silence_threshold_sec: 60, max_proactive_nudges_per_question: 1 },
-  'qiao-lin': { patience: 'high', nudge_style: 'gentle', silence_threshold_sec: 120, max_proactive_nudges_per_question: 1 },
-  'sofia-rivera': { patience: 'medium', nudge_style: 'structured', silence_threshold_sec: 90, max_proactive_nudges_per_question: 1 },
-  'aisha-patel': { patience: 'high', nudge_style: 'gentle', silence_threshold_sec: 110, max_proactive_nudges_per_question: 1 },
-  'eleanor-park': { patience: 'medium', nudge_style: 'skeptical', silence_threshold_sec: 90, max_proactive_nudges_per_question: 1 },
-  'marcus-reed': { patience: 'low', nudge_style: 'pressure', silence_threshold_sec: 55, max_proactive_nudges_per_question: 1 },
-  'priya-nair': { patience: 'medium', nudge_style: 'structured', silence_threshold_sec: 75, max_proactive_nudges_per_question: 1 },
-  'carlos-mendes': { patience: 'medium', nudge_style: 'skeptical', silence_threshold_sec: 75, max_proactive_nudges_per_question: 1 },
-  'kenji-sato': { patience: 'medium', nudge_style: 'structured', silence_threshold_sec: 85, max_proactive_nudges_per_question: 1 },
-  'grace-okafor': { patience: 'high', nudge_style: 'gentle', silence_threshold_sec: 120, max_proactive_nudges_per_question: 1 },
+  'li-yan': { patience: 'low', nudge_style: 'pressure', silence_threshold_sec: 120, max_proactive_nudges_per_question: 1 },
+  'maya-chen': { patience: 'medium', nudge_style: 'structured', silence_threshold_sec: 300, max_proactive_nudges_per_question: 1 },
+  'helena-brooks': { patience: 'low', nudge_style: 'skeptical', silence_threshold_sec: 240, max_proactive_nudges_per_question: 1 },
+  'qiao-lin': { patience: 'high', nudge_style: 'gentle', silence_threshold_sec: 600, max_proactive_nudges_per_question: 1 },
+  'sofia-rivera': { patience: 'medium', nudge_style: 'structured', silence_threshold_sec: 360, max_proactive_nudges_per_question: 1 },
+  'aisha-patel': { patience: 'high', nudge_style: 'gentle', silence_threshold_sec: 480, max_proactive_nudges_per_question: 1 },
+  'eleanor-park': { patience: 'medium', nudge_style: 'skeptical', silence_threshold_sec: 420, max_proactive_nudges_per_question: 1 },
+  'marcus-reed': { patience: 'low', nudge_style: 'pressure', silence_threshold_sec: 180, max_proactive_nudges_per_question: 1 },
+  'priya-nair': { patience: 'medium', nudge_style: 'structured', silence_threshold_sec: 300, max_proactive_nudges_per_question: 1 },
+  'carlos-mendes': { patience: 'medium', nudge_style: 'skeptical', silence_threshold_sec: 300, max_proactive_nudges_per_question: 1 },
+  'kenji-sato': { patience: 'medium', nudge_style: 'structured', silence_threshold_sec: 360, max_proactive_nudges_per_question: 1 },
+  'grace-okafor': { patience: 'high', nudge_style: 'gentle', silence_threshold_sec: 540, max_proactive_nudges_per_question: 1 },
 };
 
 const LENGTH_OPTION_IDS = ['micro','short','standard','deep','marathon'] as const;
@@ -326,11 +337,124 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 interface Props {
   resumeObj: Record<string, unknown>;
+  resumeId?: string;
   targetJd?: string;
   onClose: () => void;
 }
 
-export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
+function toDisplayText(value: unknown): string {
+  if (value == null) return '';
+  if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) return value.map(toDisplayText).join(', ');
+  if (typeof value === 'object') return Object.entries(value as Record<string,unknown>).map(([k,v]) => `${k}: ${toDisplayText(v)}`).join(' | ');
+  return '';
+}
+
+function ResumePanelContent({ resumeObj }: { resumeObj: Record<string, unknown> }) {
+  const sections = [
+    { key: 'personalInfo', label: 'Personal Info' },
+    { key: 'summary', label: 'Summary' },
+    { key: 'workExperience', label: 'Work Experience' },
+    { key: 'education', label: 'Education' },
+    { key: 'personalProjects', label: 'Projects' },
+    { key: 'research', label: 'Research' },
+    { key: 'additional', label: 'Additional' },
+  ];
+  return (
+    <>
+      {sections.map(({ key, label }) => {
+        const val = resumeObj[key];
+        if (val == null || val === '' || (Array.isArray(val) && val.length === 0)) return null;
+        return (
+          <div key={key} className="rounded-lg border border-[var(--brand-line)] bg-[var(--brand-surface-soft)] p-3">
+            <p className="font-sans text-[10px] font-semibold text-[var(--brand-ink-muted)] uppercase tracking-wide mb-1.5">{label}</p>
+            {key === 'summary' || key === 'additional' ? (
+              <p className="font-sans text-xs leading-relaxed text-[var(--brand-ink)]">{toDisplayText(val)}</p>
+            ) : Array.isArray(val) ? (
+              <div className="space-y-2">
+                {(val as Array<Record<string,unknown>>).map((item, i) => (
+                  <div key={i} className="text-xs text-[var(--brand-ink)]">
+                    <p className="font-medium">{toDisplayText(item.name || item.title || item.institution || item.company || '')}</p>
+                    <p className="text-[var(--brand-ink-muted)] mt-0.5">{toDisplayText(item.description || item.years || item.degree || item.role || '')}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function DraggablePopup({ title, children, onClose, zoom, onZoomChange }: { title: string; children: React.ReactNode; onClose: () => void; zoom?: number; onZoomChange?: (z: number) => void }) {
+  const [pos, setPos] = useState({ x: Math.max(40, window.innerWidth/2 - 320), y: 60 });
+  const [size, setSize] = useState({ w: 640, h: 520 });
+  const [dragging, setDragging] = useState(false);
+  const [resizing, setResizing] = useState(false);
+  const dragRef = useRef<{ sx: number; sy: number; px: number; py: number }>({ sx:0, sy:0, px:0, py:0 });
+
+  useEffect(() => {
+    const onMouseMove = (e: MouseEvent) => {
+      if (dragging) {
+        setPos({ x: e.clientX - dragRef.current.sx, y: e.clientY - dragRef.current.sy });
+      }
+      if (resizing) {
+        setSize({
+          w: Math.max(360, e.clientX - dragRef.current.px),
+          h: Math.max(280, e.clientY - dragRef.current.py),
+        });
+      }
+    };
+    const onMouseUp = () => { setDragging(false); setResizing(false); };
+    if (dragging || resizing) {
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    }
+    return () => { window.removeEventListener('mousemove', onMouseMove); window.removeEventListener('mouseup', onMouseUp); };
+  }, [dragging, resizing]);
+
+  return (
+    <div className="fixed z-[60]" style={{ left: pos.x, top: pos.y, width: size.w, height: size.h }}>
+      <div className="flex flex-col h-full rounded-xl border border-[var(--brand-line-strong)] bg-[var(--brand-surface)] shadow-2xl overflow-hidden">
+        <div
+          className="flex shrink-0 items-center justify-between bg-[var(--brand-surface-soft)] px-3 py-2 border-b border-[var(--brand-line)] cursor-move select-none"
+          onMouseDown={e => { setDragging(true); dragRef.current = { sx: e.clientX - pos.x, sy: e.clientY - pos.y, px: pos.x, py: pos.y }; }}
+        >
+          <div className="flex items-center gap-2">
+            <GripHorizontal className="size-3.5 text-[var(--brand-ink-muted)]" />
+            <span className="font-sans text-[11px] font-semibold text-[var(--brand-ink)]">{title}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            {onZoomChange && (
+              <div className="flex items-center gap-0.5">
+                <button onClick={() => onZoomChange(Math.max(0.25, (zoom || 1) - 0.1))}
+                  className="rounded px-1.5 py-0.5 font-mono text-[10px] text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)] transition-colors">−</button>
+                <span className="font-mono text-[10px] text-[var(--brand-ink-muted)] w-8 text-center">{Math.round((zoom || 1) * 100)}%</span>
+                <button onClick={() => onZoomChange(Math.min(2, (zoom || 1) + 0.1))}
+                  className="rounded px-1.5 py-0.5 font-mono text-[10px] text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)] transition-colors">+</button>
+              </div>
+            )}
+            <button onClick={onClose} className="rounded-full p-0.5 text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)] hover:text-[var(--brand-ink)] transition-colors">
+              <X className="size-3.5" />
+            </button>
+          </div>
+        </div>
+        <div className="flex-1 overflow-auto bg-[var(--brand-paper)]">
+          <div style={zoom ? { transform: `scale(${zoom})`, transformOrigin: 'top left', width: `${100/zoom}%` } : undefined}>
+            {children}
+          </div>
+        </div>
+        <div
+          className="absolute right-0 bottom-0 w-4 h-4 cursor-se-resize"
+          onMouseDown={e => { e.stopPropagation(); setResizing(true); dragRef.current = { ...dragRef.current, px: e.clientX - size.w, py: e.clientY - size.h }; }}
+        />
+      </div>
+    </div>
+  );
+}
+
+export function InterviewModal({ resumeObj, resumeId, targetJd, onClose }: Props) {
   const { t } = useTranslation();
   const last = loadLastSetup();
   const [inProgress, setInProgress] = useState<InProgressSession | null>(loadInProgress);
@@ -375,6 +499,12 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
   const [codingCode, setCodingCode] = useState('');
   const [codingQuestionKey, setCodingQuestionKey] = useState('');
   const [manualCode, setManualCode] = useState('');
+  const [resumePopup, setResumePopup] = useState(false);
+  const [resumeZoom, setResumeZoom] = useState(0.65);
+  const [resumeHtml, setResumeHtml] = useState('');
+  const [jdPopup, setJDPopup] = useState(false);
+  const [codePanelOpen, setCodePanelOpen] = useState(false);
+  const [editorLang, setEditorLang] = useState('python');
   const scrollRef = useRef<HTMLDivElement>(null);
   const filteredPresets = industryFilter === 'all'
     ? PRESETS
@@ -383,7 +513,7 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
   const activePreset = PRESETS.find(p => p.id === (config?.preset_id || selectedPreset)) || PRESETS[0];
   const interactionProfile = getInteractionProfile(activePreset.id);
   const lastAssistantMessage = [...messages].reverse().find(m => m.role === 'assistant');
-  const effectiveThreshold = Math.max(20, Math.min(240, Number(lastAssistantMessage?.waitSeconds || interactionProfile.silence_threshold_sec || 90)));
+  const effectiveThreshold = Math.max(120, Math.min(900, Number(lastAssistantMessage?.waitSeconds || interactionProfile.silence_threshold_sec || 300)));
 
   // ── Persist in-progress session on every state change ───────────────
   useEffect(() => {
@@ -470,6 +600,7 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
     setIvSessionId('');
     toolSessionStart({
       doc_type: 'resume',
+      resume_id: resumeId || '',
       title: 'Mock Interview',
       refined_document_obj: resumeObj,
     })
@@ -494,6 +625,18 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
   };
 
   useEffect(() => { createSession(); }, []);
+
+  // Fetch builder HTML resume when popup opens
+  useEffect(() => {
+    if (resumePopup && resumeObj && Object.keys(resumeObj).length > 0) {
+      postJson<{html: string}>('/agent/v3/template:render', {
+        resume_obj: resumeObj,
+        active_style: {},
+        page_count_mode: 'single-page',
+        target_pages: 1,
+      }, 'Render resume failed').then(d => setResumeHtml(d.html)).catch(() => {});
+    }
+  }, [resumePopup, resumeObj]);
 
   useEffect(() => {
     if (step !== 'interview') return;
@@ -633,92 +776,78 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
   // ── Setup UI ──────────────────────────────────────────────────────────
   if (step==='setup') {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 dark:bg-black/50 backdrop-blur-sm" onClick={onClose}>
-        <div className="flex h-[92vh] w-[min(1120px,94vw)] flex-col overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-[var(--brand-surface)] shadow-xl" onClick={e => e.stopPropagation()}>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--brand-ink)]/40 backdrop-blur-sm" onClick={e => e.stopPropagation()}>
+        <div className="flex max-h-[92vh] w-[95vw] max-w-6xl flex-col overflow-hidden rounded-2xl border-[var(--brand-line)] bg-[var(--brand-paper)] shadow-[var(--shadow-sw-card)]">
+
           {/* Header */}
-          <div className="flex shrink-0 items-center gap-3 border-b border-zinc-100 dark:border-zinc-700 px-5 py-3">
-            <button onClick={onClose} className="rounded-full p-1.5 text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"><ChevronLeft className="size-4" /></button>
-            <div>
-              <h3 className="font-sans text-sm font-semibold text-zinc-800 dark:text-zinc-200">{t('interview.setup')}</h3>
-              <p className="font-sans text-[11px] text-zinc-400 dark:text-zinc-500">{t('interview.configureHint')}</p>
+          <header className="flex shrink-0 items-center justify-between rounded-t-2xl border-b border-[var(--brand-line)] bg-[var(--brand-surface)] px-5 py-3">
+            <div className="flex items-center gap-3">
+              <button onClick={onClose} className="rounded-full p-1.5 text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface-soft)] hover:text-[var(--brand-ink)] transition-colors"><ChevronLeft className="size-4" /></button>
+              <div>
+                <h1 className="font-sans text-sm font-semibold text-[var(--brand-ink)]">{t('interview.setup')}</h1>
+                <p className="font-sans text-[10px] text-[var(--brand-ink-muted)]">{t('interview.configureHint')}</p>
+              </div>
             </div>
-          </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setShowHistory(!showHistory)}
+                className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-sans text-[11px] font-medium transition-colors ${showHistory ? 'bg-[var(--brand-surface)] text-[var(--brand-ink)]' : 'text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)]'}`}>
+                <History className="size-3.5" /> {t('interview.history')}
+              </button>
+              <span className="rounded-full bg-[var(--brand-signal-soft)] px-3 py-1 font-sans text-[10px] font-medium text-[var(--brand-signal)]">{t('interview.settings')}</span>
+            </div>
+          </header>
 
           {/* Body */}
-          <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_320px] overflow-hidden">
+          <div className={`grid min-h-0 flex-1 overflow-hidden ${showHistory ? 'grid-cols-[1fr_280px]' : 'grid-cols-[1fr]'}`}>
+            <div className="grid min-h-0 grid-cols-[1fr_340px] overflow-hidden">
             <div className="min-h-0 overflow-auto">
             {/* Continue session banner */}
             {inProgress && inProgress.messages && inProgress.messages.length > 0 && (
-              <div className="mx-5 mt-4 rounded-xl border-2 border-blue-200 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30 p-4">
+              <div className="mx-5 mt-4 rounded-xl border-2 border-[var(--brand-signal-soft)] bg-[var(--brand-surface-soft)] p-4">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
-                    <RotateCcw className="size-4 text-blue-600 dark:text-blue-400" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--brand-signal-soft)]">
+                    <RotateCcw className="size-4 text-[var(--brand-signal)]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-sans text-sm font-semibold text-blue-900 dark:text-blue-200">{t('interview.inProgressTitle')}</p>
-                    <p className="mt-0.5 font-sans text-[11px] text-blue-600/70 dark:text-blue-400/70">
+                    <p className="font-sans text-sm font-semibold text-[var(--brand-ink)]">{t('interview.inProgressTitle')}</p>
+                    <p className="mt-0.5 font-sans text-[11px] text-[var(--brand-ink-muted)]">
                       {t('interview.inProgressDesc', {n: inProgress.messages.length, time: new Date(inProgress.updatedAt).toLocaleTimeString('zh-CN')})}
                       {inProgress.config?.preset_id ? ` • ${PRESETS.find(p => p.id === inProgress.config?.preset_id)?.name || ''}` : ''}
                     </p>
                     <div className="mt-3 flex items-center gap-2">
-                      <button onClick={handleContinueInterview}
-                        className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 font-sans text-xs font-semibold text-white transition-all hover:bg-blue-500 active:scale-[0.98]">
-                        <Play className="size-3.5" /> {t('interview.continue')}
-                      </button>
-                      <button onClick={handleDiscardInProgress}
-                        className="rounded-lg px-3 py-2 font-sans text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors">
-                        {t('interview.discard')}
-                      </button>
+                      <Button onClick={handleContinueInterview} size="sm"><Play className="size-3.5" /> {t('interview.continue')}</Button>
+                      <Button onClick={handleDiscardInProgress} variant="ghost" size="sm">{t('interview.discard')}</Button>
                     </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Interviewers */}
+            {/* Recommended */}
             <div className="px-5 pt-4 pb-3">
-              <div className="mb-4 rounded-xl border border-zinc-100 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800/60">
+              <div className="mb-4 rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface-soft)] p-4">
                 <div className="mb-2 flex items-center justify-between">
                   <div>
-                    <p className="font-sans text-xs font-semibold text-zinc-900 dark:text-zinc-100">Recommended for this role</p>
-                    <p className="mt-0.5 font-sans text-[11px] text-zinc-400 dark:text-zinc-500">
-                      Based on your resume{targetJd ? ' and target JD' : ''}
-                    </p>
+                    <p className="font-sans text-xs font-semibold text-[var(--brand-ink)]">Recommended for this role</p>
+                    <p className="mt-0.5 font-sans text-[11px] text-[var(--brand-ink-muted)]">Based on your resume{targetJd ? ' and target JD' : ''}</p>
                   </div>
-                  <span className="rounded-full bg-white px-2 py-0.5 font-mono text-[10px] text-zinc-400 dark:bg-zinc-900 dark:text-zinc-500">top 3</span>
+                  <span className="rounded-full bg-[var(--brand-surface)] px-2 py-0.5 font-sans text-[10px] text-[var(--brand-ink-muted)]">top 3</span>
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                   {recommendations.map(({preset, reason}, idx) => {
                     const active = selectedPreset === preset.id;
                     return (
-                      <button
-                        key={preset.id}
-                        onClick={() => {
-                          setSelectedPreset(preset.id);
-                          setIndustryFilter('all');
-                          setLanguage(preset.language);
-                        }}
-                        className={`rounded-lg border p-2 text-left transition-all ${
-                          active
-                            ? 'border-zinc-900 bg-white shadow-sm dark:border-zinc-200 dark:bg-zinc-900'
-                            : 'border-zinc-100 bg-white/70 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900/60'
-                        }`}
-                      >
+                      <button key={preset.id} onClick={() => { setSelectedPreset(preset.id); setIndustryFilter('all'); setLanguage(preset.language); }}
+                        className={`rounded-lg border p-2.5 text-left transition-all ${active ? 'border-[var(--brand-signal)] bg-[var(--brand-signal-soft)] shadow-sm' : 'border-[var(--brand-line)] bg-[var(--brand-surface)] hover:border-[var(--brand-line-strong)]'}`}>
                         <div className="flex items-center gap-2">
-                          <span
-                            className="h-8 w-8 shrink-0 rounded-full border border-zinc-200 bg-cover dark:border-zinc-600"
-                            style={{
-                              backgroundImage: `url(${avatarUrl(preset)})`,
-                              backgroundPosition: preset.avatarPosition,
-                              backgroundSize: '300% 200%',
-                            }}
-                          />
+                          <span className="h-8 w-8 shrink-0 rounded-full border border-[var(--brand-line)] bg-cover"
+                            style={{ backgroundImage: `url(${avatarUrl(preset)})`, backgroundPosition: preset.avatarPosition, backgroundSize: '300% 200%' }} />
                           <div className="min-w-0">
-                            <p className="truncate font-sans text-[11px] font-semibold text-zinc-900 dark:text-zinc-100">{preset.name}</p>
-                            <p className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500">rank {idx + 1}</p>
+                            <p className="truncate font-sans text-[11px] font-semibold text-[var(--brand-ink)]">{preset.name}</p>
+                            <p className="font-sans text-[10px] text-[var(--brand-ink-muted)]">rank {idx + 1}</p>
                           </div>
                         </div>
-                        <p className="mt-2 line-clamp-2 font-sans text-[10px] leading-relaxed text-zinc-500 dark:text-zinc-400">{reason}</p>
+                        <p className="mt-2 line-clamp-2 font-sans text-[10px] leading-relaxed text-[var(--brand-ink-muted)]">{reason}</p>
                       </button>
                     );
                   })}
@@ -727,34 +856,24 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
 
               <div className="mb-3 flex items-end justify-between gap-3">
                 <div>
-                  <p className="font-sans text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t('interview.chooseInterviewer')}</p>
-                  <p className="mt-0.5 font-sans text-[11px] text-zinc-400 dark:text-zinc-500">{t('interview.chooseInterviewerHint')}</p>
+                  <p className="font-sans text-sm font-semibold text-[var(--brand-ink)]">{t('interview.chooseInterviewer')}</p>
+                  <p className="mt-0.5 font-sans text-[11px] text-[var(--brand-ink-muted)]">{t('interview.chooseInterviewerHint')}</p>
                 </div>
-                <span className="shrink-0 rounded-full border border-zinc-200 dark:border-zinc-700 px-2.5 py-1 font-mono text-[10px] text-zinc-500 dark:text-zinc-400">{t('interview.modesCount', {current: filteredPresets.length, total: PRESETS.length})}</span>
+                <span className="shrink-0 rounded-full border border-[var(--brand-line)] px-2.5 py-1 font-sans text-[10px] text-[var(--brand-ink-muted)]">{t('interview.modesCount', {current: filteredPresets.length, total: PRESETS.length})}</span>
               </div>
 
               <div className="mb-3 flex gap-1.5 overflow-x-auto pb-1">
                 {INDUSTRY_FILTER_IDS.map(filterId => {
                   const active = industryFilter === filterId;
                   return (
-                    <button
-                      key={filterId}
-                      onClick={() => {
-                        setIndustryFilter(filterId);
-                        const next = filterId === 'all'
-                          ? PRESETS[0]
-                          : PRESETS.find(p => hasIndustry(p, filterId));
-                        if (next && !hasIndustry(next, filterId) && filterId !== 'all') return;
-                        if (next && (filterId !== industryFilter)) setSelectedPreset(next.id);
-                      }}
-                      className={`shrink-0 rounded-full border px-2.5 py-1 font-sans text-[11px] font-medium transition-colors ${
-                        active
-                          ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-100 dark:bg-zinc-100 dark:text-zinc-950'
-                          : 'border-zinc-200 bg-white text-zinc-500 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400'
-                      }`}
-                    >
-                      {(t as any)(`interview.industryFilters.${filterId}`)}
-                    </button>
+                    <button key={filterId} onClick={() => {
+                      setIndustryFilter(filterId);
+                      const next = filterId === 'all' ? PRESETS[0] : PRESETS.find(p => hasIndustry(p, filterId));
+                      if (next && !hasIndustry(next, filterId) && filterId !== 'all') return;
+                      if (next && (filterId !== industryFilter)) setSelectedPreset(next.id);
+                    }}
+                      className={`shrink-0 rounded-full border px-2.5 py-1 font-sans text-[11px] font-medium transition-colors ${active ? 'border-[var(--brand-ink)] bg-[var(--brand-ink)] text-[var(--brand-paper)]' : 'border-[var(--brand-line)] bg-[var(--brand-surface)] text-[var(--brand-ink-muted)] hover:border-[var(--brand-line-strong)]'}`}>
+                      {(t as any)(`interview.industryFilters.${filterId}`)}</button>
                   );
                 })}
               </div>
@@ -764,33 +883,22 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
                   const active = selectedPreset === p.id;
                   return (
                     <button key={p.id} onClick={() => handlePreset(p.id)}
-                      className={`min-h-[142px] rounded-xl border p-3 text-left transition-all ${
-                        active
-                          ? 'border-zinc-900 dark:border-zinc-200 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-950 shadow-md'
-                          : 'border-zinc-100 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 hover:border-zinc-300 dark:hover:border-zinc-500 hover:shadow-sm'
-                      }`}>
+                      className={`min-h-[142px] rounded-xl border p-3 text-left transition-all ${active ? 'border-[var(--brand-signal)] bg-[var(--brand-signal)] text-white shadow-md' : 'border-[var(--brand-line)] bg-[var(--brand-surface)] text-[var(--brand-ink)] hover:border-[var(--brand-line-strong)] hover:shadow-sm'}`}>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex min-w-0 items-start gap-2.5">
-                          <span
-                            className={`h-11 w-11 shrink-0 rounded-full border bg-cover shadow-sm ${active ? 'border-white/30 dark:border-zinc-300' : 'border-zinc-200 dark:border-zinc-600'}`}
-                            style={{
-                              backgroundImage: `url(${avatarUrl(p)})`,
-                              backgroundPosition: p.avatarPosition,
-                              backgroundSize: '300% 200%',
-                            }}
-                          />
+                          <span className={`h-11 w-11 shrink-0 rounded-full border bg-cover shadow-sm ${active ? 'border-white/30' : 'border-[var(--brand-line)]'}`}
+                            style={{ backgroundImage: `url(${avatarUrl(p)})`, backgroundPosition: p.avatarPosition, backgroundSize: '300% 200%' }} />
                           <div className="min-w-0">
                             <p className="font-sans text-sm font-semibold leading-tight">{p.name}</p>
-                            <p className={`mt-0.5 font-sans text-[11px] leading-snug ${active ? 'text-white/70 dark:text-zinc-700' : 'text-zinc-500 dark:text-zinc-400'}`}>{p.title}</p>
+                            <p className={`mt-0.5 font-sans text-[11px] leading-snug ${active ? 'text-white/70' : 'text-[var(--brand-ink-muted)]'}`}>{p.title}</p>
                           </div>
                         </div>
-                        <span className={`shrink-0 rounded-full px-2 py-0.5 font-mono text-[10px] ${active ? 'bg-white/15 dark:bg-zinc-950/10' : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-300'}`}>{t('interview.defaultRounds', {n: p.rounds})}</span>
                       </div>
-                      <p className={`mt-3 font-sans text-xs leading-relaxed ${active ? 'text-white/85 dark:text-zinc-800' : 'text-zinc-700 dark:text-zinc-300'}`}>{p.desc}</p>
-                      <p className={`mt-2 line-clamp-2 font-sans text-[11px] leading-relaxed ${active ? 'text-white/55 dark:text-zinc-600' : 'text-zinc-400 dark:text-zinc-500'}`}>{p.bestFor}</p>
+                      <p className={`mt-3 font-sans text-xs leading-relaxed ${active ? 'text-white/85' : 'text-[var(--brand-ink)]'}`}>{p.desc}</p>
+                      <p className={`mt-2 line-clamp-2 font-sans text-[11px] leading-relaxed ${active ? 'text-white/55' : 'text-[var(--brand-ink-muted)]'}`}>{p.bestFor}</p>
                       <div className="mt-3 flex flex-wrap gap-1.5">
                         {p.tags.map(tag => (
-                          <span key={tag} className={`rounded-full px-2 py-0.5 font-sans text-[10px] font-medium ${active ? 'bg-white/15 dark:bg-zinc-950/10 text-white/80 dark:text-zinc-700' : 'bg-zinc-50 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-300'}`}>{tag}</span>
+                          <span key={tag} className={`rounded-full px-2 py-0.5 font-sans text-[10px] font-medium ${active ? 'bg-white/15 text-white/80' : 'bg-[var(--brand-surface-soft)] text-[var(--brand-ink-muted)]'}`}>{tag}</span>
                         ))}
                       </div>
                     </button>
@@ -798,30 +906,24 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
                 })}
               </div>
             </div>
-
             </div>
 
-            <aside className="min-h-0 overflow-auto border-l border-zinc-100 bg-zinc-50/70 p-4 dark:border-zinc-700 dark:bg-zinc-900/30">
-            <div className="mb-4 rounded-xl border border-zinc-100 dark:border-zinc-700 bg-white dark:bg-zinc-800/60 p-4">
+            {/* Config sidebar */}
+            <aside className="min-h-0 overflow-auto border-l border-[var(--brand-line)] bg-[var(--brand-surface-soft)] p-4">
+            <div className="mb-4 rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-4">
               {(() => {
                 const picked = PRESETS.find(p => p.id === selectedPreset) || PRESETS[0];
                 return (
                   <div className="flex items-start gap-3">
-                    <div
-                      className="h-12 w-12 shrink-0 rounded-full border border-zinc-200 bg-cover shadow-sm dark:border-zinc-600"
-                      style={{
-                        backgroundImage: `url(${avatarUrl(picked)})`,
-                        backgroundPosition: picked.avatarPosition,
-                        backgroundSize: '300% 200%',
-                      }}
-                    />
+                    <span className="h-12 w-12 shrink-0 rounded-full border border-[var(--brand-line)] bg-cover shadow-sm"
+                      style={{ backgroundImage: `url(${avatarUrl(picked)})`, backgroundPosition: picked.avatarPosition, backgroundSize: '300% 200%' }} />
                     <div className="min-w-0 flex-1">
-                      <p className="font-sans text-xs font-semibold text-zinc-900 dark:text-zinc-100">{t('interview.youWillMeet', {name: picked.name})}</p>
-                      <p className="mt-1 font-sans text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400">{picked.bestFor}</p>
-                      <div className="mt-2 flex flex-wrap gap-2 font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
-                        <span>{picked.language === 'zh' ? t('interview.chineseInterview') : t('interview.englishInterview')}</span>
-                        <span>{t('interview.plannedRounds', {n: (LENGTH_OPTIONS.find(o => o.id === lengthId) || LENGTH_OPTIONS[2]).rounds})}</span>
-                        {targetJd && <span>{t('interview.jdAware')}</span>}
+                      <p className="font-sans text-xs font-semibold text-[var(--brand-ink)]">{t('interview.youWillMeet', {name: picked.name})}</p>
+                      <p className="mt-1 font-sans text-[11px] leading-relaxed text-[var(--brand-ink-muted)]">{picked.bestFor}</p>
+                      <div className="mt-2 flex flex-wrap gap-2 font-sans text-[10px] text-[var(--brand-ink-muted)]">
+                        <span className="rounded-full bg-[var(--brand-surface-soft)] px-2 py-0.5">{picked.language === 'zh' ? t('interview.chineseInterview') : t('interview.englishInterview')}</span>
+                        <span className="rounded-full bg-[var(--brand-surface-soft)] px-2 py-0.5">{t('interview.plannedRounds', {n: (LENGTH_OPTIONS.find(o => o.id === lengthId) || LENGTH_OPTIONS[2]).rounds})}</span>
+                        {targetJd && <span className="rounded-full bg-[var(--brand-surface-soft)] px-2 py-0.5">{t('interview.jdAware')}</span>}
                       </div>
                     </div>
                   </div>
@@ -829,68 +931,97 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
               })()}
             </div>
 
-            <div className="mb-4 space-y-4 rounded-xl border border-zinc-100 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4">
+            <div className="mb-4 space-y-4 rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-4">
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <p className="font-sans text-xs font-semibold text-zinc-900 dark:text-zinc-100">{t('interview.interviewLength')}</p>
-                  <span className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500">
-                    {t('interview.roundsCount', {n: (LENGTH_OPTIONS.find(o => o.id === lengthId) || LENGTH_OPTIONS[2]).rounds})}
-                  </span>
+                  <p className="font-sans text-xs font-semibold text-[var(--brand-ink)]">{t('interview.interviewLength')}</p>
+                  <span className="font-sans text-[10px] text-[var(--brand-ink-muted)]">{t('interview.roundsCount', {n: (LENGTH_OPTIONS.find(o => o.id === lengthId) || LENGTH_OPTIONS[2]).rounds})}</span>
                 </div>
                 <div className="grid grid-cols-5 gap-1.5">
                   {LENGTH_OPTIONS.map(option => {
                     const active = lengthId === option.id;
                     return (
-                      <button
-                        key={option.id}
-                        onClick={() => {
-                          setLengthId(option.id);
-                          setRounds(option.rounds);
-                        }}
-                        className={`rounded-lg border px-2 py-2 text-center transition-all ${
-                          active
-                            ? 'border-zinc-900 bg-zinc-900 text-white dark:border-zinc-200 dark:bg-zinc-100 dark:text-zinc-950'
-                            : 'border-zinc-100 bg-zinc-50 text-zinc-500 hover:border-zinc-300 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400'
-                        }`}
-                      >
+                      <button key={option.id} onClick={() => { setLengthId(option.id); setRounds(option.rounds); }}
+                        className={`rounded-lg border px-2 py-2 text-center transition-all ${active ? 'border-[var(--brand-signal)] bg-[var(--brand-signal)] text-white' : 'border-[var(--brand-line)] bg-[var(--brand-surface-soft)] text-[var(--brand-ink-muted)] hover:border-[var(--brand-line-strong)]'}`}>
                         <p className="font-sans text-[11px] font-semibold">{(t as any)(`interview.lengthOptions.${option.id}.label`)}</p>
-                        <p className={`mt-0.5 font-mono text-[10px] ${active ? 'opacity-70' : 'text-zinc-400'}`}>{option.rounds}r</p>
+                        <p className={`mt-0.5 font-sans text-[10px] ${active ? 'opacity-70' : 'text-[var(--brand-ink-muted)]'}`}>{option.rounds}r</p>
                       </button>
                     );
                   })}
                 </div>
               </div>
-
               <div>
                 <div className="mb-2 flex items-center justify-between">
-                  <p className="font-sans text-xs font-semibold text-zinc-900 dark:text-zinc-100">{t('interview.customPreference')}</p>
-                  <span className="font-mono text-[10px] text-zinc-400 dark:text-zinc-500">{t('interview.sentToInterviewer')}</span>
+                  <p className="font-sans text-xs font-semibold text-[var(--brand-ink)]">{t('interview.customPreference')}</p>
+                  <span className="font-sans text-[10px] text-[var(--brand-ink-muted)]">{t('interview.sentToInterviewer')}</span>
                 </div>
-                <textarea
-                  value={userPreferences}
-                  onChange={e => setUserPreferences(e.target.value)}
-                  rows={3}
-                  maxLength={600}
-                  placeholder={t('interview.preferencesPlaceholder')}
-                  className="w-full resize-none rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2 font-sans text-xs leading-5 text-zinc-700 outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-300 focus:bg-white dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:focus:border-zinc-500"
-                />
+                <textarea value={userPreferences} onChange={e => setUserPreferences(e.target.value)}
+                  rows={3} maxLength={600} placeholder={t('interview.preferencesPlaceholder')}
+                  className="w-full resize-none rounded-lg border border-[var(--brand-line)] bg-[var(--brand-paper)] px-3 py-2 font-sans text-xs leading-5 text-[var(--brand-ink)] outline-none transition-colors placeholder:text-[var(--brand-ink-muted)] focus:border-[var(--brand-signal)] focus:shadow-[0_0_0_3px_var(--brand-signal-soft)]" />
               </div>
             </div>
-            <button onClick={handleStartInterview}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--brand-signal)] py-3 font-sans text-sm font-semibold text-white shadow-sm transition-all hover:brightness-110 active:scale-[0.98]">
+            <Button onClick={handleStartInterview} size="lg" className="w-full">
               {t('interview.startInterviewBtn')} <ChevronRight className="size-4" />
-            </button>
+            </Button>
             </aside>
+            </div>
 
+            {/* Toggleable history panel */}
+            {showHistory && (
+              <div className="flex flex-col border-l border-[var(--brand-line)] bg-[var(--brand-surface-soft)] min-h-0">
+                <div className="flex shrink-0 items-center justify-between border-b border-[var(--brand-line)] px-3 py-2">
+                  <div className="flex items-center gap-1.5">
+                    <History className="size-3.5 text-[var(--brand-ink-muted)]" />
+                    <span className="font-sans text-[10px] font-semibold text-[var(--brand-ink-muted)] uppercase tracking-wide">{t('interview.history')}</span>
+                    <span className="font-sans text-[10px] text-[var(--brand-ink-muted)]/50">{history.length}</span>
+                  </div>
+                  <button onClick={() => setShowHistory(false)}
+                    className="rounded-full p-0.5 text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)] hover:text-[var(--brand-ink)] transition-colors">
+                    <X className="size-3.5" />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-auto p-3 space-y-2">
+                  {history.length === 0 ? (
+                    <div className="py-8 text-center">
+                      <History className="mx-auto size-6 text-[var(--brand-ink-muted)]/20" />
+                      <p className="mt-2 font-sans text-[11px] text-[var(--brand-ink-muted)]">{t('interview.noRecords')}</p>
+                    </div>
+                  ) : (
+                    history.map(rec => {
+                      const completed = Boolean(rec.report);
+                      return (
+                        <div key={rec.id}
+                          onClick={() => {
+                            setMessages(rec.messages); setReport(rec.report); setCurrentRecordId(rec.id);
+                            setReviewMode(false); setShowHistory(false); setStep('interview');
+                            setIvSessionId(''); setSessionReady(false);
+                            if (rec.report) setPhase('review');
+                          }}
+                          className="cursor-pointer rounded-lg border border-[var(--brand-line)] bg-[var(--brand-surface)] p-2.5 hover:border-[var(--brand-line-strong)] hover:shadow-sm transition-all">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
+                              <span className={`h-1.5 w-1.5 rounded-full ${completed ? 'bg-[var(--status-done)]' : 'bg-[var(--status-running)]'}`} />
+                              <span className="font-sans text-[11px] font-semibold text-[var(--brand-ink)]">#{rec.sessionNum}</span>
+                            </div>
+                            {completed ? (
+                              <span className={`rounded-full px-2 py-0.5 font-sans text-[10px] font-semibold ${rec.score>=8?'bg-[var(--status-done)]/10 text-[var(--status-done)]':rec.score>=6?'bg-[var(--status-running)]/10 text-[var(--status-running)]':'bg-[var(--brand-surface-soft)] text-[var(--brand-ink-muted)]'}`}>
+                                {t('interview.scoreFmt', {s: rec.score})}
+                              </span>
+                            ) : (
+                              <span className="rounded-full bg-[var(--status-running)]/10 px-2 py-0.5 font-sans text-[10px] text-[var(--status-running)]">In progress</span>
+                            )}
+                          </div>
+                          <p className="mt-1 font-sans text-[10px] text-[var(--brand-ink-muted)]">{new Date(rec.date).toLocaleDateString('zh-CN')} {new Date(rec.date).toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'})}</p>
+                          <p className="mt-1 line-clamp-2 font-sans text-[10px] leading-relaxed text-[var(--brand-ink-muted)]">{rec.summary}</p>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Footer */}
-          <div className="hidden shrink-0 border-t border-zinc-100 dark:border-zinc-700 px-5 py-3">
-            <button onClick={handleStartInterview}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--brand-signal)] py-3 font-sans text-sm font-semibold text-white shadow-sm transition-all hover:brightness-110 active:scale-[0.98]">
-              {t('interview.startInterviewBtn')} <ChevronRight className="size-4" />
-            </button>
-          </div>
         </div>
       </div>
     );
@@ -898,66 +1029,93 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
 
   // ── Interview UI ──────────────────────────────────────────────────────
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 dark:bg-black/50 backdrop-blur-sm" onClick={handleClose}>
-      <div className="flex h-[92vh] w-[min(1120px,94vw)] flex-col overflow-hidden rounded-xl border border-zinc-200 dark:border-[var(--brand-line)] bg-white dark:bg-[var(--brand-surface)] shadow-xl" onClick={e => e.stopPropagation()}>
-        <div className="flex shrink-0 items-center justify-between border-b border-zinc-100 dark:border-[var(--brand-line)] bg-white dark:bg-[var(--brand-surface)] px-5 py-2.5">
-          <div>
-            <h2 className="font-sans text-sm font-semibold text-zinc-800 dark:text-[var(--brand-ink)]">{showHistory ? t('interview.history') : t('interview.title')}</h2>
-            <p className="font-sans text-[11px] text-zinc-400 dark:text-zinc-500">
-              {showHistory ? t('interview.sessions', {n: history.length}) : reviewMode ? t('interview.enterReviewMode') : report ? t('interview.completed') : running ? t('interview.running') : t('interview.sessionNum', {n: history.length+1})}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--brand-ink)]/40 backdrop-blur-sm" onClick={e => e.stopPropagation()}>
+      <div className="flex h-screen w-screen flex-col overflow-hidden bg-[var(--brand-paper)] shadow-[var(--shadow-sw-card)]">
+
+        {/* Header */}
+        <header className="flex shrink-0 items-center justify-between border-b border-[var(--brand-line)] bg-[var(--brand-surface)] px-5 py-2.5">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 rounded-lg bg-[var(--brand-surface-soft)] px-3 py-1.5">
+              <span className="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-full ring-2 ring-[var(--brand-signal)]">
+                <span
+                  className="h-full w-full bg-cover"
+                  style={{ backgroundImage: `url(${avatarUrl(activePreset)})`, backgroundPosition: activePreset.avatarPosition, backgroundSize: '300% 200%' }}
+                />
+              </span>
+              <div>
+                <p className="font-sans text-xs font-semibold text-[var(--brand-ink)]">{activePreset.name}</p>
+                <p className="font-sans text-[10px] text-[var(--brand-ink-muted)]">{activePreset.title}</p>
+              </div>
+            </div>
+            <span className="flex items-center gap-1.5 rounded-full bg-[var(--status-done)]/10 px-2.5 py-0.5 font-sans text-[10px] font-medium text-[var(--status-done)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--status-done)]" />
+              {showHistory ? t('interview.history') : report ? 'Completed' : reviewMode ? 'Review Mode' : running ? t('interview.running') : 'Live'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="font-sans text-xs text-[var(--brand-ink-muted)]">
+              {reviewMode ? 'Session Ended' : t('interview.sessionNum', {n: history.length+1})}
+            </span>
+            <Button variant="ghost" size="sm" className="text-[var(--status-failed)] hover:bg-[var(--status-failed)]/10" onClick={handleClose}>
+              {report ? 'Exit Review' : t('interview.endInterview')}
+            </Button>
+          </div>
+        </header>
+
+        {/* Toolbar */}
+        <div className="flex shrink-0 items-center justify-between border-b border-[var(--brand-line)] bg-[var(--brand-surface-soft)] px-5 py-1.5">
+          <div className="flex items-center gap-4">
+            <p className="font-sans text-[11px] text-[var(--brand-ink-muted)]">
+              <span className="font-sans font-semibold text-[var(--brand-ink)] mr-1">Target:</span> {targetJd ? 'JD Specific' : 'General Resume'}
             </p>
+            {!showHistory && (
+              <p className="font-sans text-[11px] text-[var(--brand-ink-muted)]">
+                <span className="font-sans font-semibold text-[var(--brand-ink)] mr-1">Round:</span> {t('interview.sessionNum', {n: history.length+1})}
+              </p>
+            )}
           </div>
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => {
-                if (codingQuestion) { setCodingEditorOpen(!codingEditorOpen); }
-                else { setManualEditorOpen(!manualEditorOpen); }
-              }}
-              className={`flex items-center gap-1 rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors ${
-                (codingQuestion && codingEditorOpen) || (!codingQuestion && manualEditorOpen)
-                  ? 'bg-zinc-100 dark:bg-[var(--brand-surface-soft)] text-zinc-800 dark:text-[var(--brand-ink)]'
-                  : 'text-zinc-500 dark:text-[var(--brand-ink-muted)] hover:bg-zinc-100 dark:hover:bg-[var(--brand-surface-soft)] hover:text-zinc-700 dark:hover:text-zinc-300'
-              }`}
-              title={codingQuestion ? t('interview.openCoding') : t('interview.openEditor')}
-            >
-              <Code2 className="size-3" />
-              {codingQuestion ? t('interview.problem') : t('interview.notes')}
-              {codingQuestion && !codingEditorOpen && (
-                <span className="ml-0.5 size-1.5 rounded-full bg-amber-400 dark:bg-amber-500" />
-              )}
-            </button>
-            <button className="rounded-md px-2.5 py-1 text-[11px] font-medium text-zinc-500 dark:text-[var(--brand-ink-muted)] hover:bg-zinc-100 dark:hover:bg-[var(--brand-surface-soft)] hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+            <button onClick={() => setResumePopup(!resumePopup)}
+              className={`rounded-md px-2.5 py-1 font-sans text-[11px] font-medium transition-colors ${resumePopup ? 'bg-[var(--brand-surface)] text-[var(--brand-ink)]' : 'text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)] hover:text-[var(--brand-ink)]'}`}
+            >Resume</button>
+            <button onClick={() => setJDPopup(!jdPopup)}
+              className={`rounded-md px-2.5 py-1 font-sans text-[11px] font-medium transition-colors ${jdPopup ? 'bg-[var(--brand-surface)] text-[var(--brand-ink)]' : 'text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)] hover:text-[var(--brand-ink)]'}`}
+            >JD</button>
+            <button onClick={() => setCodePanelOpen(!codePanelOpen)}
+              className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-sans text-[11px] font-medium transition-colors ${codePanelOpen ? 'bg-[var(--brand-surface)] text-[var(--brand-ink)]' : 'text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)] hover:text-[var(--brand-ink)]'}`}
+            >Code{codingQuestion && !codePanelOpen && <span className="ml-0.5 size-1.5 rounded-sm bg-[var(--status-warning)]" />}</button>
+            <div className="w-px h-4 bg-[var(--brand-line)] mx-1" />
+            <button className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 font-sans text-[11px] font-medium transition-colors ${showHistory ? 'bg-[var(--brand-surface)] text-[var(--brand-ink)]' : 'text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)] hover:text-[var(--brand-ink)]'}`}
               onClick={() => setShowHistory(!showHistory)}>
-              {showHistory ? t('interview.back') : <span className="flex items-center gap-1"><History className="size-3" /> {t('interview.history')}</span>}
+              <History className="size-3.5" /> {t('interview.history')}
             </button>
-            <button className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors ${messages.length===0?'text-zinc-300 dark:text-zinc-600 cursor-not-allowed':'text-zinc-500 dark:text-[var(--brand-ink-muted)] hover:bg-zinc-100 dark:hover:bg-[var(--brand-surface-soft)] hover:text-zinc-700 dark:hover:text-zinc-300'}`}
+            <button className={`rounded-md px-2.5 py-1 font-sans text-[11px] font-medium transition-colors ${messages.length===0?'text-[var(--brand-ink-muted)] cursor-not-allowed opacity-40':'text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface)] hover:text-[var(--brand-ink)]'}`}
               onClick={startNewSession} disabled={messages.length===0}>{t('interview.new')}</button>
-            <button className="rounded-md p-1 text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:hover:bg-[var(--brand-surface-soft)] hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors" onClick={handleClose}><ChevronLeft className="size-4" /></button>
           </div>
         </div>
 
-        <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_260px] overflow-hidden">
-        <div ref={scrollRef} className="min-h-0 overflow-auto p-4">
+        <div className={`grid min-h-0 flex-1 overflow-hidden ${codePanelOpen ? 'grid-cols-[1fr_1fr_260px]' : 'grid-cols-[1fr_260px]'}`}>
+        <div ref={scrollRef} className="min-h-0 overflow-auto">
           {showHistory ? (
             <div className="space-y-2">
               {history.length===0 ? (
                 <div className="py-12 text-center">
-                  <History className="mx-auto size-8 text-zinc-300 dark:text-zinc-600" />
-                  <p className="mt-3 text-[13px] text-zinc-400 dark:text-zinc-500">{t('interview.noRecords')}</p>
-                  <p className="mt-1 text-[11px] text-zinc-300 dark:text-zinc-600">{t('interview.startFirst')}</p>
+                  <History className="mx-auto size-8 text-[var(--brand-ink-muted)]/30" />
+                  <p className="mt-3 font-sans text-sm text-[var(--brand-ink-muted)]">{t('interview.noRecords')}</p>
+                  <p className="mt-1 font-sans text-xs text-[var(--brand-ink-muted)]">{t('interview.startFirst')}</p>
                 </div>
               ) : (
                 history.map(rec => (
-                  <div key={rec.id} className="cursor-pointer rounded-xl border border-zinc-100 dark:border-[var(--brand-line)] bg-white dark:bg-[var(--brand-surface)] p-3.5 hover:border-zinc-300 dark:hover:border-[var(--brand-line-strong)] hover:shadow-sm transition-all"
+                  <div key={rec.id} className="cursor-pointer rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-3.5 hover:border-[var(--brand-line-strong)] hover:shadow-sm transition-all"
                     onClick={() => { setMessages(rec.messages); setReport(rec.report); setCurrentRecordId(rec.id); setReviewMode(false); setShowHistory(false); }}>
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-xs font-semibold text-zinc-900 dark:text-[var(--brand-ink)]">{t('interview.sessionNum', {n: rec.sessionNum})}</span>
-                      <span className={`rounded-full px-2.5 py-0.5 font-mono text-[11px] font-semibold ${
-                        rec.score>=8?'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300':rec.score>=6?'bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300':'bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-300'
+                      <span className="font-sans text-xs font-semibold text-[var(--brand-ink)]">{t('interview.sessionNum', {n: rec.sessionNum})}</span>
+                      <span className={`rounded-full px-2.5 py-0.5 font-sans text-[11px] font-semibold ${
+                        rec.score>=8?'bg-[var(--status-done)]/10 text-[var(--status-done)]':rec.score>=6?'bg-[var(--status-running)]/10 text-[var(--status-running)]':'bg-[var(--brand-surface-soft)] text-[var(--brand-ink-muted)]'
                       }`}>{t('interview.scoreFmt', {s: rec.score})}</span>
                     </div>
-                    <p className="mt-1 font-sans text-[11px] text-zinc-400 dark:text-zinc-500">{new Date(rec.date).toLocaleString('zh-CN')}</p>
-                    <p className="mt-1 line-clamp-2 text-xs text-zinc-600 dark:text-[var(--brand-ink-muted)]">{rec.summary}</p>
+                    <p className="mt-1 font-sans text-[11px] text-[var(--brand-ink-muted)]">{new Date(rec.date).toLocaleString('zh-CN')}</p>
+                    <p className="mt-1 line-clamp-2 text-xs text-[var(--brand-ink-muted)]">{rec.summary}</p>
                   </div>
                 ))
               )}
@@ -965,72 +1123,94 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
           ) : (
           <>
           {messages.length===0 && !report && (
-            <div className="rounded-xl border border-zinc-100 dark:border-[var(--brand-line)] bg-zinc-50 dark:bg-[var(--brand-surface-soft)] p-6 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-zinc-100 dark:bg-[var(--brand-surface)]">
-                <MessageCircle className="size-5 text-zinc-400 dark:text-zinc-500" />
+            <div className="mx-auto mt-12 max-w-lg rounded-2xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-8 text-center shadow-sm">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[var(--brand-signal-soft)]">
+                <MessageCircle className="size-7 text-[var(--brand-signal)]" />
               </div>
-              <p className="font-sans text-sm font-semibold text-zinc-900 dark:text-[var(--brand-ink)]">{t('interview.mockInterviewMode')}</p>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-[var(--brand-ink-muted)]">
+              <h2 className="mb-2 font-sans text-lg font-semibold text-[var(--brand-ink)]">{t('interview.mockInterviewMode')}</h2>
+              <p className="mb-6 font-sans text-sm leading-relaxed text-[var(--brand-ink-muted)]">
                 {t('interview.welcomeDesc', {jd: targetJd ? t('interview.welcomeDescJd') : ''})}
               </p>
-              <div className="mt-4 flex justify-center gap-4">
-                <div className="rounded-lg border border-zinc-200 dark:border-[var(--brand-line)] bg-white dark:bg-[var(--brand-surface)] px-3 py-2 text-center">
-                  <p className="font-sans text-[10px] text-zinc-400 dark:text-zinc-500">{t('interview.pressEnter')}</p>
-                  <p className="font-mono text-[10px] font-semibold text-zinc-600 dark:text-[var(--brand-ink-muted)]">{t('interview.toSend')}</p>
+              <div className="grid grid-cols-3 gap-3 rounded-xl bg-[var(--brand-surface-soft)] p-4">
+                <div>
+                  <p className="font-sans text-[10px] font-semibold text-[var(--brand-ink-muted)] uppercase tracking-wide">{t('interview.pressEnter')}</p>
+                  <p className="mt-0.5 font-sans text-xs font-medium text-[var(--brand-ink)]">{t('interview.toSend')}</p>
                 </div>
-                <div className="rounded-lg border border-zinc-200 dark:border-[var(--brand-line)] bg-white dark:bg-[var(--brand-surface)] px-3 py-2 text-center">
-                  <p className="font-sans text-[10px] text-zinc-400 dark:text-zinc-500">{t('interview.sayEnd')}</p>
-                  <p className="font-mono text-[10px] font-semibold text-zinc-600 dark:text-[var(--brand-ink-muted)]">{t('interview.toFinish')}</p>
+                <div>
+                  <p className="font-sans text-[10px] font-semibold text-[var(--brand-ink-muted)] uppercase tracking-wide">{t('interview.sayEnd')}</p>
+                  <p className="mt-0.5 font-sans text-xs font-medium text-[var(--brand-ink)]">{t('interview.toFinish')}</p>
                 </div>
-                <div className="rounded-lg border border-zinc-200 dark:border-[var(--brand-line)] bg-white dark:bg-[var(--brand-surface)] px-3 py-2 text-center">
-                  <p className="font-sans text-[10px] text-zinc-400 dark:text-zinc-500">{t('interview.shiftEnter')}</p>
-                  <p className="font-mono text-[10px] font-semibold text-zinc-600 dark:text-[var(--brand-ink-muted)]">{t('interview.newLine')}</p>
+                <div>
+                  <p className="font-sans text-[10px] font-semibold text-[var(--brand-ink-muted)] uppercase tracking-wide">{t('interview.shiftEnter')}</p>
+                  <p className="mt-0.5 font-sans text-xs font-medium text-[var(--brand-ink)]">{t('interview.newLine')}</p>
                 </div>
               </div>
             </div>
           )}
-          <div className="space-y-3 text-[13px] leading-6">
-            {messages.map((m, i) => (
-              <div key={i} className={m.role==='user'?'flex justify-end':'flex justify-start'}>
-                <span className={`inline-block max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed whitespace-pre-wrap ${
-                  m.role==='user'
-                    ? 'bg-zinc-900 dark:bg-zinc-700 text-white dark:text-white'
-                    : m.role==='system'
-                      ? 'bg-zinc-100 dark:bg-[var(--brand-surface-soft)] text-zinc-400 dark:text-zinc-500 text-[11px]'
-                      : 'bg-zinc-50 dark:bg-[var(--brand-surface-soft)] border border-zinc-200 dark:border-[var(--brand-line)] text-zinc-800 dark:text-[var(--brand-ink)]'
-                }`}>
-                  {m.role==='assistant'
-                    ? (m.blocks && m.blocks.length > 1
-                      ? <div className="space-y-2">{m.blocks.map((block, bi) => <div key={bi}>{renderAssistantMarkdown(block)}</div>)}</div>
-                      : renderAssistantMarkdown(m.text))
-                    : m.text}
-                </span>
-              </div>
-            ))}
+          <div className="mx-auto w-full max-w-3xl space-y-4 px-4 py-6">
+            {messages.map((m, i) => {
+              if (m.role === 'system') {
+                return (
+                  <div key={i} className="flex justify-center py-1">
+                    <span className="rounded-full bg-[var(--brand-surface-soft)] px-3 py-1 font-sans text-[10px] text-[var(--brand-ink-muted)]">{m.text}</span>
+                  </div>
+                );
+              }
+              if (m.role === 'user') {
+                return (
+                  <div key={i} className="flex justify-end">
+                    <div className="max-w-[75%] rounded-2xl rounded-br-md bg-[var(--brand-signal)] px-4 py-3 shadow-sm">
+                      <p className="font-sans text-sm leading-relaxed text-white whitespace-pre-wrap">{m.text}</p>
+                    </div>
+                  </div>
+                );
+              }
+              return (
+                <div key={i} className="flex justify-start gap-3">
+                  <span
+                    className="mt-1 flex h-8 w-8 shrink-0 overflow-hidden rounded-full bg-[var(--brand-surface-soft)] ring-1 ring-[var(--brand-line)] bg-cover"
+                    style={{ backgroundImage: `url(${avatarUrl(activePreset)})`, backgroundPosition: activePreset.avatarPosition, backgroundSize: '300% 200%' }}
+                  />
+                  <div className="max-w-[75%] rounded-2xl rounded-bl-md bg-[var(--brand-surface)] px-4 py-3 shadow-sm border border-[var(--brand-line)]">
+                    <div className="mb-1 flex items-center gap-2">
+                      <span className="font-sans text-[11px] font-semibold text-[var(--brand-ink)]">{activePreset.name}</span>
+                    </div>
+                    <div className="font-sans text-sm leading-relaxed text-[var(--brand-ink)] whitespace-pre-wrap">
+                      {m.blocks && m.blocks.length > 1
+                        ? <div className="space-y-3">{m.blocks.map((block, bi) => <div key={bi}>{renderAssistantMarkdown(block)}</div>)}</div>
+                        : renderAssistantMarkdown(m.text)}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
             {running && (
-              <div className="flex justify-start">
-                <span className="inline-flex items-center gap-1 rounded-2xl border border-zinc-200 dark:border-[var(--brand-line)] bg-zinc-50 dark:bg-[var(--brand-surface-soft)] px-4 py-2.5">
-                  <span className="size-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce" style={{animationDelay:'0ms'}} />
-                  <span className="size-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce" style={{animationDelay:'150ms'}} />
-                  <span className="size-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce" style={{animationDelay:'300ms'}} />
-                </span>
+              <div className="flex justify-start gap-3">
+                <span
+                  className="mt-1 flex h-8 w-8 shrink-0 overflow-hidden rounded-full bg-[var(--brand-surface-soft)] ring-1 ring-[var(--brand-line)] bg-cover"
+                  style={{ backgroundImage: `url(${avatarUrl(activePreset)})`, backgroundPosition: activePreset.avatarPosition, backgroundSize: '300% 200%' }}
+                />
+                <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md bg-[var(--brand-surface)] px-4 py-3 border border-[var(--brand-line)]">
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-ink-muted)]" style={{animationDelay:'0ms'}} />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-ink-muted)]" style={{animationDelay:'150ms'}} />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-[var(--brand-ink-muted)]" style={{animationDelay:'300ms'}} />
+                </div>
               </div>
             )}
           </div>
           {report && (
-            <div className="mt-4 rounded-xl border-2 border-zinc-900 dark:border-zinc-300 bg-zinc-50 dark:bg-[var(--brand-surface-soft)] p-5">
+            <div className="mx-4 mt-4 rounded-2xl border-2 border-[var(--brand-signal-soft)] bg-[var(--brand-surface-soft)] p-6 max-w-3xl mx-auto">
               <div className="mb-3 flex items-center justify-center gap-2">
-                <Check className="size-4 text-emerald-600 dark:text-emerald-400" />
-                <p className="font-serif text-base font-bold text-zinc-900 dark:text-[var(--brand-ink)]">{t('interview.report')}</p>
+                <Check className="size-4 text-[var(--status-done)]" />
+                <p className="font-sans text-base font-bold text-[var(--brand-ink)]">{t('interview.report')}</p>
               </div>
-              <div className="font-sans text-[13px] leading-6 text-zinc-700 dark:text-zinc-300">
+              <div className="font-sans text-sm leading-6 text-[var(--brand-ink)]">
                 {renderAssistantMarkdown((report.assistant_message as string)||'')}
               </div>
               {!reviewMode && (
                 <div className="mt-4 text-center">
-                  <button className="rounded-xl bg-zinc-900 dark:bg-zinc-700 dark:text-white px-5 py-2.5 font-sans text-xs font-semibold text-white hover:bg-zinc-800 dark:hover:bg-zinc-600 transition-colors"
-                    onClick={enterReviewMode}>{t('interview.enterReviewMode')}</button>
-                  <p className="mt-1.5 font-sans text-[11px] text-zinc-400 dark:text-zinc-500">{t('interview.discussCoach')}</p>
+                  <Button onClick={enterReviewMode}>{t('interview.enterReviewMode')}</Button>
+                  <p className="mt-1.5 font-sans text-[11px] text-[var(--brand-ink-muted)]">{t('interview.discussCoach')}</p>
                 </div>
               )}
             </div>
@@ -1039,62 +1219,204 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
           )}
         </div>
 
+        {/* Right Code Editor Panel */}
+        {codePanelOpen && (
+          <div className="flex flex-col border-l-2 border-[var(--brand-signal)] bg-[var(--brand-paper)] min-h-0">
+            <div className="flex shrink-0 items-center justify-between border-b border-[var(--brand-line)] bg-[var(--brand-surface)] px-3 py-1.5">
+              <div className="flex items-center gap-2">
+                <span className="font-sans text-[10px] font-semibold text-[var(--brand-ink)] uppercase tracking-wide">Editor</span>
+                {codingQuestion ? (
+                  <span className="font-sans text-[10px] text-[var(--brand-ink-muted)]">{codingQuestion.difficulty} &middot; {codingQuestion.language}</span>
+                ) : (
+                  <select value={editorLang} onChange={e => setEditorLang(e.target.value)}
+                    className="rounded border border-[var(--brand-line)] bg-[var(--brand-surface)] px-1.5 py-0.5 font-sans text-[10px] text-[var(--brand-ink)] outline-none focus:border-[var(--brand-signal)]">
+                    <option value="python">Python</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                    <option value="c">C</option>
+                    <option value="go">Go</option>
+                  </select>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                {codingQuestion && (
+                  <button onClick={() => setCodingEditorOpen(true)}
+                    className="flex items-center gap-1 rounded px-2 py-0.5 font-sans text-[10px] text-[var(--brand-signal)] hover:bg-[var(--brand-signal-soft)] transition-colors">
+                    <Code2 className="size-3" /> Full Editor
+                  </button>
+                )}
+                <button onClick={() => setManualCode('')}
+                  className="rounded px-2 py-0.5 font-sans text-[10px] text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface-soft)] transition-colors">Clear</button>
+                <button onClick={() => { if (manualCode.trim() && !running) { sendTurn(manualCode); setManualCode(''); } }}
+                  disabled={!manualCode.trim() || running}
+                  className="flex items-center gap-1 rounded px-2 py-0.5 font-sans text-[10px] font-medium text-[var(--brand-signal)] hover:bg-[var(--brand-signal-soft)] transition-colors disabled:opacity-30">
+                  <Send className="size-3" /> Send
+                </button>
+                <button onClick={() => setCodePanelOpen(false)}
+                  className="ml-1 rounded p-0.5 text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface-soft)] transition-colors">
+                  <X className="size-3.5" />
+                </button>
+              </div>
+            </div>
+            <Editor
+              value={manualCode}
+              onValueChange={setManualCode}
+              highlight={code => {
+                try { return highlight(code, (languages as any)[editorLang] || languages.python, editorLang); }
+                catch { return code; }
+              }}
+              padding={12}
+              placeholder="// Draft answers, take notes, or work through problems here..."
+              style={{
+                fontFamily: "'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'SF Mono', Consolas, monospace",
+                fontSize: 13,
+                lineHeight: 1.6,
+                minHeight: '100%',
+                background: '#fafafa',
+                color: '#1d1d1f',
+              }}
+            />
+          </div>
+        )}
+
+        {/* Sidebar */}
         {!showHistory && (
-          <aside className="hidden min-h-0 border-l border-zinc-100 bg-zinc-50/70 p-4 dark:border-[var(--brand-line)] dark:bg-[var(--brand-surface-soft)] md:block">
-            <div className="flex flex-col items-center text-center">
+          <aside className="hidden min-h-0 w-[260px] border-l border-[var(--brand-line)] bg-[var(--brand-surface-soft)] md:flex flex-col">
+            <div className="flex flex-col items-center border-b border-[var(--brand-line)] px-4 py-4">
               <span
-                className="h-20 w-20 rounded-full border border-zinc-200 bg-cover shadow-sm dark:border-zinc-600"
+                className="h-16 w-16 shrink-0 rounded-full border-2 border-[var(--brand-line)] bg-cover shadow-sm"
                 style={{
                   backgroundImage: `url(${avatarUrl(activePreset)})`,
                   backgroundPosition: activePreset.avatarPosition,
                   backgroundSize: '300% 200%',
                 }}
               />
-              <p className="mt-3 font-sans text-sm font-semibold text-zinc-900 dark:text-[var(--brand-ink)]">{activePreset.name}</p>
-              <p className="mt-1 font-sans text-[11px] leading-snug text-zinc-500 dark:text-zinc-400">{activePreset.title}</p>
+              <p className="mt-2 font-sans text-sm font-bold text-[var(--brand-ink)]">{activePreset.name}</p>
+              <p className="mt-0.5 font-sans text-[10px] text-[var(--brand-ink-muted)] text-center leading-tight">{activePreset.title}</p>
             </div>
-            <div className="mt-5 space-y-2">
-              <div className={`rounded-lg border px-3 py-2 ${attitudeClass(attitude)}`}>
-                <p className="font-sans text-[10px] uppercase tracking-[0.08em] opacity-70">Attitude</p>
-                <p className="mt-0.5 font-sans text-xs font-semibold">{attitudeLabel(attitude)}</p>
-              </div>
-              <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900">
-                <p className="font-sans text-[10px] uppercase tracking-[0.08em] text-zinc-400">Phase</p>
-                <p className="mt-0.5 truncate font-sans text-xs font-semibold text-zinc-700 dark:text-zinc-200">{phase || 'interview'}</p>
-              </div>
-              <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="flex items-center gap-1.5 font-sans text-[10px] uppercase tracking-[0.08em] text-zinc-400"><Clock className="size-3" /> Waiting</span>
-                  <span className="font-mono text-[10px] text-zinc-400">{effectiveThreshold}s</span>
+            <div className="flex-1 overflow-auto p-3 space-y-2.5">
+              <div className="rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-2.5">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <Signal className="size-3 text-[var(--brand-ink-muted)]" />
+                  <span className="font-sans text-[10px] font-medium text-[var(--brand-ink-muted)] uppercase tracking-wide">Attitude</span>
                 </div>
-                <p className="mt-0.5 font-mono text-sm font-semibold text-zinc-700 dark:text-zinc-200">{waitingSeconds}s</p>
+                <p className="font-sans text-[11px] font-semibold text-[var(--brand-ink)]">{attitudeLabel(attitude)}</p>
               </div>
-              <div className="rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-900">
-                <p className="flex items-center gap-1.5 font-sans text-[10px] uppercase tracking-[0.08em] text-zinc-400"><Signal className="size-3" /> JD-aware</p>
-                <p className="mt-0.5 font-sans text-xs font-semibold text-zinc-700 dark:text-zinc-200">{targetJd ? 'Enabled' : 'No target JD'}</p>
+              <div className="rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-2.5">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <MessageCircle className="size-3 text-[var(--brand-ink-muted)]" />
+                  <span className="font-sans text-[10px] font-medium text-[var(--brand-ink-muted)] uppercase tracking-wide">Phase</span>
+                </div>
+                <p className="font-sans text-[11px] font-semibold text-[var(--brand-ink)] truncate">{String(phase || 'Interview').toUpperCase()}</p>
+              </div>
+              <div className="rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-2.5">
+                <div className="flex items-center justify-between mb-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="size-3 text-[var(--brand-ink-muted)]" />
+                    <span className="font-sans text-[10px] font-medium text-[var(--brand-ink-muted)] uppercase tracking-wide">Timer</span>
+                  </div>
+                  <span className="font-sans text-[10px] text-[var(--brand-ink-muted)]">{effectiveThreshold}s</span>
+                </div>
+                <p className="font-sans text-[11px] font-semibold">
+                  <span className={waitingSeconds > effectiveThreshold * 0.8 ? 'text-[var(--status-warning)]' : 'text-[var(--brand-ink)]'}>{waitingSeconds}s</span>
+                  <span className="text-[var(--brand-ink-muted)]"> elapsed</span>
+                </p>
+              </div>
+              <div className="rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-2.5">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <RotateCcw className="size-3 text-[var(--brand-ink-muted)]" />
+                  <span className="font-sans text-[10px] font-medium text-[var(--brand-ink-muted)] uppercase tracking-wide">Context</span>
+                </div>
+                <p className="font-sans text-[11px] font-semibold text-[var(--brand-ink)]">{targetJd ? 'JD + Resume' : 'Resume Only'}</p>
               </div>
             </div>
           </aside>
         )}
         </div>
 
+        {/* Draggable Resume Popup */}
+        {resumePopup && (
+          <DraggablePopup title="Resume" onClose={() => setResumePopup(false)} zoom={resumeZoom} onZoomChange={setResumeZoom}>
+            <div className="bg-white">
+              {resumeHtml ? (
+                <div dangerouslySetInnerHTML={{ __html: resumeHtml }} />
+              ) : (
+                <p className="text-[var(--brand-ink-muted)] text-xs text-center py-8">Loading resume...</p>
+              )}
+            </div>
+          </DraggablePopup>
+        )}
+
+        {/* Draggable JD Popup */}
+        {jdPopup && (
+          <DraggablePopup title="Job Description" onClose={() => setJDPopup(false)}>
+            <div className="font-sans text-sm">
+              {targetJd ? (() => {
+                const lines = targetJd.split('\n').filter(Boolean);
+                const sections: {title: string; items: string[]}[] = [];
+                let currentTitle = 'Overview';
+                let currentItems: string[] = [];
+                for (const line of lines) {
+                  const trimmed = line.trim();
+                  if (/^[A-Z][A-Za-z\s&/]{3,40}$/.test(trimmed) && trimmed.length < 50 && !trimmed.includes('.')) {
+                    if (currentItems.length > 0) {
+                      sections.push({title: currentTitle, items: [...currentItems]});
+                      currentItems = [];
+                    }
+                    currentTitle = trimmed;
+                  } else {
+                    currentItems.push(trimmed);
+                  }
+                }
+                if (currentItems.length > 0) sections.push({title: currentTitle, items: currentItems});
+                if (sections.length <= 1) sections[0] = {title: '', items: lines.map(l => l.trim()).filter(Boolean)};
+                return (
+                  <div className="space-y-4">
+                    {sections.map((sec, si) => (
+                      <div key={si}>
+                        {sec.title && (
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="h-px flex-1 bg-[var(--brand-line)]" />
+                            <span className="shrink-0 font-sans text-[10px] font-semibold text-[var(--brand-signal)] uppercase tracking-wide">{sec.title}</span>
+                            <span className="h-px flex-1 bg-[var(--brand-line)]" />
+                          </div>
+                        )}
+                        <ul className="space-y-1.5">
+                          {sec.items.map((item, ii) => (
+                            <li key={ii} className="flex items-start gap-2 text-[13px] leading-relaxed text-[var(--brand-ink)]">
+                              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--brand-signal)]/40" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })() : (
+                <p className="text-[var(--brand-ink-muted)] text-xs text-center py-8">No JD loaded.</p>
+              )}
+            </div>
+          </DraggablePopup>
+        )}
+
         {!showHistory && (!report || reviewMode) && (
-          <div className="shrink-0 border-t border-zinc-100 dark:border-[var(--brand-line)] bg-white dark:bg-[var(--brand-surface)]">
+          <div className="shrink-0 border-t border-[var(--brand-line)] bg-[var(--brand-surface)] px-4 py-3">
             {/* Pending coding question indicator */}
             {codingQuestion && !codingEditorOpen && (
               <button
                 onClick={() => setCodingEditorOpen(true)}
-                className="flex w-full items-center gap-2 border-b border-amber-100 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/30 px-4 py-2 text-left transition-colors hover:bg-amber-50 dark:hover:bg-amber-950/50"
+                className="mb-2 flex w-full items-center gap-2 rounded-lg border border-[var(--status-warning)]/20 bg-[var(--status-warning)]/5 px-4 py-2 text-left transition-colors hover:bg-[var(--status-warning)]/10"
               >
-                <Code2 className="size-3.5 text-amber-500" />
-                <span className="flex-1 font-sans text-[11px] font-medium text-amber-800 dark:text-amber-300 truncate">
+                <Code2 className="size-3.5 text-[var(--status-warning)]" />
+                <span className="flex-1 font-sans text-xs font-medium text-[var(--status-warning)] truncate">
                   {t('interview.codingPending', {d: codingQuestion.difficulty})}
                 </span>
-                <span className="font-mono text-[10px] text-amber-500 dark:text-amber-400">{t('interview.openArrow')}</span>
+                <span className="font-sans text-[10px] text-[var(--status-warning)]">{t('interview.openArrow')}</span>
               </button>
             )}
-            <div className="p-3">
-            <div className="flex gap-2">
+            <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-2xl border border-[var(--brand-line)] bg-[var(--brand-paper)] px-4 py-2 shadow-sm transition-all focus-within:border-[var(--brand-signal)] focus-within:shadow-[0_0_0_3px_var(--brand-signal-soft)]">
               <textarea value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => {
@@ -1105,12 +1427,14 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
                 }}
                 placeholder={reviewMode ? t('interview.askCoach') : messages.length===0 ? t('interview.typeToStart') : t('interview.yourAnswer')}
                 rows={1}
-                className="flex-1 resize-none rounded-xl border border-zinc-200 dark:border-[var(--brand-line)] bg-zinc-50 dark:bg-[var(--brand-surface-soft)] px-4 py-2.5 font-sans text-sm outline-none transition-colors focus:border-zinc-400 dark:focus:border-zinc-500 focus:bg-white dark:focus:bg-[var(--brand-surface)]"
+                className="flex-1 resize-none border-none bg-transparent px-0 py-1.5 font-sans text-sm outline-none focus:ring-0 text-[var(--brand-ink)] placeholder:text-[var(--brand-ink-muted)]"
                 disabled={!sessionReady} />
-              <button className="shrink-0 rounded-lg bg-[var(--brand-signal)] px-5 py-2.5 font-sans text-xs font-semibold text-white shadow-sm transition-all hover:brightness-110 active:scale-[0.97] disabled:opacity-30"
-                onClick={() => sendTurn(input)} disabled={running || !sessionReady || !input.trim()}>{t('interview.send')}</button>
+              <button onClick={() => sendTurn(input)}
+                disabled={running || !sessionReady || !input.trim()}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[var(--brand-signal)] text-white transition-all hover:brightness-110 active:scale-95 disabled:opacity-30">
+                <Send className="size-4" />
+              </button>
             </div>
-          </div>
           </div>
         )}
         {codingEditorOpen && codingQuestion && (
@@ -1129,22 +1453,6 @@ export function InterviewModal({ resumeObj, targetJd, onClose }: Props) {
               setTimeout(() => sendTurn(formatted), 0);
             }}
             onClose={() => setCodingEditorOpen(false)} />
-        )}
-        {manualEditorOpen && (
-          <WritingPanel
-            mode="write"
-            question={{ problem: t('interview.writeHere') }}
-            initialCode={manualCode}
-            onCodeChange={setManualCode}
-            title={t('interview.notes')}
-            submitLabel={t('interview.send')}
-            placeholder={t('interview.startWriting')}
-            onSubmit={(text) => {
-              setManualEditorOpen(false);
-              setManualCode('');
-              sendTurn(text);
-            }}
-            onClose={() => setManualEditorOpen(false)} />
         )}
       </div>
     </div>

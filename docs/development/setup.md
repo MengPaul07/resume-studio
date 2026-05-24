@@ -114,7 +114,7 @@ npm --version
 
 ```bash
 git clone <repo-url>
-cd resume-builder
+cd resume-studio
 
 # Backend
 python -m venv .venv
@@ -124,6 +124,7 @@ pip install -r requirements.txt
 # Frontend
 cd frontend
 npm install
+cd ..
 ```
 
 ### 2. Configure / 配置
@@ -153,20 +154,21 @@ This loads 87+ campus JDs from `tests/fixtures/jds/`. Skip if you don't need JD 
 **Backend** (Terminal 1):
 
 ```bash
-cd resume-builder
+cd resume-studio
 .venv/Scripts/python.exe -m uvicorn src.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 On Linux/Mac:
 ```bash
-cd resume-builder
+cd resume-studio
+source .venv/bin/activate
 uvicorn src.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
 **Frontend** (Terminal 2):
 
 ```bash
-cd resume-builder/frontend
+cd resume-studio/frontend
 npm run dev
 ```
 
@@ -187,14 +189,14 @@ If using WSL for development:
 
 ```bash
 # Git operations in WSL
-cd ~/projects/resume-builder
+cd ~/projects/resume-studio
 
 # Backend runs from Windows or WSL
 # Use cmd or PowerShell:
-D:\Repo\resume-builder\.venv\Scripts\python.exe -m uvicorn src.main:app --host 127.0.0.1 --port 8000
+D:\Repo\resume-studio\.venv\Scripts\python.exe -m uvicorn src.main:app --host 127.0.0.1 --port 8000
 
 # Frontend dev server from Windows:
-cd D:\Repo\resume-builder\frontend
+cd D:\Repo\resume-studio\frontend
 npm run dev
 ```
 

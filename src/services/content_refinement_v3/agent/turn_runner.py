@@ -101,6 +101,7 @@ def _compose_general_chat_message(message: str) -> str:
             api_base=llm.api_base or None,
             temperature=0.2,
             max_tokens=4096,
+            timeout=60,
         )
         answer = str(getattr(response.choices[0].message, "content", "") or "").strip()
         if answer:
@@ -281,10 +282,18 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
         # Queue + thread for real-time SSE streaming
         _q: queue.Queue = queue.Queue()
 
+        # Capture LLM config in main thread before spawning — contextvars
+        # are not inherited by threading.Thread workers.
+        from src.utils.context import get_llm_config as _get_llm_cfg
+        _captured_llm_config = _get_llm_cfg()
+
         def _on_event(kind: str, data: Any) -> None:
             _q.put(("event", kind, data))
 
         def _run_agent_thread() -> None:
+            # Re-hydrate LLM config in agent thread context
+            from src.utils.context import set_llm_config as _set_llm_cfg
+            _set_llm_cfg(_captured_llm_config)
             try:
                 if mode == "interview":
                     from src.services.content_refinement_v3.prompts.interview import build_interview_prompt
@@ -354,8 +363,11 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
         _duration = int((_time.perf_counter() - _started) * 1000)
 
         if not agent_result:
-            yield from _sse.emit_step_failed(ctx, step_id, "agent_loop",
-                _agent_error[0] if _agent_error else "agent loop returned no result")
+            error_msg = _agent_error[0] if _agent_error else "agent loop returned no result"
+            yield from _sse.emit_step_failed(ctx, step_id, "agent_loop", error_msg)
+            error_payload = {"session_id": session_id, "turn_id": turn_id, "error": error_msg, "termination_reason": "error"}
+            finish_turn(turn_id=turn_id, status="failed", error_text=error_msg)
+            yield _sse_event("turn.completed", error_payload)
             return
 
         # Record agent loop step

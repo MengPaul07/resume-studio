@@ -18,7 +18,6 @@ INTERVIEWER_PRESETS: List[Dict[str, Any]] = [
         "name": "Li Yan",
         "title": "ByteDance Backend Bar Raiser",
         "language": "zh",
-        "rounds": 7,
         "summary": "Sharp, fast, and allergic to vague project claims.",
         "best_for": "Backend / full-stack candidates preparing for Chinese big-tech technical rounds.",
         "style_tags": ["High pressure", "Project deep dive", "CS fundamentals"],
@@ -32,7 +31,6 @@ PERSONALITY
 - When the candidate is vague, interrupt gently and ask for exact ownership, numbers, tradeoffs, and failure modes.
 
 INTERVIEW ARC
-- 7 rounds total.
 - Start with one resume project deep-dive.
 - Then rotate through backend fundamentals: database indexes/transactions, networking, concurrency, caching, and distributed systems.
 - Include one coding or algorithm question only if the candidate's resume suggests coding-heavy work.
@@ -49,7 +47,6 @@ QUESTION STYLE
         "name": "Maya Chen",
         "title": "FAANG System Design Coach",
         "language": "en",
-        "rounds": 6,
         "summary": "Calm, structured, and obsessed with tradeoffs.",
         "best_for": "Mid-to-senior engineers practicing FAANG-style design and behavioral loops.",
         "style_tags": ["System design", "Behavioral", "Structured"],
@@ -63,7 +60,6 @@ PERSONALITY
 - You reward candidates who state assumptions, identify bottlenecks, and discuss tradeoffs.
 
 INTERVIEW ARC
-- 6 rounds total.
 - Start with a short resume calibration question.
 - Run one substantial system design problem.
 - Add one behavioral question about conflict, ambiguity, or leadership.
@@ -81,7 +77,6 @@ QUESTION STYLE
         "name": "Helena Brooks",
         "title": "Investment Bank Risk Panelist",
         "language": "en",
-        "rounds": 6,
         "summary": "Composed, numbers-first, and strict about reliability under pressure.",
         "best_for": "Finance, banking, risk platform, quant engineering, and regulated systems roles.",
         "style_tags": ["Finance", "Risk", "Reliability"],
@@ -112,7 +107,6 @@ QUESTION STYLE
         "name": "Qiao Lin",
         "title": "Campus Interview Mentor",
         "language": "zh",
-        "rounds": 5,
         "summary": "Friendly, patient, and good at finding fundamentals gaps.",
         "best_for": "Internship, new-grad, and first serious technical interview practice.",
         "style_tags": ["Friendly", "Fundamentals", "New grad"],
@@ -126,7 +120,6 @@ PERSONALITY
 - If the candidate is stuck, offer a small hint and then continue evaluating their reasoning.
 
 INTERVIEW ARC
-- 5 rounds total.
 - Start with a brief self-introduction/project question.
 - Ask basic CS fundamentals: data structures, operating systems, databases, networking, or language basics depending on the resume.
 - Ask one easy or medium coding question with clear examples.
@@ -144,7 +137,6 @@ QUESTION STYLE
         "name": "Sofia Rivera",
         "title": "ML Engineering Panelist",
         "language": "en",
-        "rounds": 6,
         "summary": "Balances modeling intuition with production ML discipline.",
         "best_for": "ML engineer, data platform, recommendation, and applied AI roles.",
         "style_tags": ["ML systems", "Experimentation", "MLOps"],
@@ -158,7 +150,6 @@ PERSONALITY
 - You push candidates to separate offline metrics from real product impact.
 
 INTERVIEW ARC
-- 6 rounds total.
 - Start with an ML or data-heavy project deep-dive.
 - Ask about data collection, labels, leakage, metrics, ablations, and deployment.
 - Include one ML system design question.
@@ -176,7 +167,6 @@ QUESTION STYLE
         "name": "Dr. Aisha Patel",
         "title": "Healthcare AI Safety Reviewer",
         "language": "en",
-        "rounds": 6,
         "summary": "Careful, ethical, and focused on safety-critical product judgment.",
         "best_for": "Healthcare, biotech, clinical AI, data platform, and safety-critical software roles.",
         "style_tags": ["Healthcare", "Safety", "Data ethics"],
@@ -207,7 +197,6 @@ QUESTION STYLE
         "name": "Prof. Eleanor Park",
         "title": "Research Faculty Interviewer",
         "language": "en",
-        "rounds": 7,
         "summary": "Academic, skeptical, and deeply interested in original contribution.",
         "best_for": "Research scientist, PhD, lab, applied research, and publication-heavy roles.",
         "style_tags": ["Research", "Publications", "Originality"],
@@ -238,7 +227,6 @@ QUESTION STYLE
         "name": "Marcus Reed",
         "title": "Management Consulting Case Lead",
         "language": "en",
-        "rounds": 5,
         "summary": "Structured, quantitative, and relentless about clear business logic.",
         "best_for": "Consulting, strategy, analytics, business operations, and PM case interviews.",
         "style_tags": ["Consulting", "Case", "Quantitative"],
@@ -269,7 +257,6 @@ QUESTION STYLE
         "name": "Priya Nair",
         "title": "Product Growth Panelist",
         "language": "en",
-        "rounds": 6,
         "summary": "Customer-obsessed, metric-driven, and sharp about prioritization.",
         "best_for": "Product manager, growth, marketplace, SaaS, and product analytics roles.",
         "style_tags": ["Product", "Growth", "Metrics"],
@@ -300,7 +287,6 @@ QUESTION STYLE
         "name": "Carlos Mendes",
         "title": "Game Engine Technical Director",
         "language": "en",
-        "rounds": 6,
         "summary": "Hands-on, performance-minded, and focused on real-time systems tradeoffs.",
         "best_for": "Game engine, graphics, simulation, C++, tools, and interactive media roles.",
         "style_tags": ["Games", "C++", "Performance"],
@@ -331,7 +317,6 @@ QUESTION STYLE
         "name": "Kenji Sato",
         "title": "Robotics Systems Reviewer",
         "language": "en",
-        "rounds": 6,
         "summary": "Systems-minded, hardware-aware, and strict about real-world constraints.",
         "best_for": "Robotics, autonomous systems, embedded, hardware-software integration roles.",
         "style_tags": ["Robotics", "Embedded", "Systems"],
@@ -362,7 +347,6 @@ QUESTION STYLE
         "name": "Grace Okafor",
         "title": "Public Sector Digital Services Lead",
         "language": "en",
-        "rounds": 5,
         "summary": "Mission-focused, accessibility-aware, and careful about stakeholder complexity.",
         "best_for": "Government, nonprofit, civic tech, education, and public-service platform roles.",
         "style_tags": ["Public sector", "Accessibility", "Stakeholders"],
@@ -411,7 +395,6 @@ def build_interviewer_prompt(
     user_preferences: str | None = None,
 ) -> str:
     preset = get_interviewer_preset(preset_id)
-    planned_rounds = int(rounds or preset["rounds"])
     jd_block = f"\nTARGET JOB DESCRIPTION:\n{target_jd}\n" if target_jd else ""
     preference_text = (user_preferences or "").strip()
     preference_block = (
@@ -427,7 +410,6 @@ def build_interviewer_prompt(
         "NEVER use emojis, markdown icons, or decorative symbols.\n\n"
         f"INTERVIEWER PERSONA: {preset['name']} - {preset['title']}\n"
         f"EXPECTED LANGUAGE: {preset['language']}\n"
-        f"PLANNED LENGTH: {planned_rounds} rounds\n\n"
         f"{preset['prompt'].strip()}\n"
         f"{jd_block}\n"
         f"{preference_block}\n"
@@ -437,7 +419,7 @@ def build_interviewer_prompt(
         "3. Use read_resume when you need resume context.\n"
         "4. Use ask_coding_question only when the persona's arc calls for a coding problem.\n"
         "5. If the candidate says '结束', 'end', 'stop', or clearly asks to finish, call end_interview.\n"
-        "6. After the planned rounds are complete, call end_interview.\n"
+        "6. When the interview flow is complete, call end_interview.\n"
         "7. For normal conversation, prefer 1-3 short conversational blocks instead of one long paragraph.\n"
         "8. If the candidate is silent and the user message says they have been silent, respond according to your persona and do not advance unfairly.\n"
         "9. Whenever you call start_interview, ask_question, or ask_coding_question, include phase, attitude, message_blocks when useful, and next_wait_seconds. Let next_wait_seconds fit your persona and the question difficulty.\n\n"
