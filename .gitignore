@@ -23,9 +23,6 @@ src/services/data/recent_resumes/
 outputs/
 uploads/
 
-# Tauri
-frontend/src-tauri/target/
-
 # Personal cache / AI tool configs
 .chroma/
 .claude/
@@ -35,6 +32,10 @@ frontend/src-tauri/target/
 # Personal docs
 AGENTS.md
 CHANGELOG.md
+
+# Bench/Eval
+bench/
+scripts/dres_bench.py
 
 # Logs
 *.log

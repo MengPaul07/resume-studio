@@ -1,9 +1,7 @@
-﻿export type LLMConfig = {
+export type LLMConfig = {
   model: string;
   api_key: string;
   api_base: string;
-  max_tokens: number;
-  temperature: number;
 };
 
 export type LLMProvider = {
@@ -60,16 +58,9 @@ export const DEFAULT_LLM_CONFIG: LLMConfig = {
   model: 'deepseek-v4-pro',
   api_key: '',
   api_base: 'https://api.deepseek.com/v1',
-  max_tokens: 4096,
-  temperature: 0,
 };
 
 const LLM_CONFIG_STORAGE_KEY = 'resume.llm_config';
-
-function toNumber(value: unknown, fallback: number): number {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
-}
 
 function sanitizeLLMConfig(raw: unknown): LLMConfig {
   const input = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
@@ -77,8 +68,6 @@ function sanitizeLLMConfig(raw: unknown): LLMConfig {
     model: String(input.model ?? DEFAULT_LLM_CONFIG.model),
     api_key: String(input.api_key ?? DEFAULT_LLM_CONFIG.api_key),
     api_base: String(input.api_base ?? DEFAULT_LLM_CONFIG.api_base),
-    max_tokens: Math.max(1, Math.trunc(toNumber(input.max_tokens, DEFAULT_LLM_CONFIG.max_tokens))),
-    temperature: toNumber(input.temperature, DEFAULT_LLM_CONFIG.temperature),
   };
 }
 
@@ -126,8 +115,6 @@ export type Preset = {
   provider: string;
   model: string;
   api_base: string;
-  max_tokens: number;
-  temperature: number;
 };
 
 function buildAllPresets(): Preset[] {
@@ -140,8 +127,6 @@ function buildAllPresets(): Preset[] {
         provider: provider.name,
         model,
         api_base: provider.api_base,
-        max_tokens: DEFAULT_LLM_CONFIG.max_tokens,
-        temperature: DEFAULT_LLM_CONFIG.temperature,
       });
     }
   }
@@ -175,4 +160,3 @@ export function groupPresetsByProvider(): PresetGroup[] {
   }
   return Array.from(map.entries()).map(([provider, items]) => ({ provider, items }));
 }
-

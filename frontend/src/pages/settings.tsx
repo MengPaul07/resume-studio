@@ -19,9 +19,7 @@ function isSameLLMConfig(a: LLMConfig, b: LLMConfig): boolean {
   return (
     a.model === b.model &&
     a.api_key === b.api_key &&
-    a.api_base === b.api_base &&
-    a.max_tokens === b.max_tokens &&
-    a.temperature === b.temperature
+    a.api_base === b.api_base
   );
 }
 
@@ -84,8 +82,6 @@ export function SettingsPage() {
       ...prev,
       model: preset.model,
       api_base: preset.api_base || prev.api_base,
-      max_tokens: preset.max_tokens,
-      temperature: preset.temperature,
     }));
   };
 
@@ -147,24 +143,6 @@ export function SettingsPage() {
                   <div className="rounded-xl border border-[var(--brand-line-strong)] bg-[var(--brand-surface)] px-3 py-2">
                     <p className="font-mono text-[10px] uppercase tracking-wide text-[var(--brand-ink-muted)]">Model</p>
                     <p className="mt-1 font-mono text-xs">{draft.model}</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <input
-                      value={String(draft.max_tokens)}
-                      onChange={(e) => updateField('max_tokens', Number(e.target.value) || DEFAULT_LLM_CONFIG.max_tokens)}
-                      placeholder={t('settings.maxTokens')}
-                      type="number"
-                      min={1}
-                      className="ui-input"
-                    />
-                    <input
-                      value={String(draft.temperature)}
-                      onChange={(e) => updateField('temperature', Number(e.target.value))}
-                      placeholder={t('settings.temperature')}
-                      type="number"
-                      step="0.1"
-                      className="ui-input"
-                    />
                   </div>
                 </div>
               </Card>

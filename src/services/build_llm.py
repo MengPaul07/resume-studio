@@ -116,34 +116,21 @@ class LiteLLMAdapter:
 
 def build_llm() -> LiteLLMAdapter:
     config = get_llm_config()
-    
+
     raw_model = (config.get("model") or os.getenv("LLM_MODEL") or "").strip()
     normalized_model = LiteLLMAdapter._normalize_model(raw_model or "deepseek-chat")
     is_ollama = normalized_model.startswith("ollama/")
-    provider_env = _provider_env_names(normalized_model)
 
     api_key = str(config.get("api_key") or "").strip()
     if not api_key:
         api_key = os.getenv("API_KEY", "").strip()
-    if not api_key:
-        for key_name in provider_env["api_keys"]:
-            api_key = os.getenv(key_name, "").strip()
-            if api_key:
-                break
     if not api_key and not is_ollama:
-        raise RuntimeError(
-            "Missing API key: set API_KEY or one of OPENAI_API_KEY / DEEPSEEK_API_KEY / ANTHROPIC_API_KEY / GEMINI_API_KEY"
-        )
+        raise RuntimeError("Missing API key: set API_KEY in .env")
 
     model = raw_model or "deepseek-chat"
     base_url = str(config.get("api_base") or "").strip()
     if not base_url:
         base_url = os.getenv("API_BASE", "").strip()
-    if not base_url:
-        for base_name in provider_env["api_bases"]:
-            base_url = os.getenv(base_name, "").strip()
-            if base_url:
-                break
     if is_ollama and not base_url:
         base_url = "http://localhost:11434"
 
@@ -162,35 +149,3 @@ def build_llm() -> LiteLLMAdapter:
         temperature=temperature,
         max_tokens=max_tokens,
     )
-
-
-def _provider_env_names(normalized_model: str) -> Dict[str, List[str]]:
-    if normalized_model.startswith("openai/"):
-        return {
-            "api_keys": ["OPENAI_API_KEY", "DEEPSEEK_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY"],
-            "api_bases": ["OPENAI_API_BASE"],
-        }
-    if normalized_model.startswith("deepseek/"):
-        return {
-            "api_keys": ["DEEPSEEK_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY"],
-            "api_bases": ["DEEPSEEK_API_BASE", "OPENAI_API_BASE"],
-        }
-    if normalized_model.startswith("anthropic/"):
-        return {
-            "api_keys": ["ANTHROPIC_API_KEY", "OPENAI_API_KEY", "DEEPSEEK_API_KEY", "GEMINI_API_KEY"],
-            "api_bases": ["ANTHROPIC_API_BASE"],
-        }
-    if normalized_model.startswith("gemini/"):
-        return {
-            "api_keys": ["GEMINI_API_KEY", "OPENAI_API_KEY", "DEEPSEEK_API_KEY", "ANTHROPIC_API_KEY"],
-            "api_bases": ["GEMINI_API_BASE"],
-        }
-    if normalized_model.startswith("ollama/"):
-        return {
-            "api_keys": [],
-            "api_bases": ["OLLAMA_API_BASE"],
-        }
-    return {
-        "api_keys": ["OPENAI_API_KEY", "DEEPSEEK_API_KEY", "ANTHROPIC_API_KEY", "GEMINI_API_KEY"],
-        "api_bases": ["OPENAI_API_BASE", "DEEPSEEK_API_BASE", "ANTHROPIC_API_BASE", "GEMINI_API_BASE"],
-    }

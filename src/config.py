@@ -25,8 +25,8 @@ class Settings(BaseSettings):
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./resume_intelligence.db")
 
     # LLM settings
-    OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
-    OPENAI_API_BASE: str = os.getenv("OPENAI_API_BASE", "https://api.deepseek.com")
+    API_KEY: str = os.getenv("API_KEY", "")
+    API_BASE: str = os.getenv("API_BASE", "https://api.deepseek.com")
     LLM_MODEL: str = os.getenv("LLM_MODEL", "deepseek-chat")
     LLM_MAX_TOKENS: int = int(os.getenv("LLM_MAX_TOKENS", "2048"))
     LLM_TEMPERATURE: float = float(os.getenv("LLM_TEMPERATURE", "0"))
