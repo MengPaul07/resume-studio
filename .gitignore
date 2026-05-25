@@ -19,6 +19,7 @@ src/data/recent_resumes/
 src/data/imports/
 src/data/job_descriptions/
 src/services/data/user_profiles/
+src/services/data/user_preferences/
 src/services/data/recent_resumes/
 *.sqlite3
 *.db
