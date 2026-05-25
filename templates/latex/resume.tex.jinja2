@@ -1,6 +1,5 @@
 % !TEX program = xelatex
 \documentclass[a4paper]{article}
-% 页面边距：来自 HTML 的 --r-page-padding，单位在后端转成 mm。
 \usepackage[hmargin={{ page_padding }}mm,vmargin={{ page_padding }}mm]{geometry}
 \usepackage{fontspec}
 \usepackage{xcolor}
@@ -8,14 +7,21 @@
 \usepackage{hyperref}
 \usepackage{ragged2e}
 \usepackage[most]{tcolorbox}
+\usepackage{xeCJK}
 
-% ---------- 字体 ----------
-% body_font_name 对应正文；header_font_name 对应姓名标题。
+% -- fonts --
+{% if has_chinese %}
+\setmainfont{Noto Serif CJK SC}[Scale=MatchLowercase,Script=CJK]
+\setCJKmainfont{Noto Serif CJK SC}[AutoFakeBold=2.5]
+\newfontfamily\bodyfont{Noto Serif CJK SC}[Scale=MatchLowercase,Script=CJK]
+\newfontfamily\headerfont{Noto Sans CJK SC}[Scale=MatchLowercase,Script=CJK,BoldFont=Noto Sans CJK SC Bold]
+{% else %}
 \setmainfont{ {{ body_font_name }} }[Scale=MatchLowercase]
 \newfontfamily\bodyfont{ {{ body_font_name }} }[Scale=MatchLowercase]
 \newfontfamily\headerfont{ {{ header_font_name }} }[Scale=MatchLowercase]
+{% endif %}
 
-% ---------- 颜色 ----------
+% -- colors --
 \definecolor{accent}{HTML}{ {{ accent }} }
 \definecolor{accentmuted}{HTML}{ {{ accent_muted }} }
 \definecolor{body}{HTML}{ {{ body_color }} }
@@ -27,7 +33,7 @@
 \definecolor{tagbg}{HTML}{ {{ tag_bg }} }
 \definecolor{tagborder}{HTML}{ {{ tag_border }} }
 
-% ---------- 全局 ----------
+% -- page --
 \pagecolor{white}
 \color{body}
 \bodyfont
@@ -35,54 +41,12 @@
 \setlength{\parskip}{0pt}
 \pagestyle{empty}
 
-% ---------- 宏 ----------
-\newcommand{\cvsection}[1]{
-  % section_gap 控制每个 section 标题前的空白。
-  % heading_rule_gap / heading_rule_thick 控制标题和下划线之间的距离、线条粗细。
-  % heading_margin 控制下划线之后到内容的空白，也就是 section 标题和内容的主间距。
-  \par\vspace{ {{ section_gap }} pt}
-  \noindent{
-    \fontsize{ {{ heading_size }} }{ {{ heading_leading }} }\selectfont
-    \bfseries\color{accent}
-{% if is_uppercase %}\MakeUppercase{{ '{#' }}1}{% else %}{{ '#' }}1{% endif %}%
-  }
-{% if heading_style == "underline" %}
-  \par\vspace{ {{ heading_rule_gap }} pt}
-  \noindent\textcolor{accentmuted}{\rule{\linewidth}{ {{ heading_rule_thick }} pt}}
-{% elif heading_style == "bar" %}
-  \hspace{10pt}\raisebox{-1pt}{\textcolor{accent}{\rule{3pt}{10pt}}}
-{% elif heading_style == "boxed" %}
-  \hspace{4pt}\fcolorbox{accentmuted}{tagbg}{\rule[-4pt]{0pt}{14pt}\hspace{6pt}}
-{% endif %}
-  \par\vspace{ {{ heading_margin }} pt}
-}
+% -- macros --
+{{ cvsection_def }}
 
-\newcommand{\cvtag}[1]{
-  % 标签胶囊：tag_radius 控制圆角；tag_pad_x/tag_pad_y 控制内边距；tag_border_width 控制边框粗细。
-  \tcbox[
-    on line,
-    colback=tagbg,
-    colframe=tagborder,
-    boxrule={{ tag_border_width }}pt,
-    arc={{ tag_radius }}pt,
-    boxsep=0pt,
-    left={{ tag_pad_x }}pt,
-    right={{ tag_pad_x }}pt,
-    top={{ tag_pad_y }}pt,
-    bottom={{ tag_pad_y }}pt
-  ]{\fontsize{ {{ tag_size }} }{ {{ tag_leading }} }\selectfont\bodyfont\strut{{ '#' }}1}
-}
+{{ cvtag_def }}
 
-\newcommand{\expheader}[3]{
-  % item_gap 控制每个经历/项目/教育条目前的空白。
-  \par\vspace{ {{ item_gap }} pt}
-  \noindent{\fontsize{ {{ body_size }} }{ {{ body_leading }} }\selectfont\bodyfont\bfseries {{ '#' }}1}
-  \par\noindent{
-    \fontsize{ {{ meta_size }} }{ {{ meta_leading }} }\selectfont
-    \color{meta}\bodyfont {{ '#' }}2%
-    \if\relax\detokenize{{ '{#' }}3}\relax\else\hfill {{ '#' }}3\fi
-    \par}
-}
+{{ expheader_def }}
 
 \begin{document}
 
@@ -148,8 +112,7 @@
 
 \vspace{ {{ header_pad }} pt}
 {% if show_divider %}
-% Header 分割线：divider_thick 控制粗细；header_pad/header_margin 控制上下距离。
-\noindent\textcolor{divider}{\rule{\textwidth}{ {{ divider_thick }} pt}}\par
+\noindent\textcolor{divider}{\rule{\linewidth}{ {{ divider_thick }} pt}}\par
 {% endif %}
 \vspace{ {{ header_margin }} pt}
 
@@ -157,7 +120,6 @@
 {% if is_double and left_sections %}
 \noindent
 \colorbox{sidebarbg}{
-% 左栏宽度来自 --r-left-basis；sidebar_padding 控制背景块内边距。
 \begin{minipage}[t]{ {{ left_col_width }} }
 \vspace{ {{ sidebar_padding }} pt}
 \hspace{ {{ sidebar_padding }} pt}\begin{minipage}[t]{\dimexpr\linewidth - {{ sidebar_inner_deduct }}pt\relax}

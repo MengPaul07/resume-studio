@@ -1,5 +1,6 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
+import json
 import logging
 from typing import Any, Dict, List
 
@@ -366,11 +367,14 @@ async def template_preview_section(payload: TemplatePreviewRequest) -> Dict[str,
 @router.post("/agent/v3/template:export-latex")
 async def template_export_latex(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Export resume as LaTeX source."""
-    from src.services.layout_design.nodes.common import render_latex_template
+    from src.services.latex_gen import render_tex
     try:
         resume_obj = dict(payload.get("resume_obj", {}))
-        active_style = dict(payload.get("active_style", {}))
-        latex = render_latex_template(resume_obj, active_style)
+        guidance = dict(payload.get("guidance", {}))
+        sections = list(payload.get("sections", []))
+        personal_info = dict(payload.get("personal_info", {})) or None
+        html_source = str(payload.get("html_source", ""))
+        latex = render_tex(resume_obj, guidance, sections, personal_info, html_source)
         return {"latex": latex}
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"latex export failed: {exc}")
@@ -407,6 +411,153 @@ class LatexPdfRequest(BaseModel):
     html_source: str = ""
 
 
+def _strip_latex_code_fence(text: str) -> str:
+    raw = str(text or "").strip()
+    if not raw.startswith("```"):
+        return raw
+    lines = raw.splitlines()
+    if lines:
+        lines = lines[1:]
+    if lines and lines[-1].strip().startswith("```"):
+        lines = lines[:-1]
+    return "\n".join(lines).strip()
+
+
+def _build_html_to_latex_style_contract(html: str, guidance: Dict[str, Any] | None = None) -> Dict[str, Any]:
+    from src.services.latex_gen import build_latex_style_context
+
+    style = build_latex_style_context(guidance or {}, html)
+    typography = style["typography"]
+    spacing = style["spacing"]
+    layout = style["layout"]
+    return {
+        "colors": style["colors"],
+        "typography_pt": {
+            "name_size": typography["name_size"],
+            "role_size": typography["role_size"],
+            "meta_size": typography["meta_size"],
+            "body_size": typography["body_size"],
+            "heading_size": typography["heading_size"],
+            "line_height": typography["line_height"],
+            "header_font": typography["header_font"],
+            "body_font": typography["body_font"],
+        },
+        "spacing_pt": {
+            "page_padding_mm": spacing["page_padding_mm"],
+            "section_title_gap": spacing["section_title_gap"],
+            "entry_gap": spacing["entry_gap"],
+            "meta_gap": spacing["meta_gap"],
+            "heading_margin": spacing["heading_margin"],
+            "bullet_indent": spacing["bullet_indent"],
+            "bullet_gap": spacing["bullet_gap"],
+            "bullet_topsep": spacing["bullet_topsep"],
+            "tag_gap": spacing["tag_gap"],
+            "tag_pad_x": spacing["tag_pad_x"],
+            "tag_pad_y": spacing["tag_pad_y"],
+            "tag_radius": spacing["tag_radius"],
+        },
+        "layout": {
+            "column_mode": layout["column_mode"],
+            "header_layout": layout["header_layout"],
+            "contact_layout": layout["contact_layout"],
+            "show_divider": layout["show_divider"],
+            "left_pct": layout["left_pct"],
+        },
+        "heading": {
+            "style": style["heading"]["style"],
+            "case": style["heading"]["case"],
+            "bar_width": style["heading"]["bar_width"],
+            "bar_pad": style["heading"]["bar_pad"],
+            "boxed_padding_x": style["heading"]["boxed_padding_x"],
+            "boxed_padding_y": style["heading"]["boxed_padding_y"],
+        },
+        "entry": style["entry"],
+        "support": style["support"],
+    }
+
+
+def _build_html_to_latex_messages(html: str, guidance: Dict[str, Any] | None = None) -> List[Dict[str, str]]:
+    contract_json = json.dumps(
+        _build_html_to_latex_style_contract(html, guidance),
+        ensure_ascii=False,
+        indent=2,
+    )
+    system_prompt = f"""
+Convert the supplied resume HTML into compilable XeLaTeX for Overleaf.
+
+Output contract:
+- Return raw LaTeX only. Do not use Markdown fences, explanations, comments about limitations, or prose outside the document.
+- The output must include exactly one complete document with \\documentclass, packages, \\begin{{document}}, and \\end{{document}}.
+- Preserve every visible resume text string exactly as written and in the same order. Do not rewrite, translate, summarize, add achievements, add bullets, rename sections, or invent links.
+
+Style contract:
+- Treat this JSON as authoritative. Use these colors, typography, spacing, layout, heading, and entry semantics. Do not invent colors, gradients, shadows, icons, ornaments, extra rules, or new style systems.
+- If the HTML contains unsupported CSS, use the fallback rules below instead of inventing a replacement.
+
+STYLE_CONTRACT_JSON:
+{contract_json}
+
+Required style mapping:
+- Page: use article + geometry. Use page_padding_mm from the contract for horizontal and vertical margins.
+- Fonts: use fontspec and xeCJK. For CJK or mixed content, use Noto Serif CJK SC for body and Noto Sans CJK SC for headings. Otherwise use TeX Gyre Heros/Pagella matching the contract.
+- Colors: define only colors from the contract. Reuse accent, accent_muted, body, meta, header_bg, header_text, sidebar_bg, divider, tag_bg, and tag_border.
+- Header: implement header_layout as center, left, or split. Implement contact_layout as inline separators or stacked lines. Preserve divider only when show_divider is true.
+- Section headings: implement heading.style exactly:
+  - underline: colored heading text plus an accent_muted horizontal rule below.
+  - bar: left vertical accent bar plus heading text, not a bar after the text.
+  - boxed: tcolorbox with tag_bg background, accent_muted frame, and boxed padding from the contract. Do not force a fixed height.
+  - plain: colored bold heading only.
+- Entry dates: implement entry.date_layout exactly:
+  - title_row_right: title on the left and date on the same line right-aligned with \\hfill.
+  - meta_row_right: title first, then subtitle/meta line with date right-aligned using \\hfill.
+  - muted_lines: title, subtitle/meta, and date on separate muted lines.
+- Lists: use enumitem. Respect bullet_indent, bullet_gap, and bullet_topsep. Do not change bullet text.
+- Tags/pills: use tcolorbox tcbox with tag_bg, tag_border, tag padding, and tag_radius. Do not use arbitrary pill colors.
+- Columns: if the HTML has a two-column layout or contract column_mode is double, use minipages with the contract left_pct. Otherwise use a single column.
+
+Fallback rules for unsupported CSS:
+- Ignore box-shadow, text-shadow, transitions, hover styles, gradients, and browser-only effects.
+- Approximate border-radius only through tcolorbox arc.
+- Approximate flex/grid using minipage, tabularx, or simple paragraphs.
+- If exact layout is uncertain, choose the simpler compilable approximation that best preserves text order and contract colors/spacing.
+
+LaTeX safety:
+- Escape &, %, $, #, _, {{, }}, ~, and ^ in text content.
+- Use \\href only for actual link/contact text present in the HTML.
+- Prefer simple macros over complex custom environments.
+- The result must compile with XeLaTeX without requiring shell escape.
+""".strip()
+    return [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": html},
+    ]
+
+
+@router.post("/agent/v3/html-to-latex")
+async def html_to_latex(payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Convert HTML resume to LaTeX via LLM (backup for built-in renderer)."""
+    from litellm import completion
+    from src.services.build_llm import build_llm
+
+    html = str(payload.get("html", "")).strip()
+    if not html:
+        raise HTTPException(status_code=422, detail="html is required")
+
+    guidance = dict(payload.get("guidance", {}) or {})
+    llm = build_llm()
+    resp = completion(
+        model=llm.model,
+        messages=_build_html_to_latex_messages(html, guidance),
+        api_key=llm.api_key or None,
+        api_base=llm.api_base or None,
+        temperature=0,
+        max_tokens=8192,
+        timeout=120,
+    )
+    content = getattr(resp.choices[0].message, "content", "") or ""
+    return {"latex": _strip_latex_code_fence(content)}
+
+
 @router.post("/latex/tex")
 async def generate_latex_tex(payload: LatexPdfRequest) -> Dict[str, Any]:
     """Generate LaTeX source from resume data (no PDF compilation).
@@ -422,7 +573,7 @@ async def generate_latex_tex(payload: LatexPdfRequest) -> Dict[str, Any]:
         personal_info = dict(payload.personal_info or {}) or None
         html_source = str(payload.html_source or "")
 
-        if not resume_obj:
+        if resume_obj is None:
             raise HTTPException(status_code=400, detail="resume_obj is required")
 
         tex = render_tex(resume_obj, guidance, sections, personal_info, html_source)
@@ -431,3 +582,4 @@ async def generate_latex_tex(payload: LatexPdfRequest) -> Dict[str, Any]:
     except Exception as exc:
         logger.error("[latex] tex generation error: %s", exc)
         raise HTTPException(status_code=500, detail=f"latex tex generation failed: {exc}")
+

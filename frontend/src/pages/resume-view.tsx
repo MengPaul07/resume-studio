@@ -1,7 +1,7 @@
 ﻿import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { ClipboardCopy, Download, ExternalLink, FileText, Save, WandSparkles, X } from 'lucide-react';
+import { Check, ChevronDown, ClipboardCopy, Copy, Download, ExternalLink, FileCode, FileText, Save, WandSparkles, X } from 'lucide-react';
 import { buildApiUrl, getRecentResume, listRecentResumes, saveRecentResume } from '../api';
 import { BuilderLayout } from '../components/builder-workbench/BuilderLayout';
 import { EditorPanel } from '../components/builder-workbench/EditorPanel';
@@ -163,6 +163,9 @@ export function ResumeViewPage() {
   const [savingPdf, setSavingPdf] = useState(false);
   const [savingTex, setSavingTex] = useState(false);
   const [showOverleafModal, setShowOverleafModal] = useState(false);
+  const [latexMenuOpen, setLatexMenuOpen] = useState(false);
+  const [generatingLatex, setGeneratingLatex] = useState(false);
+  const [copiedLatex, setCopiedLatex] = useState(false);
   const [contentOverflows, setContentOverflows] = useState(false);
   const [guidance, setGuidance] = useState<RenderGuidanceSettings>(DEFAULT_GUIDANCE);
   const [sections, setSections] = useState<BuilderSectionDraft[]>(DEFAULT_SECTIONS);
@@ -469,10 +472,83 @@ export function ResumeViewPage() {
               <FileText />
               {savingPdf ? t('common.generating') : t('resume.exportPdf')}
             </Button>
-            <Button variant="outline" onClick={() => void handleDownloadTex()} disabled={savingTex || !resume?.resume_obj}>
-              <ClipboardCopy />
-              {savingTex ? t('common.generating') : t('resume.copyLatex')}
-            </Button>
+            {/* LaTeX dropdown */}
+            <div className="relative">
+              <Button
+                variant="outline"
+                disabled={generatingLatex || savingTex || !resume?.resume_obj}
+                onClick={() => setLatexMenuOpen((prev) => !prev)}
+                onBlur={() => setTimeout(() => setLatexMenuOpen(false), 150)}
+              >
+                {copiedLatex ? (
+                  <><Check className="size-3.5" /> Copied</>
+                ) : generatingLatex ? (
+                  <><span className="mr-1 inline-block size-3 animate-spin rounded-full border-2 border-current border-r-transparent" />{'...'}</>
+                ) : savingTex ? (
+                  <><ClipboardCopy className="size-3.5" /> {t('common.generating')}</>
+                ) : (
+                  <><FileCode className="size-3.5" /> {t('resume.copyLatex')}</>
+                )}
+                <ChevronDown className="size-3 ml-1" />
+              </Button>
+              {latexMenuOpen && (
+                <div className="absolute right-0 top-full z-50 mt-1 w-72 border border-[var(--brand-line)] bg-white dark:bg-zinc-800 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.2)]">
+                  <button
+                    type="button"
+                    className="flex w-full flex-col gap-0.5 px-4 py-3 text-left hover:bg-[var(--brand-surface-soft)]"
+                    onClick={async () => {
+                      setLatexMenuOpen(false);
+                      await handleDownloadTex();
+                    }}
+                  >
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider">
+                      <Copy className="size-3.5 inline mr-1" />
+                      Direct Copy
+                    </span>
+                    <span className="font-sans text-[10px] text-[var(--status-warning)]">
+                      Fast, but formatting may differ from preview
+                    </span>
+                  </button>
+                  <div className="border-t border-[var(--brand-line)]" />
+                  <button
+                    type="button"
+                    className="flex w-full flex-col gap-0.5 px-4 py-3 text-left hover:bg-[var(--brand-surface-soft)]"
+                    onClick={async () => {
+                      setLatexMenuOpen(false);
+                      setGeneratingLatex(true);
+                      try {
+                        const resp = await fetch(buildApiUrl('/agent/v3/html-to-latex'), {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            html: htmlDraft,
+                            guidance,
+                            sections: withSectionOrder(sections),
+                          }),
+                        });
+                        if (!resp.ok) throw new Error(await resp.text());
+                        const data = await resp.json();
+                        await navigator.clipboard.writeText(data.latex || '');
+                        setCopiedLatex(true);
+                        setTimeout(() => setCopiedLatex(false), 2000);
+                      } catch (e) {
+                        setError(e instanceof Error ? e.message : 'LLM conversion failed');
+                      } finally {
+                        setGeneratingLatex(false);
+                      }
+                    }}
+                  >
+                    <span className="font-mono text-xs font-bold uppercase tracking-wider">
+                      <WandSparkles className="size-3.5 inline mr-1" />
+                      LLM Convert
+                    </span>
+                    <span className="font-sans text-[10px] text-gray-500 dark:text-zinc-400">
+                      Higher quality via AI — takes a few seconds
+                    </span>
+                  </button>
+                </div>
+              )}
+            </div>
           </>
         }
         editorPanel={

@@ -1104,8 +1104,13 @@ export function TailorChatPage() {
                   Object.keys(session.refinedResumeObj).length === 0
                 }
               >
-              {session.isSaving ? <Loader2 className="animate-spin" /> : <WandSparkles />}
-                {session.isSaving ? t('common.saving') : t('tailor.saveTailor')}
+              <span className="relative">
+                {session.isSaving ? <Loader2 className="animate-spin" /> : <WandSparkles />}
+                {(autoAppliedDiffs.length > 0 || (session.pendingChanges?.length ?? 0) > 0) && (
+                  <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+                )}
+              </span>
+                {session.isSaving ? t('common.saving') : (autoAppliedDiffs.length > 0 || (session.pendingChanges?.length ?? 0) > 0) ? 'Save*' : t('tailor.saveTailor')}
               </Button>
               <Link
                 to={`/builder?resumeId=${resumeId}`}
@@ -1334,7 +1339,12 @@ export function TailorChatPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       {session.statusText ? (
-                        <p className="font-mono text-xs text-green-700 dark:text-green-400">{session.statusText}</p>
+                        <p className="font-mono text-xs text-green-700 dark:text-green-400">
+                          {session.statusText}
+                          {(autoAppliedDiffs.length > 0 || (session.pendingChanges?.length ?? 0) > 0) && (
+                            <span className="ml-2 text-amber-600 dark:text-amber-400">— Save before switching to Layout</span>
+                          )}
+                        </p>
                       ) : null}
                       {session.errorText ? (
                         <p className="font-mono text-xs text-red-700 dark:text-red-400">{session.errorText}</p>

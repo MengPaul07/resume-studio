@@ -1,19 +1,16 @@
-{# section.tex.jinja2: 渲染单个简历 section。 #}
+{# section.tex.jinja2: renders a single resume section #}
 {% set sitems = sec.get("items", []) %}
 {% if sec.type == "experience" %}
 \cvsection{ {{ sec.title }} }
 {% for exp in sitems %}
 {% if exp.is_bottom %}
 \expheader{ {{ exp.title }} }{ {{ exp.subtitle }} }{ {{ exp.years }} }
+{% elif exp.is_inline %}
+\expheaderinline{ {{ exp.title }} }{ {{ exp.subtitle }} }{ {{ exp.years }} }
 {% else %}
-\expheader{ {{ exp.title }} }{ {{ exp.subtitle }} }{}
-{% if exp.years %}
-\par\vspace{2pt}
-\noindent{\fontsize{ {{ meta_size }} }{ {{ meta_leading }} }\selectfont\color{meta} {{ exp.years }} }\par
-{% endif %}
+\expheadermuted{ {{ exp.title }} }{ {{ exp.subtitle }} }{ {{ exp.years }} }
 {% endif %}
 {% if exp.bullets %}
-% Bullet 列表：bullet_indent 控制缩进；bullet_gap 控制 bullet 之间距离；bullet_topsep 控制列表和条目头之间距离。
 \begin{itemize}[leftmargin= {{ bullet_indent }} pt,itemsep= {{ bullet_gap }} pt,topsep= {{ bullet_topsep }} pt,parsep=0pt,partopsep=0pt,label=\textbullet]
 {% for b in exp.bullets %}
   \item {\fontsize{ {{ body_size }} }{ {{ body_leading }} }\selectfont {{ b }} }
@@ -27,21 +24,25 @@
 {% for edu in sitems %}
 {% if edu.is_bottom %}
 \expheader{ {{ edu.institution }} }{ {{ edu.degree }} }{ {{ edu.years }} }
+{% elif edu.is_inline %}
+\expheaderinline{ {{ edu.institution }} }{ {{ edu.degree }} }{ {{ edu.years }} }
 {% else %}
-\expheader{ {{ edu.institution }} }{ {{ edu.degree }} }{}
-{% if edu.years %}
-\par\vspace{2pt}
-\noindent{\fontsize{ {{ meta_size }} }{ {{ meta_leading }} }\selectfont\color{meta} {{ edu.years }} }\par
-{% endif %}
+\expheadermuted{ {{ edu.institution }} }{ {{ edu.degree }} }{ {{ edu.years }} }
 {% endif %}
 {% if edu.gpa %}
 \noindent{\fontsize{ {{ meta_size }} }{ {{ meta_leading }} }\selectfont\color{meta} GPA: {{ edu.gpa }} }\par
+{% endif %}
+{% if edu.description %}
+\begin{itemize}[leftmargin= {{ bullet_indent }} pt,itemsep= {{ bullet_gap }} pt,topsep= {{ bullet_topsep }} pt,parsep=0pt,partopsep=0pt,label=\textbullet]
+{% for d in edu.description %}
+  \item {\fontsize{ {{ body_size }} }{ {{ body_leading }} }\selectfont {{ d }} }
+{% endfor %}
+\end{itemize}
 {% endif %}
 {% endfor %}
 
 {% elif sec.type == "tags" %}
 \cvsection{ {{ sec.title }} }
-% 标签行：tag_gap 控制标签之间横向距离。
 {% for tag in sitems %}\cvtag{ {{ tag }} }\hspace{ {{ tag_gap }} pt}{% endfor %}\par
 
 {% elif sec.type == "text" %}
@@ -50,7 +51,6 @@
 
 {% elif sec.type == "list" %}
 \cvsection{ {{ sec.title }} }
-% 普通列表：参数含义同上面的 Bullet 列表。
 \begin{itemize}[leftmargin= {{ bullet_indent }} pt,itemsep= {{ bullet_gap }} pt,topsep= {{ bullet_topsep }} pt,parsep=0pt,partopsep=0pt,label=\textbullet]
 {% for item in sitems %}
   \item {\fontsize{ {{ body_size }} }{ {{ body_leading }} }\selectfont {{ item }} }

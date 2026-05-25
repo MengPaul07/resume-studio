@@ -30,6 +30,7 @@ export function PreviewPanel({
   onResetHtml,
   onGuidanceChange,
   onOverflowChange,
+  sections,
 }: PreviewPanelProps) {
   const { t } = useTranslation();
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -204,6 +205,7 @@ export function PreviewPanel({
           </div>
         )}
       </div>
+
     </div>
   );
 }
