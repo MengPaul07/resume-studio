@@ -14,24 +14,23 @@ from .preference_store import upsert_fact, upsert_preference
 
 logger = logging.getLogger(__name__)
 
-EXTRACTION_PROMPT = """You are a memory extraction agent. Analyze this conversation turn and extract any NEW user preferences or key facts worth remembering across sessions.
+EXTRACTION_PROMPT = """You are a memory extraction agent. Analyze this conversation turn and extract any NEW user preferences worth remembering across sessions.
 
 Return ONLY a JSON object, no explanation:
 {
   "updates": [
-    {"type": "preference", "key": "writing_style", "value": "prefers concise bullet points with quantified results"},
-    {"type": "fact", "key": "job_target", "value": "targeting Senior SDE roles at FAANG companies"}
+    {"type": "preference", "key": "writing_style", "value": "prefers concise bullet points with quantified results"}
   ]
 }
 
 RULES:
-- Only extract NEW or CHANGED information not already in existing_memory.
-- Preference: user's style/tone/format preferences, things they like or dislike, patterns they want you to follow or avoid.
-- Key Fact: important personal details, career goals, target roles, education history, skills, context for future conversations.
-- If the user corrects or contradicts a previous fact, include the updated version. The system will overwrite.
+- Only extract NEW or CHANGED preferences not already in existing_memory.
+- Preference: user's style/tone/format/language preferences, things they like or dislike, patterns they want you to follow or avoid.
+- If the user corrects or contradicts a previous preference, include the updated version.
 - If the turn is just greetings, simple edits, or contains no useful long-term information, return {"updates": []}.
 - Keep values concise (under 80 chars), in the user's language.
-- Key names should be short English identifiers: writing_style, tone, avoid_topics, career_goal, education, skills, location, target_role, etc.
+- Key names should be short English identifiers: writing_style, tone, avoid_topics, etc.
+- Do NOT extract facts about the resume content (job_target, career_goal, education, skills, etc.) — the agent already reads the full conversation history.
 """
 
 
@@ -93,7 +92,8 @@ def extract_memory(
         raw = getattr(resp.choices[0].message, "content", "") or ""
         data = json.loads(raw.strip())
         updates = data.get("updates", []) if isinstance(data, dict) else []
-        return [u for u in updates if isinstance(u, dict) and u.get("type") in ("preference", "fact") and u.get("key") and u.get("value")]
+        # Only persist preferences — facts are already in the agent's full conversation history
+        return [u for u in updates if isinstance(u, dict) and u.get("type") == "preference" and u.get("key") and u.get("value")]
 
     except Exception as exc:
         logger.warning("[memory] extraction failed: %s", exc)
@@ -101,16 +101,12 @@ def extract_memory(
 
 
 def apply_updates(user_id: str, updates: list[dict]) -> int:
-    """Apply extracted updates to the user's memory store. Returns number of changes."""
+    """Apply extracted preference updates. Returns number of changes."""
     count = 0
     for u in updates:
         try:
-            if u["type"] == "preference":
-                if upsert_preference(user_id, u["key"], u["value"]):
-                    count += 1
-            elif u["type"] == "fact":
-                if upsert_fact(user_id, u["key"], u["value"]):
-                    count += 1
+            if upsert_preference(user_id, u["key"], u["value"]):
+                count += 1
         except Exception as exc:
             logger.warning("[memory] upsert failed for key=%s: %s", u.get("key"), exc)
     return count
@@ -125,9 +121,10 @@ def update_memory_after_turn(
     rejected_items: list[dict] | None = None,
     resume_brief: dict | None = None,
 ) -> int:
-    """Called after each turn to extract and persist memory. Non-blocking.
+    """Called after each turn to extract and persist preferences. Non-blocking.
 
-    Returns number of changes made, or 0 if nothing was updated or extraction failed.
+    Only preferences are persisted. Facts are not stored separately — the agent
+    already has full conversation history for per-resume context.
     """
     if not user_id or not user_message.strip():
         return 0

@@ -18,8 +18,42 @@ async def lifespan(app: FastAPI):
     print(f"[startup] {settings.APP_NAME} v{settings.APP_VERSION} starting...")
     print(f"   DEBUG mode: {settings.DEBUG}")
     print(f"   LLM Model: {settings.LLM_MODEL}")
+    _auto_seed_jd_library()
     yield
     print("[shutdown] Application shutdown")
+
+
+def _auto_seed_jd_library():
+    """Seed the JD FAISS index from fixtures if it's empty."""
+    import json
+    from pathlib import Path
+    from src.services.rag.jd_repository import JdRepository
+
+    repo = JdRepository()
+    # Quick check: if there are already embeddings, skip
+    try:
+        count = repo.store._conn.execute("SELECT COUNT(*) FROM embeddings").fetchone()[0]
+        if count > 0:
+            print(f"   JD library: {count} items indexed")
+            return
+    except Exception:
+        repo.store.clear()
+
+    jds_dir = Path(__file__).resolve().parent.parent / "tests" / "fixtures" / "jds"
+    if not jds_dir.exists():
+        print("   JD library: no fixtures found, skipping seed")
+        return
+
+    total = 0
+    for fpath in sorted(jds_dir.glob("*.json")):
+        try:
+            data = json.loads(fpath.read_text(encoding="utf-8"))
+            items = data.get("items", []) if isinstance(data, list) else data.get("items", [])
+            if items:
+                total += repo.seed(items)
+        except Exception as exc:
+            print(f"   [warn] seed {fpath.name}: {exc}")
+    print(f"   JD library: auto-seeded {total} items from fixtures")
 
 
 app = FastAPI(

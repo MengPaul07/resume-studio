@@ -229,7 +229,7 @@ def get_session(session_id: str, include_state: bool = False) -> Dict[str, Any] 
     with _connect() as conn:
         row = conn.execute(
             """
-            SELECT id, title, doc_type, status, window_size, current_version_id, created_at, updated_at
+            SELECT id, title, doc_type, status, window_size, current_version_id, resume_id, created_at, updated_at
             FROM sessions
             WHERE id = ?
             """,
