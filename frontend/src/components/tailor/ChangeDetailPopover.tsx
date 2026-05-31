@@ -24,7 +24,7 @@ export function ChangeDetailPopover({ change, activeVariantIndex, onSwitchVarian
   const hasVariants = change.variants.length > 1;
 
   return (
-    <div className="border border-black bg-[#fffdf7] p-2 mt-1">
+    <div className="absolute left-0 top-full z-50 border border-black bg-[#fffdf7] p-2 mt-1 shadow-lg min-w-[280px]">
       <div className="flex items-center justify-between gap-2">
         <p className="font-mono text-[10px] uppercase text-gray-500 dark:text-zinc-400">{change.path}</p>
         {hasVariants ? (

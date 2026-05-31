@@ -44,8 +44,8 @@ export function TemplatePreview({
     setEditingValue(currentText);
   };
   const saveEdit = () => {
-    if (editingPath !== null && onEditField) {
-      onEditField(editingPath, editingValue);
+    if (editingPath !== null && editingValue.trim() && onEditField) {
+      onEditField(editingPath, editingValue.trim());
     }
     setEditingPath(null);
   };
@@ -142,7 +142,8 @@ export function TemplatePreview({
         {items.map((item, i) => {
           const path = `additional.${key}[${i}]`;
           const change = fc(path);
-          const isC = Boolean(change);
+          // Only match exact path or children — skip if change targets the array root
+          const isC = Boolean(change) && !change!.path.endsWith(key);
           const isA = isC && focusedChangePath && isPathMatch(change!.path, focusedChangePath);
           const isE = expandedChangePaths.has(path);
 
@@ -166,7 +167,7 @@ export function TemplatePreview({
           }
 
           return (
-            <span key={i}>
+            <span key={i} className="relative inline-flex">
               <span
                 ref={el => { previewAnchorRefs.current[path] = el; }}
                 data-path={path}
@@ -206,7 +207,8 @@ export function TemplatePreview({
         {items.map((item, i) => {
           const path = `additional.${key}[${i}]`;
           const change = fc(path);
-          const isC = Boolean(change);
+          // Only match exact path or children — skip if change targets the array root
+          const isC = Boolean(change) && !change!.path.endsWith(key);
           const isA = isC && focusedChangePath && isPathMatch(change!.path, focusedChangePath);
           const isE = expandedChangePaths.has(path);
 
@@ -526,8 +528,8 @@ export function TemplatePreview({
                 );
               }
               if (typeof val === 'string' && val) {
-                // String fallback: if comma/semicolon-separated, split and render adaptively
-                const parts = val.split(/[,;，；]\s*/).filter(Boolean);
+                // String fallback: split by comma/semicolon/newline and render as badges
+                const parts = val.split(/[,;，；\n]\s*/).filter(Boolean);
                 if (parts.length > 1) {
                   const label = key.replace(/([A-Z])/g, ' $1').trim();
                   const useList = anyItemLong(parts);

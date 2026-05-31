@@ -77,15 +77,30 @@ def _css_px(value: Any, fallback: float) -> float:
 
 
 def _px_to_mm(px: float) -> float:
-    return round(px * 25.4 / 96, 2)
+    return round(px * 25.4 / 96, 4)
 
 
 def _px_to_pt(px: float) -> float:
-    return round(px * 72 / 96, 2)
+    return round(px * 72 / 96, 4)
 
 
 def _font_px_to_pt(px: float) -> float:
-    return round(px * 72 / 96, 2)
+    return round(px * 72 / 96, 4)
+
+
+def _fmt_pt(v: float) -> str:
+    """Format a pt value without trailing zeros or excessive precision."""
+    rounded = round(v, 4)
+    if rounded == int(rounded):
+        return str(int(rounded))
+    # Strip trailing zeros but keep at least one decimal if needed
+    s = f"{rounded:.4f}".rstrip('0').rstrip('.')
+    return s
+
+
+def _tex_color(name: str, hex_val: str) -> str:
+    """Format a complete \definecolor command."""
+    return f"\\definecolor{{{name}}}{{HTML}}{{{hex_val}}}"
 
 
 def _css_px_var(css_vars: Dict[str, str], key: str, fallback: float) -> float:

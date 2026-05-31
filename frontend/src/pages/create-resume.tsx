@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, ArrowRight, Sparkles, Briefcase, GraduationCap, Code } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles, Briefcase, GraduationCap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { saveRecentResume } from '../api';
@@ -16,8 +16,7 @@ export function CreateResumePage() {
   const [targetRole, setTargetRole] = useState('');
   const [industry, setIndustry] = useState('');
   const [seniority, setSeniority] = useState('senior');
-  const [skills, setSkills] = useState<string[]>([]);
-  const [skillInput, setSkillInput] = useState('');
+  const [skills] = useState<string[]>([]);
   const [background, setBackground] = useState('');
   const [language, setLanguage] = useState<'en' | 'zh'>('en');
 
@@ -41,27 +40,8 @@ export function CreateResumePage() {
     { value: 'principal', label: t('createResume.principal') || 'Principal' },
   ];
 
-  function addSkill() {
-    const value = skillInput.trim();
-    if (!value) return;
-    if (!skills.includes(value)) {
-      setSkills((prev) => [...prev, value]);
-    }
-    setSkillInput('');
-  }
-
-  function handleSkillKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      addSkill();
-    }
-    if (e.key === 'Backspace' && !skillInput && skills.length > 0) {
-      setSkills((prev) => prev.slice(0, -1));
-    }
-  }
-
   const handleNext = () => {
-    if (step < 3) setStep(step + 1);
+    if (step < 2) setStep(step + 1);
   };
 
   const handleBack = () => {
@@ -177,31 +157,6 @@ export function CreateResumePage() {
         </div>
       ),
       canAdvance: industry.trim().length >= 2,
-    },
-    {
-      title: "Add a few core skills",
-      subtitle: "Just bullet out your top skills (press Enter after each).",
-      icon: <Code className="size-6" />,
-      content: (
-        <div className="mt-4">
-          <div className="flex flex-wrap gap-2 mb-4">
-            {skills.map((s, i) => (
-              <span key={i} className="inline-flex items-center gap-1 rounded-full bg-[var(--brand-signal)]/10 px-3 py-1 font-mono text-sm text-[var(--brand-signal)]">
-                {s}
-              </span>
-            ))}
-          </div>
-          <input
-            ref={inputRef as any}
-            value={skillInput}
-            onChange={(e) => setSkillInput(e.target.value)}
-            onKeyDown={handleSkillKeyDown}
-            placeholder="e.g. React, Python, Product Strategy..."
-            className="w-full border-none bg-transparent px-0 py-3 font-serif text-2xl outline-none placeholder:text-[var(--brand-ink-muted)] text-[var(--brand-ink)]"
-          />
-        </div>
-      ),
-      canAdvance: skills.length > 0 || skillInput.length > 0,
     },
     {
       title: "The human story",
@@ -324,7 +279,7 @@ export function CreateResumePage() {
                     ) : (
                       <Button
                         size="lg"
-                        onClick={() => { if(skillInput) addSkill(); handleSubmit(); }}
+                        onClick={() => { handleSubmit(); }}
                         disabled={!stepsConfig[step].canAdvance}
                         className="rounded-full px-8 text-sm bg-[var(--brand-signal)] text-white hover:bg-[var(--brand-signal)]/90"
                       >

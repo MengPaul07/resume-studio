@@ -355,8 +355,26 @@ def _load_resume(session_id: str) -> tuple[dict, dict]:
 
 def _save_resume(session_id: str, resume: dict) -> None:
     from ..session.service import save_session_state
+    from ..backends.session import get_session as _get_sess
     try:
         save_session_state(session_id=session_id, refined_resume_obj=resume)
+        # Sync to recent_resumes so Builder preview sees agent edits
+        sess = _get_sess(session_id, include_state=False)
+        if sess:
+            rid = str(sess.get("resume_id", "")).strip()
+            if rid:
+                from ..storage.recent_resume_store import save_recent_resume, get_recent_resume
+                rr = get_recent_resume(rid, include_payload=False)
+                if rr:
+                    save_recent_resume(
+                        resume_id=rid, title=str(rr.get("title", "")), source=str(rr.get("source", "tailor")),
+                        tags=list(rr.get("tags", [])) if isinstance(rr.get("tags"), list) else [],
+                        resume_obj=resume,
+                        output_markdown=str(rr.get("output_markdown", "")),
+                        output_html=str(rr.get("output_html", "")),
+                        template_name=str(rr.get("template_name", "")),
+                        layout_preferences=rr.get("layout_preferences"),
+                    )
     except Exception:
         pass
 
@@ -406,10 +424,30 @@ def tool_add_entry(*, session_id: str, section: str, value: str = "",
                       meta={"actionability": actionability, "confidence": confidence})
 
 
+_ARRAY_FIELD_ROOTS = {
+    "additional.technicalSkills",
+    "additional.languages",
+    "additional.certificationsTraining",
+    "additional.awards",
+}
+
+
+def _is_array_root(path: str) -> bool:
+    """Check if path targets an array field root WITHOUT an index.
+    'additional.technicalSkills' → blocked (would overwrite array with string)
+    'additional.technicalSkills[0]' → allowed (edits specific item)
+    """
+    clean = path.strip().rstrip(".")
+    for root in _ARRAY_FIELD_ROOTS:
+        if clean == root:
+            return True
+    return False
+
+
 @tool("update_field",
-      "Update a LEAF field (plain text or simple value). For structured entries use set_entry or add_entry.",
+      "Update a LEAF field (plain text or simple value). For array fields (additional.technicalSkills etc) use add_entry or edit individual items with index like additional.technicalSkills[0].",
       {"type": "object", "properties": {
-          "path": {"type": "string", "description": "Dot-path to a leaf field: 'summary', 'personalInfo.email', 'workExperience[0].description[1]', 'additional.technicalSkills'"},
+          "path": {"type": "string", "description": "Dot-path to a leaf field: 'summary', 'personalInfo.email', 'workExperience[0].description[1]'. NEVER use array roots like 'additional.technicalSkills' — use add_entry or index like 'additional.technicalSkills[0]' instead."},
           "value": {"type": "string", "description": "New text value. Plain text only — NOT a JSON object string."},
           "reason": {"type": "string", "description": "Brief reason in Chinese, under 30 chars."},
           "actionability": {"type": "string", "enum": ["apply_ready", "confirm_required"], "description": "confirm_required for fact-sensitive fields (name, email, phone, dates, gpa)."},
@@ -419,6 +457,14 @@ def tool_update_field(*, session_id: str, path: str, value: str = "",
                       reason: str = "", actionability: str = "apply_ready",
                       confidence: float = 0.8, **kwargs: Any) -> ToolResult:
     from ..session.service import _set_by_path_local, _get_by_path_local
+
+    # Block: array root paths must use add_entry or indexed access
+    if _is_array_root(path):
+        return ToolResult(success=False, tool_name="update_field", data={},
+            error=f"Cannot update array root '{path}'. Use add_entry() to append new items, "
+                  f"set_entry('{path}[N]') to replace items, or delete_entry('{path}[N]') to remove items. "
+                  f"To edit a single item: use '{path}[0]' (with index).")
+
     _, resume = _load_resume(session_id)
     if not resume:
         return ToolResult(success=False, tool_name="update_field", data={}, error="No resume loaded")

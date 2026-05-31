@@ -85,7 +85,7 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
     tool_failures: dict[str, int] = {}
     step_counter = 0
     state_lock = threading.Lock()
-    max_rounds = 6
+    max_rounds = 10
 
     for round_idx in range(max_rounds):
         _total_chars = sum(len(str(m.get("content", ""))) + len(str(m.get("tool_calls", ""))) for m in messages)

@@ -5,6 +5,7 @@ function toText(value: unknown): string {
   if (value === null || value === undefined) return '';
   if (typeof value === 'string') return value;
   if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+  if (Array.isArray(value)) return value.map(toText).filter(Boolean).join(', ');
   return '';
 }
 
@@ -110,7 +111,7 @@ function renderSectionByKey(
         const desc = bulletsToHtml(row.description as unknown[], guidance.bulletStyle, 'vertical', `education[${idx}].description`);
         if (!institution && !degree && !years && !gpa && !desc) return '';
         if (isBottom) {
-          const metaLine = `<p class="meta">${degree || ''}${years ? `<span class="meta" data-path="education[${idx}].years">${years}</span>` : ''}</p>`;
+          const metaLine = `<p class="meta">${degree || ''}${years ? `<span class="meta" data-path="education[${idx}].years">${years}</span>` : ''}</p>${gpa ? `<p class="meta" data-path="education[${idx}].gpa">GPA: ${gpa}</p>` : ''}`;
           return `<article class="resume-item"><div class="item-head"><h3 data-path="education[${idx}].institution">${institution || 'Institution'}</h3>${metaLine}</div>${desc}</article>`;
         }
         return `<article class="resume-item"><div class="item-head"><h3 data-path="education[${idx}].institution">${institution || 'Institution'}</h3><p class="meta" data-path="education[${idx}].degree">${degree || ''}</p>${years ? `<p class="meta" data-path="education[${idx}].years">${years}</p>` : ''}${gpa ? `<p class="meta" data-path="education[${idx}].gpa">GPA: ${gpa}</p>` : ''}</div>${desc}</article>`;
@@ -140,24 +141,33 @@ function renderSectionByKey(
       .join('');
     return rows ? `<section><h2>${title}</h2>${rows}</section>` : '';
   }
+  // Normalize: coerce flat strings to arrays for additional fields
+  const ensureArray = (val: unknown): unknown[] => {
+    if (Array.isArray(val)) return val;
+    if (typeof val === 'string' && val.trim()) {
+      return val.split(/[,;，；\n]+/).map(s => s.trim()).filter(Boolean);
+    }
+    return [];
+  };
+
   if (key === 'technicalSkills') {
-    const skills = (resumeObj.additional as Record<string, unknown> | undefined)?.technicalSkills;
-    const html = bulletsToHtml(skills as unknown[], guidance.bulletStyle, guidance.skillsLayout);
+    const skills = ensureArray((resumeObj.additional as Record<string, unknown> | undefined)?.technicalSkills);
+    const html = bulletsToHtml(skills, guidance.bulletStyle, guidance.skillsLayout);
     return html ? `<section><h2>${title}</h2>${html}</section>` : '';
   }
   if (key === 'languages') {
-    const langs = (resumeObj.additional as Record<string, unknown> | undefined)?.languages;
-    const html = bulletsToHtml(langs as unknown[], guidance.bulletStyle, guidance.languagesLayout);
+    const langs = ensureArray((resumeObj.additional as Record<string, unknown> | undefined)?.languages);
+    const html = bulletsToHtml(langs, guidance.bulletStyle, guidance.languagesLayout);
     return html ? `<section><h2>${title}</h2>${html}</section>` : '';
   }
   if (key === 'certifications') {
-    const certs = (resumeObj.additional as Record<string, unknown> | undefined)?.certificationsTraining;
-    const html = bulletsToHtml(certs as unknown[], guidance.bulletStyle, guidance.certificationsLayout);
+    const certs = ensureArray((resumeObj.additional as Record<string, unknown> | undefined)?.certificationsTraining);
+    const html = bulletsToHtml(certs, guidance.bulletStyle, guidance.certificationsLayout);
     return html ? `<section><h2>${title}</h2>${html}</section>` : '';
   }
   if (key === 'awards') {
-    const awards = (resumeObj.additional as Record<string, unknown> | undefined)?.awards;
-    const html = bulletsToHtml(awards as unknown[], guidance.bulletStyle, guidance.awardsLayout);
+    const awards = ensureArray((resumeObj.additional as Record<string, unknown> | undefined)?.awards);
+    const html = bulletsToHtml(awards, guidance.bulletStyle, guidance.awardsLayout);
     return html ? `<section><h2>${title}</h2>${html}</section>` : '';
   }
   // Generic fallback: look up the key directly from resumeObj, additional, or customSections

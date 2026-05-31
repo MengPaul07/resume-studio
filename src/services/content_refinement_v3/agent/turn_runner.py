@@ -1026,6 +1026,27 @@ def apply_changes(*, session_id: str, human_review_decision: Dict[str, Any] | No
     save_session_state(session_id=session_id, refined_resume_obj=refined, suggestion_resume_obj=persisted, review_payload=review_payload)
     _record_version(session_id=session_id, refined_document_obj=refined, suggestion_document_obj=persisted, source="apply", turn_id=turn_id, note=f"accepted={len(resolved_item_keys)}")
 
+    # Sync refined data back to recent_resumes so Builder preview sees agent edits
+    _resume_id = str(session.get("resume_id", "")).strip()
+    if _resume_id and refined:
+        try:
+            from src.services.content_refinement_v3.storage.recent_resume_store import save_recent_resume as _save_rr, get_recent_resume as _get_rr
+            _rr = _get_rr(_resume_id, include_payload=False)
+            if _rr:
+                _save_rr(
+                    resume_id=_resume_id,
+                    title=str(_rr.get("title", "")),
+                    source=str(_rr.get("source", "tailor")),
+                    tags=list(_rr.get("tags", [])) if isinstance(_rr.get("tags"), list) else [],
+                    resume_obj=refined,
+                    output_markdown=str(_rr.get("output_markdown", "")),
+                    output_html=str(_rr.get("output_html", "")),
+                    template_name=str(_rr.get("template_name", "")),
+                    layout_preferences=_rr.get("layout_preferences"),
+                )
+        except Exception:
+            pass
+
     duration_ms = int((time.perf_counter() - started) * 1000)
     add_node_event(
         session_id=session_id,

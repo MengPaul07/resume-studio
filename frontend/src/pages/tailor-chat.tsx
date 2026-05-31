@@ -984,7 +984,20 @@ export function TailorChatPage() {
 
   function handleInlineEdit(path: string, newValue: string) {
     const next = JSON.parse(JSON.stringify(session.refinedResumeObj));
-    setByPathLocal(next, path, newValue);
+    // additional fields may be string (legacy) or array — normalize before editing
+    const m = path.match(/^additional\.(\w+)\[(\d+)\]$/);
+    if (m) {
+      const [, key, idx] = m;
+      const ad = (next.additional || {}) as Record<string, unknown>;
+      const val = ad[key];
+      const arr: string[] = Array.isArray(val) ? [...val] as string[]
+        : typeof val === 'string' ? val.split(/[,;，；\n]\s*/).filter(Boolean) as string[]
+        : [];
+      arr[Number(idx)] = newValue;
+      ad[key] = arr.filter(Boolean);
+    } else {
+      setByPathLocal(next, path, newValue);
+    }
     session.setRefinedResumeObj(next);
   }
 
