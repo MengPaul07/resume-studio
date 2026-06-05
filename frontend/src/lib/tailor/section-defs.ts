@@ -26,7 +26,8 @@ export const SECTION_FIELD_ALIASES: Record<string, Record<string, string[]>> = {
     institution:   ['institution', 'school', 'university'],
     degree:        ['degree', 'field', 'major'],
     years:         ['years', 'date', 'period', 'graduation', 'startDate', 'endDate'],
-    description:   ['description', 'details', 'summary', 'achievements', 'courses', 'gpa'],
+    gpa:           ['gpa'],
+    description:   ['description', 'details', 'summary', 'achievements', 'courses'],
   },
   personalProjects: {
     name:          ['name', 'title', 'projectName'],

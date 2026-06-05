@@ -265,11 +265,8 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
         #    ChainPlanner → propose_direct_edit pipeline.
         step_id = "step_direct_edit"
         # Agent loop: LLM selects tools autonomously (read_resume, edit_field, compose, etc.)
-        yield from _sse.emit_plan_updated(ctx, "agent_loop", "reasoning")
-        yield from _sse.emit_plan_step(ctx, step_id, "agent_loop", "reasoning")
-        yield from _sse.emit_step_started(ctx, step_id, "agent_loop")
-
-        yield from _sse.emit_thinking(ctx, "Analyzing your request... / 正在分析你的请求...")
+        yield from _sse.emit_turn_step(ctx, step_id, "agent_loop")
+        yield from _sse.emit_turn_thinking(ctx, "Analyzing your request... / 正在分析你的请求...")
 
         import queue
         import threading
@@ -348,15 +345,13 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
             item = _q.get()
             if item[0] == "event":
                 _, kind, data = item
-                if kind == "thinking":
-                    yield from _sse.emit_thinking(ctx, data)
-                elif kind == "reasoning":
-                    yield from _sse.emit_reasoning(ctx, data)
+                if kind == "thinking" or kind == "reasoning":
+                    yield from _sse.emit_turn_thinking(ctx, data)
                 elif kind == "step_start":
-                    yield from _sse.emit_step_started(ctx, data["step_id"], data["tool"])
+                    yield from _sse.emit_turn_step(ctx, data["step_id"], data["tool"])
                 elif kind == "step_done":
                     extra = {k: v for k, v in data.items() if k not in ("step_id", "tool", "ms")}
-                    yield from _sse.emit_step_succeeded(ctx, data["step_id"], data["tool"], data.get("ms", 0), **extra)
+                    yield from _sse.emit_turn_step_done(ctx, data["step_id"], data["tool"], data.get("ms", 0), **extra)
                 elif kind == "coding_question":
                     yield from _sse.emit_event("coding_question", data)
             elif item[0] == "result":
@@ -372,7 +367,7 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
 
         if not agent_result:
             error_msg = _agent_error[0] if _agent_error else "agent loop returned no result"
-            yield from _sse.emit_step_failed(ctx, step_id, "agent_loop", error_msg)
+            yield from _sse.emit_turn_step_done(ctx, step_id, "agent_loop", 0, status="failed", error=error_msg)
             error_payload = {"session_id": session_id, "turn_id": turn_id, "error": error_msg, "termination_reason": "error"}
             finish_turn(turn_id=turn_id, status="failed", error_text=error_msg)
             yield _sse_event("turn.completed", error_payload)
@@ -418,9 +413,9 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
             }
             ctx.turn_output_bundle = turn_output_bundle
             ctx.termination_reason = "composed"
-            yield from _sse.emit_step_succeeded(ctx, step_id, "agent_loop", _duration,
+            yield from _sse.emit_turn_step_done(ctx, step_id, "agent_loop", _duration,
                 thinking=agent_result.get("thinking", ""), interview=turn_output_bundle["interview"])
-            yield from _sse.emit_turn_composed(ctx, assistant_msg)
+            yield from _sse.emit_turn_message(ctx, assistant_msg)
             assistant_row = add_message(session_id=session_id, turn_id=turn_id, role="assistant", content=assistant_msg)
             finish_turn(turn_id=turn_id, status="completed", assistant_message_id=str(assistant_row.get("id", "")))
 
@@ -578,14 +573,11 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
         extra: Dict[str, Any] = {}
         extra["actionability_summary"] = _actionability_summary(merged)
         extra["thinking"] = agent_result.get("thinking", "")
-        yield from _sse.emit_step_succeeded(ctx, step_id, "agent_loop", _duration, **extra)
+        yield from _sse.emit_turn_step_done(ctx, step_id, "agent_loop", _duration, **extra)
 
         # 2. Code-based verdict — no LLM compose call needed
         compose_step_id = "step_compose"
-        yield from _sse.emit_plan_updated(ctx, "compose_and_check", "verdict")
-        yield from _sse.emit_plan_step(ctx, compose_step_id, "compose_and_check", "verdict")
-        yield from _sse.emit_step_started(ctx, compose_step_id, "compose_and_check")
-        yield from _sse.emit_selfcheck_started(ctx)
+        yield from _sse.emit_turn_step(ctx, compose_step_id, "compose_and_check")
         add_node_event(session_id=session_id, turn_id=turn_id, node_name="tool:compose_and_check", status="running", duration_ms=0, payload={})
 
         combined = _compose_and_self_check(
@@ -601,10 +593,9 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
         ctx.selected_steps.append(StepRecord(step_id=compose_step_id, tool="compose_and_check", status="success", duration_ms=0, reason_brief=combined.get("reason", "")))
 
         assistant_msg = str(combined.get("assistant_message", "")).strip()
-        yield from _sse.emit_step_succeeded(ctx, compose_step_id, "compose_and_check", 0,
+        yield from _sse.emit_turn_step_done(ctx, compose_step_id, "compose_and_check", 0,
             verdict=combined.get("verdict"), verdict_reason=str(combined.get("reason", ""))[:200])
-        yield from _sse.emit_turn_composed(ctx, assistant_msg)
-        yield from _sse.emit_selfcheck_completed(ctx, {"result": combined.get("verdict"), "reason": combined.get("reason")})
+        yield from _sse.emit_turn_message(ctx, assistant_msg)
 
         # 3. Finalize
         step_reason_summary = [{"step_id": s.step_id, "tool": s.tool, "reason_brief": s.reason_brief} for s in ctx.selected_steps]
@@ -710,7 +701,7 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
         add_node_event(session_id=session_id, turn_id=turn_id, node_name="tool:turn_runner_v3", status="failed", duration_ms=0, payload={}, error=str(exc))
         add_message(session_id=session_id, turn_id=turn_id, role="assistant", content="Sorry, something went wrong while processing your request. Please try again.")
         finish_turn(turn_id=turn_id, status="failed", error_text=str(exc))
-        yield _sse_event("step.failed", {"turn_id": turn_id, "error": "Internal error"})
+        yield _sse_event("turn.step_done", {"turn_id": turn_id, "step_id": "step_agent_loop", "tool": "agent_loop", "status": "failed", "error": "Internal error", "duration_ms": 0})
         error_payload = {"session_id": session_id, "turn_id": turn_id, "error": "Internal error", "termination_reason": "error"}
         _save_compact_turn_log(session_id=session_id, turn_id=turn_id, message=clean_message, final_payload=error_payload, ctx=ctx)
         yield _sse_event("turn.completed", error_payload)
@@ -815,7 +806,7 @@ def resume_turn_sse(*, session_id: str, turn_id: str,
     visible = _visible_suggestions(merged, include_confirm_required=False)
     assistant_msg = str(result.get("assistant_message", "") or "")
     add_message(session_id=session_id, turn_id=turn_id, role="assistant", content=assistant_msg)
-    yield from _sse.emit_turn_composed(ctx, assistant_msg)
+    yield from _sse.emit_turn_message(ctx, assistant_msg)
 
     ctx.termination_reason = "composed"
     selected_steps = [{

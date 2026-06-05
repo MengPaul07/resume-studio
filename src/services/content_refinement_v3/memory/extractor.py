@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import logging
 
-from .preference_store import upsert_fact, upsert_preference
+from .preference_store import upsert_preference
 
 logger = logging.getLogger(__name__)
 

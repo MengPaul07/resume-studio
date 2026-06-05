@@ -31,8 +31,8 @@ def test_starts_interview_and_asks_first_question():
     assert not r["error"], f"Error: {r['error']}"
     # Verify assistant responded
     events = r["events"]
-    composed = [e for e in events if e[0] == "turn.composed"]
-    assert composed, "No turn.composed event"
+    composed = [e for e in events if e[0] == "turn.message"]
+    assert composed, "No turn.message event"
     print(f"  [ok] interview started  ({r['elapsed']:.1f}s)")
 
 
@@ -51,7 +51,7 @@ def test_answers_question_and_gets_followup():
                        "We used a two-tower model with real-time features.", timeout=300)
     assert not r2["error"], f"Error: {r2['error']}"
     events = r2["events"]
-    composed = [e for e in events if e[0] == "turn.composed"]
+    composed = [e for e in events if e[0] == "turn.message"]
     assert composed, "No follow-up from interviewer"
     print(f"  [ok] answered + got follow-up  ({r2['elapsed']:.1f}s)")
 

@@ -113,15 +113,14 @@ def save_turn_log(
                 etype = ev.get("event", "?")
                 entry = {"event": etype, "ms": ev.get("elapsed_ms", 0)}
                 d = ev.get("data", {})
-                if etype == "step.succeeded":
+                if etype == "turn.step_done":
                     entry["tool"] = d.get("tool", "")
                     entry["step"] = d.get("step_id", "")
-                elif etype == "step.failed":
-                    entry["tool"] = d.get("tool", "")
-                    entry["error"] = str(d.get("error", ""))[:200]
+                    if d.get("status") == "failed":
+                        entry["error"] = str(d.get("error", ""))[:200]
                 elif etype == "turn.completed":
                     entry["suggestions"] = d.get("actionability_summary", {}).get("total", 0)
-                elif etype in ("thinking", "reasoning"):
+                elif etype == "turn.thinking":
                     entry["text"] = str(d.get("text", ""))[:200]
                 timeline.append(entry)
 

@@ -133,18 +133,18 @@ class TestGreetingScenario:
 
         kinds = [ev[0] for ev in events]
         assert "turn.started" in kinds
-        assert "thinking" in kinds
-        assert "step.started" in kinds, f"Expected step.started in: {kinds}"
+        assert "turn.thinking" in kinds
+        assert "turn.step" in kinds, f"Expected turn.step in: {kinds}"
         assert "turn.completed" in kinds
 
         # When compose is the only tool, content goes directly to assistant_message (not thinking)
         # Verify the compose result contains the greeting
-        composed = [ev for ev in events if ev[0] == "turn.composed"]
-        assert composed, "Expected turn.composed event"
+        composed = [ev for ev in events if ev[0] == "turn.message"]
+        assert composed, "Expected turn.message event"
 
         # Verify step for compose
-        step_events = [ev for ev in events if ev[0] == "step.started"]
-        assert len(step_events) >= 1, f"No step.started events"
+        step_events = [ev for ev in events if ev[0] == "turn.step"]
+        assert len(step_events) >= 1, f"No turn.step events"
         tools = [ev[1].get("tool", "") for ev in step_events]
         assert "compose" in tools, f"compose not in step tools: {tools}"
 
@@ -169,7 +169,7 @@ class TestAnalysisScenario:
 
         events = _run_turn(sid, "检查简历中的问题", monkeypatch, llm_rounds)
 
-        step_events = [ev for ev in events if ev[0] in ("step.started", "step.succeeded")]
+        step_events = [ev for ev in events if ev[0] in ("turn.step", "turn.step_done")]
         tools_seen = set()
         for _, data in step_events:
             t = data.get("tool", "") or data.get("tool", "")
@@ -188,13 +188,13 @@ class TestAnalysisScenario:
 
         # Round 0 content (read_resume) → thinking. Round 1 content (compose) → not emitted (goes to asst.)
         kinds = [ev[0] for ev in events]
-        assert "thinking" in kinds, f"Expected thinking event: {kinds}"
+        assert "turn.thinking" in kinds, f"Expected thinking event: {kinds}"
 
-        # per-tool step.succeeded should have status field
-        succeeded = [ev for ev in events if ev[0] == "step.succeeded"
+        # per-tool turn.step_done should have status field
+        succeeded = [ev for ev in events if ev[0] == "turn.step_done"
                      and "agent_step_" in str(ev[1].get("step_id", ""))]
         for _, data in succeeded:
-            assert "status" in data, f"agent step.succeeded missing status: {data}"
+            assert "status" in data, f"agent turn.step_done missing status: {data}"
 
 
 class TestEditScenario:
@@ -228,18 +228,18 @@ class TestEditScenario:
         kinds = [ev[0] for ev in events]
         assert "turn.started" in kinds
         assert "turn.completed" in kinds
-        assert "thinking" in kinds       # round 0
-        assert "reasoning" in kinds      # rounds 1-2
+        assert "turn.thinking" in kinds       # round 0
+        assert "turn.thinking" in kinds      # rounds 1-2
 
-        # step.succeeded events should carry status
-        step_succeeded = [ev for ev in events if ev[0] == "step.succeeded"]
+        # turn.step_done events should carry status
+        step_succeeded = [ev for ev in events if ev[0] == "turn.step_done"]
         tools = [ev[1].get("tool", "") for ev in step_succeeded]
         assert "read_resume" in tools
         assert "edit_field" in tools
         assert "compose" in tools
         for _, data in step_succeeded:
             if "agent_step_" in str(data.get("step_id", "")):
-                assert "status" in data, f"agent step.succeeded missing status: {data}"
+                assert "status" in data, f"agent turn.step_done missing status: {data}"
 
 
 class TestMultiToolScenario:
@@ -265,16 +265,16 @@ class TestMultiToolScenario:
 
         events = _run_turn(sid, "根据历史记录分析简历", monkeypatch, llm_rounds)
 
-        step_succeeded = [ev for ev in events if ev[0] == "step.succeeded"]
+        step_succeeded = [ev for ev in events if ev[0] == "turn.step_done"]
         tools = [ev[1].get("tool", "") for ev in step_succeeded]
         assert "read_resume" in tools, f"read_resume missing from {tools}"
         assert "read_history" in tools, f"read_history missing from {tools}"
         assert "compose" in tools
 
-        # Both parallel tools should have step.started before step.succeeded
-        started_tools = [ev[1].get("tool", "") for ev in events if ev[0] == "step.started"]
+        # Both parallel tools should have turn.step before turn.step_done
+        started_tools = [ev[1].get("tool", "") for ev in events if ev[0] == "turn.step"]
         for t in ("read_resume", "read_history"):
-            assert t in started_tools, f"{t} missing from step.started: {started_tools}"
+            assert t in started_tools, f"{t} missing from turn.step: {started_tools}"
 
 
 class TestEmptyResponse:

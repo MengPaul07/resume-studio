@@ -550,15 +550,10 @@ export function TailorChatPage() {
         onEvent: (eventName, data) => {
           if (
             eventName === 'turn.started' ||
-            eventName === 'plan.updated' ||
-            eventName === 'plan.step' ||
-            eventName === 'step.started' ||
-            eventName === 'step.succeeded' ||
-            eventName === 'step.failed' ||
-            eventName === 'selfcheck.started' ||
-            eventName === 'selfcheck.completed' ||
-            eventName === 'thinking' ||
-            eventName === 'reasoning' ||
+            eventName === 'turn.step' ||
+            eventName === 'turn.step_done' ||
+            eventName === 'turn.thinking' ||
+            eventName === 'turn.message' ||
             eventName === 'turn.completed'
           ) {
             if (import.meta.env.DEV) console.log('[tailor][sse]', eventName, data);
@@ -572,28 +567,7 @@ export function TailorChatPage() {
             });
             return;
           }
-          if (eventName === 'plan.step') {
-            const stepId = String(data.step_id || `step-${Date.now()}`);
-            const tool = String(data.tool || 'step');
-            const reasonBrief = String(data.reason_brief || '').trim();
-            const label = reasonBrief ? `${tool} 路 ${reasonBrief}` : tool;
-            session.setMessages((prev) =>
-              prev.map((msg) => {
-                if (msg.id !== threadMessageId) return msg;
-                const current = Array.isArray(msg.threadSteps) ? msg.threadSteps : [];
-                const next = current.some((step) => step.key === stepId)
-                  ? current.map((step) =>
-                      step.key === stepId
-                        ? { ...step, label, status: step.status === 'done' ? ('done' as const) : ('running' as const) }
-                        : step,
-                    )
-                  : [...current, { key: stepId, label, status: 'running' as const }];
-                return { ...msg, threadTitle: t('tailor.toolChainRunning'), threadRunning: true, threadSteps: next };
-              }),
-            );
-            return;
-          }
-          if (eventName === 'step.started') {
+          if (eventName === 'turn.step') {
             const stepId = String(data.step_id || `step-${Date.now()}`);
             const tool = String(data.tool || 'step');
             session.setMessages((prev) =>
@@ -613,11 +587,11 @@ export function TailorChatPage() {
             );
             return;
           }
-          if (eventName === 'step.succeeded' || eventName === 'step.failed') {
+          if (eventName === 'turn.step_done') {
             const stepId = String(data.step_id || '');
             const tool = String(data.tool || 'step');
             const duration = Number(data.duration_ms || 0);
-            const isFailed = eventName === 'step.failed';
+            const isFailed = data.status === 'failed';
             const thinking = typeof data.thinking === 'string' ? data.thinking.trim() : '';
             session.setMessages((prev) =>
               prev.map((msg) => {
@@ -635,34 +609,7 @@ export function TailorChatPage() {
             );
             return;
           }
-          if (eventName === 'selfcheck.started') {
-            session.setStatusText(t('tailor.selfChecking'));
-            return;
-          }
-          if (eventName === 'selfcheck.completed') {
-            const result = String((data.self_check_result as { result?: string } | undefined)?.result || '');
-            if (result) session.setStatusText(`Self-check: ${result}`);
-            return;
-          }
-          if (eventName === 'tool.executed') {
-            const toolName = typeof data.tool_name === 'string' ? data.tool_name : '';
-            if (toolName) {
-              session.setStatusText(toolName);
-              session.setMessages((prev) =>
-                prev.map((msg) => {
-                  if (msg.id !== threadMessageId) return msg;
-                  const currentTools = (msg as any)._tools || [];
-                  // Deduplicate 鈥?only add new tool names
-                  if (currentTools[currentTools.length - 1] !== toolName) {
-                    return { ...msg, _tools: [...currentTools, toolName] };
-                  }
-                  return msg;
-                }),
-              );
-            }
-            return;
-          }
-          if (eventName === 'thinking' || eventName === 'reasoning') {
+          if (eventName === 'turn.thinking') {
             const text = typeof data.text === 'string' ? data.text : '';
             if (text) {
               setThinkingText((prev) => (prev ? prev + '\n' + text : text));
@@ -676,7 +623,7 @@ export function TailorChatPage() {
             }
             return;
           }
-          if (eventName === 'turn.composed') {
+          if (eventName === 'turn.message') {
             pollCancelled = true;
             if (progressTimer !== null) {
               window.clearInterval(progressTimer);
