@@ -10,6 +10,7 @@ import {
   toolGetSessionContent,
   toolResumeTurn,
 } from '../api';
+import { SSEError } from '../api/sse';
 import { DEFAULT_PREFERENCES } from '../preferences';
 import { useTailorSession } from '../hooks/useTailorSession';
 import { useTailorDag } from '../hooks/useTailorDag';
@@ -875,17 +876,30 @@ export function TailorChatPage() {
       pollCancelled = true;
       if (progressTimer !== null) window.clearInterval(progressTimer);
       const msg = err instanceof Error ? err.message : t('tailor.executionFailed');
+      const code = err instanceof SSEError ? err.code : (err instanceof Error ? 'SYS_INTERNAL' : 'SYS_INTERNAL');
+
+      // User-friendly message per error category
+      const categoryMessages: Record<string, string> = {
+        LLM_TIMEOUT: t('tailor.errorLLMTimeout') || 'AI timed out. Please try again.',
+        LLM_RATE_LIMITED: t('tailor.errorLLMRateLimited') || 'Too many requests. Please wait.',
+        LLM_EMPTY_RESPONSE: t('tailor.errorLLMEmpty') || 'AI returned empty reply. Rephrase please.',
+        LLM_CONTEXT_OVERFLOW: t('tailor.errorLLMContext') || 'Conversation too long. Start a new session.',
+        LLM_INSUFFICIENT_BALANCE: t('tailor.errorLLMBalance') || 'API balance exhausted. Top up please.',
+        LLM_API_KEY_INVALID: t('tailor.errorLLMKey') || 'API key invalid. Check settings.',
+      };
+      const userMsg = categoryMessages[code] || msg;
+
       updateThreadBubble({
         id: threadMessageId,
         title: t('tailor.toolChainFailed'),
-        steps: [{ key: 'session_turn_failed', label: 'session_turn', status: 'failed', error: truncateValue(msg, 80) }],
+        steps: [{ key: 'session_turn_failed', label: code, status: 'failed', error: truncateValue(userMsg, 80) }],
         running: false,
       });
-      session.setErrorText(msg);
+      session.setErrorText(userMsg);
       const errorMessage: ChatMessage = {
         id: `a-err-${Date.now()}`,
         role: 'assistant',
-        text: t('tailor.executionFailedMsg', { error: msg }),
+        text: `[${code}] ${userMsg}`,
         timestamp: new Date().toISOString(),
       };
       const failedMessages = [...session.messagesRef.current, errorMessage];

@@ -3,6 +3,7 @@ import os
 from typing import Any, Dict, List, Sequence, Tuple, Union
 
 from dotenv import load_dotenv
+from src.errors import llm_api_key_invalid
 from src.utils.context import get_llm_config
 
 try:
@@ -129,7 +130,7 @@ def build_llm() -> LiteLLMAdapter:
     if not api_key:
         api_key = os.getenv("API_KEY", "").strip()
     if not api_key and not is_ollama:
-        raise RuntimeError("Missing API key: set API_KEY in .env")
+        raise llm_api_key_invalid()
 
     model = raw_model or "deepseek-chat"
     base_url = str(config.get("api_base") or "").strip()

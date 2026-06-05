@@ -27,7 +27,15 @@ export function buildApiUrl(path: string): string {
 
 export async function readErrorBody(resp: Response): Promise<string> {
   const text = (await resp.text()).trim();
-  return text || 'Empty response body';
+  if (!text) return 'Empty response body';
+  // Try to extract structured error
+  try {
+    const parsed = JSON.parse(text);
+    if (parsed?.error?.code) {
+      return `[${parsed.error.code}] ${parsed.error.detail || text}`;
+    }
+  } catch {}
+  return text;
 }
 
 export async function ensureOk(resp: Response, messagePrefix: string): Promise<void> {

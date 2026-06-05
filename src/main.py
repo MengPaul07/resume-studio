@@ -1,20 +1,26 @@
 ﻿import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
 from src.api import routes_v3
 from src.api import routes_resources
 from src.config import settings
+from src.errors import AppError
 from src.utils.context import set_user_id, set_lang
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle."""
+    # Silence litellm warnings about missing optional deps (botocore etc.)
+    import logging as _logging
+    _logging.getLogger("LiteLLM").setLevel(_logging.ERROR)
+    _logging.getLogger("litellm").setLevel(_logging.ERROR)
+
     print(f"[startup] {settings.APP_NAME} v{settings.APP_VERSION} starting...")
     print(f"   DEBUG mode: {settings.DEBUG}")
     print(f"   LLM Model: {settings.LLM_MODEL}")
@@ -73,6 +79,11 @@ app.add_middleware(
 
 app.include_router(routes_v3.router, prefix=settings.API_PREFIX)
 app.include_router(routes_resources.router, prefix=settings.API_PREFIX)
+
+
+@app.exception_handler(AppError)
+async def app_error_handler(_request: Request, exc: AppError) -> JSONResponse:
+    return JSONResponse(status_code=500, content=exc.to_dict())
 
 
 @app.middleware("http")

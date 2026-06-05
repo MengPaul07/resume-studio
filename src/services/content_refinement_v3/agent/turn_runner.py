@@ -3,6 +3,8 @@
 import json
 import logging
 import re
+
+from src.errors import AppError, ErrorCode, sys_internal, llm_empty_response
 import time
 from copy import deepcopy
 from typing import Any, Dict, Generator, List, Tuple
@@ -696,13 +698,23 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
                     logger.info("[memory] updated %d items for user=%s", n, _user[:12])
             _thr.Thread(target=_extract, daemon=True).start()
 
+    except AppError as app_err:
+        logger.error("[v3][turn.error] session=%s turn=%s code=%s detail=%s", session_id, turn_id, app_err.code.value, app_err.detail)
+        add_node_event(session_id=session_id, turn_id=turn_id, node_name="tool:turn_runner_v3", status="failed", duration_ms=0, payload=app_err.to_dict(), error=app_err.detail)
+        add_message(session_id=session_id, turn_id=turn_id, role="assistant", content=app_err.user_message)
+        finish_turn(turn_id=turn_id, status="failed", error_text=app_err.detail)
+        yield _sse_event("turn.step_done", {"turn_id": turn_id, "step_id": "step_agent_loop", "tool": "agent_loop", "status": "failed", "error": app_err.detail, "error_code": app_err.code.value, "duration_ms": 0})
+        error_payload = {"session_id": session_id, "turn_id": turn_id, "error": app_err.detail, "error_code": app_err.code.value, "termination_reason": "error"}
+        _save_compact_turn_log(session_id=session_id, turn_id=turn_id, message=clean_message, final_payload=error_payload, ctx=ctx)
+        yield _sse_event("turn.completed", error_payload)
     except Exception as exc:
-        logger.exception("[v3][turn.error] session=%s turn=%s error=%s", session_id, turn_id, exc)
-        add_node_event(session_id=session_id, turn_id=turn_id, node_name="tool:turn_runner_v3", status="failed", duration_ms=0, payload={}, error=str(exc))
-        add_message(session_id=session_id, turn_id=turn_id, role="assistant", content="Sorry, something went wrong while processing your request. Please try again.")
+        wrapped = sys_internal(str(exc)[:200])
+        logger.exception("[v3][turn.error] session=%s turn=%s code=%s", session_id, turn_id, wrapped.code.value)
+        add_node_event(session_id=session_id, turn_id=turn_id, node_name="tool:turn_runner_v3", status="failed", duration_ms=0, payload=wrapped.to_dict(), error=str(exc))
+        add_message(session_id=session_id, turn_id=turn_id, role="assistant", content=wrapped.user_message)
         finish_turn(turn_id=turn_id, status="failed", error_text=str(exc))
-        yield _sse_event("turn.step_done", {"turn_id": turn_id, "step_id": "step_agent_loop", "tool": "agent_loop", "status": "failed", "error": "Internal error", "duration_ms": 0})
-        error_payload = {"session_id": session_id, "turn_id": turn_id, "error": "Internal error", "termination_reason": "error"}
+        yield _sse_event("turn.step_done", {"turn_id": turn_id, "step_id": "step_agent_loop", "tool": "agent_loop", "status": "failed", "error": wrapped.detail, "error_code": wrapped.code.value, "duration_ms": 0})
+        error_payload = {"session_id": session_id, "turn_id": turn_id, "error": wrapped.detail, "error_code": wrapped.code.value, "termination_reason": "error"}
         _save_compact_turn_log(session_id=session_id, turn_id=turn_id, message=clean_message, final_payload=error_payload, ctx=ctx)
         yield _sse_event("turn.completed", error_payload)
 

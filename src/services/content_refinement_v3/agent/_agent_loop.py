@@ -3,6 +3,16 @@
 from __future__ import annotations
 
 import concurrent.futures
+
+from src.errors import (
+    data_db_locked,
+    llm_empty_response,
+    llm_timeout,
+    llm_rate_limited,
+    llm_context_overflow,
+    llm_insufficient_balance,
+    sys_internal,
+)
 import json
 import logging
 import os
@@ -87,6 +97,113 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
     state_lock = threading.Lock()
     max_rounds = 10
 
+    # ── LLM retry state (reset each round) ──────────────────────
+    _retries_this_round: dict[str, int] = {}  # error_code → count
+    _MAX_RETRIES_PER_ROUND = 3
+    _RATE_LIMIT_BACKOFF_BASE = 2.0  # seconds
+
+    # ── LLM call + retry (inner function; modifies _msgs list for truncation) ──
+    _msgs: list = messages  # mutable reference for CONTEXT_OVERFLOW truncation
+
+    def _call_llm_with_retry(_tools):
+        """Call completion() with retry for transient failures.
+
+        Retry strategy per error:
+          TIMEOUT          → retry immediately, 1 time
+          RATE_LIMITED     → exponential backoff 2s→4s→8s, max 2 times
+          CONTEXT_OVERFLOW → truncate oldest 40% messages, retry 1 time
+          DB_LOCKED        → wait 100ms, retry 2 times
+          Others           → raise immediately
+
+        Returns (response, duration_ms) or raises AppError.
+        """
+        nonlocal _msgs
+        last_error = None
+        code = None
+
+        for attempt in range(_MAX_RETRIES_PER_ROUND):
+            t0 = time.perf_counter()
+            try:
+                resp = completion(
+                    model=llm.model,
+                    messages=_msgs,
+                    tools=_tools,
+                    tool_choice="auto",
+                    api_key=llm.api_key or None,
+                    api_base=llm.api_base or None,
+                    temperature=llm.temperature if llm.temperature > 0 else 0.2,
+                    max_tokens=16384,
+                    timeout=120,
+                )
+                return resp, int((time.perf_counter() - t0) * 1000)
+            except Exception as exc:
+                err_msg = str(exc).lower()
+                exc_type = type(exc).__name__
+                code = None
+
+                if "timeout" in err_msg or "timed out" in err_msg or "Timeout" in exc_type:
+                    code = "TIMEOUT"
+                elif "rate" in err_msg and ("limit" in err_msg or "429" in err_msg) or "RateLimit" in exc_type:
+                    code = "RATE_LIMITED"
+                elif "context" in err_msg and ("length" in err_msg or "window" in err_msg or "overflow" in err_msg or "exceed" in err_msg) or "ContextWindow" in exc_type:
+                    code = "CONTEXT_OVERFLOW"
+                elif "database is locked" in err_msg.lower():
+                    code = "DB_LOCKED"
+                elif "insufficient" in err_msg and ("balance" in err_msg or "quota" in err_msg):
+                    raise llm_insufficient_balance()
+                elif "invalid" in err_msg and ("api key" in err_msg or "key" in err_msg) or "401" in err_msg or "Authentication" in exc_type:
+                    from src.errors import llm_api_key_invalid
+                    raise llm_api_key_invalid()
+                else:
+                    raise  # unknown error → bubble up
+
+                # ── Retry logic ──
+                last_error = exc
+                cnt = _retries_this_round.get(code, 0)
+                _retries_this_round[code] = cnt + 1
+
+                if code == "TIMEOUT" and cnt < 1:
+                    logger.warning("[agent_loop] TIMEOUT retry %d/1", cnt + 1)
+                    continue  # immediate retry
+
+                elif code == "RATE_LIMITED" and cnt < 2:
+                    wait = _RATE_LIMIT_BACKOFF_BASE ** (cnt + 1)
+                    logger.warning("[agent_loop] RATE_LIMITED retry %d/2, waiting %.1fs", cnt + 1, wait)
+                    time.sleep(wait)
+                    continue
+
+                elif code == "CONTEXT_OVERFLOW" and cnt < 1:
+                    # Force small window: keep system + last 10 messages
+                    keep = min(10, len(_msgs) - 3)
+                    if keep > 0:
+                        _msgs = _msgs[:3] + _msgs[-keep:]
+                    else:
+                        _msgs = _msgs[:1] + _msgs[-5:]  # extreme: just system + last 5
+                    logger.warning("[agent_loop] CONTEXT_OVERFLOW retry: → %d messages", len(_msgs))
+                    continue
+
+                elif code == "DB_LOCKED" and cnt < 2:
+                    logger.warning("[agent_loop] DB_LOCKED retry %d/2, waiting 100ms", cnt + 1)
+                    time.sleep(0.1)
+                    continue
+
+                else:
+                    # Exhausted retries for this code
+                    break
+
+        # ── All retries exhausted → raise classified error ──
+        err_msg = str(last_error or "")[:200]
+        if code == "TIMEOUT":
+            raise llm_timeout(err_msg)
+        elif code == "RATE_LIMITED":
+            raise llm_rate_limited(err_msg)
+        elif code == "CONTEXT_OVERFLOW":
+            raise llm_context_overflow(len(_msgs), 0)
+        elif code == "DB_LOCKED":
+            raise data_db_locked("agent")
+        else:
+            raise sys_internal(err_msg)
+
     for round_idx in range(max_rounds):
         _total_chars = sum(len(str(m.get("content", ""))) + len(str(m.get("tool_calls", ""))) for m in messages)
         logger.warning("[agent_loop] round=%d context_chars=%d messages=%d",
@@ -95,28 +212,7 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
         if tracer:
             llm_span = tracer.start_span("llm.call", model=llm.model, round=round_idx)
 
-        try:
-            t0 = time.perf_counter()
-            resp = completion(
-                model=llm.model,
-                messages=messages,
-                tools=tools,
-                tool_choice="auto",
-                api_key=llm.api_key or None,
-                api_base=llm.api_base or None,
-                temperature=llm.temperature if llm.temperature > 0 else 0.2,
-                max_tokens=16384,
-                timeout=120,
-            )
-            llm_duration_ms = int((time.perf_counter() - t0) * 1000)
-        except Exception as exc:
-            if tracer and llm_span:
-                tracer.end_span(llm_span, status="error", error=str(exc)[:200])
-            logger.warning("[agent_loop] LLM call FAILED in round %d: %s", round_idx, exc)
-            import traceback as _tb
-            tb_text = _tb.format_exc()
-            logger.warning("[agent_loop] traceback: %s", tb_text)
-            break
+        resp, llm_duration_ms = _call_llm_with_retry(tools)
 
         msg = resp.choices[0].message
         tool_calls = getattr(msg, "tool_calls", None) or None
@@ -156,16 +252,10 @@ def _run_agent_loop(session_id: str, message: str, ctx: TurnContext,
             except Exception:
                 pass
 
-        # Empty response → error (no fallback guessing)
+        # Empty response → classified error
         if not tool_calls and not content:
             logger.warning("[agent_loop] round=%d EMPTY RESPONSE", round_idx)
-            return {
-                "assistant_message": "Agent error: LLM returned empty response. Please rephrase your request.",
-                "items": all_items, "fact_issues": fact_issues, "jd_matches": jd_matches,
-                "guide_prompts": [], "thinking": "\n".join(thinking_buf),
-                "sse_events": sse_events,
-                "tool_names": list(tool_names),
-            }
+            raise llm_empty_response()
 
         # No tool_calls, has content → LLM direct text response (rare, prompt asks for tools)
         if not tool_calls:

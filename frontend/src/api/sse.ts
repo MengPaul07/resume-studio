@@ -4,6 +4,15 @@ import { withUserId } from './http';
 
 const JSON_HEADERS = { 'Content-Type': 'application/json' };
 
+export class SSEError extends Error {
+  code: string;
+  constructor(code: string, detail: string) {
+    super(detail);
+    this.name = 'SSEError';
+    this.code = code;
+  }
+}
+
 export async function postSSEAndCollectFinal<T>(params: {
   path: string;
   body: unknown;
@@ -50,7 +59,8 @@ export async function postSSEAndCollectFinal<T>(params: {
       params.onEvent?.(eventName, parsed);
       if (eventName === 'turn.completed') {
         if (typeof parsed.error === 'string' && parsed.error.trim()) {
-          throw new Error(`Tool chat failed: ${parsed.error}`);
+          const code = typeof parsed.error_code === 'string' ? parsed.error_code : 'SYS_INTERNAL';
+          throw new SSEError(code, parsed.error);
         }
         finalPayload = parsed as T;
       }
