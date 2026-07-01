@@ -13,6 +13,8 @@ import {
 } from '../api';
 import { StatusBadge } from '../components/ui/status-badge';
 import type { ImportedFileRecord, RecentResumeRecord } from '../types';
+import { loadResumes, upsertResume, generateResumeId } from '../lib/localStore';
+import { SAMPLE_RESUME } from '../lib/sampleResume';
 
 const ACCEPTED_EXTS = ['.pdf', '.doc', '.docx'];
 
@@ -81,6 +83,24 @@ export function DashboardPage() {
   };
 
   useEffect(() => {
+    // Auto-create sample resume on first visit
+    const local = loadResumes();
+    if (local.length === 0) {
+      const sampleId = generateResumeId();
+      upsertResume({
+        id: sampleId,
+        title: 'Sample Resume — Alex Chen',
+        status: 'ready',
+        source: 'sample',
+        tags: ['sample'],
+        resume_obj: SAMPLE_RESUME,
+        output_markdown: '',
+        output_html: '',
+        resume_obj_path: '', output_markdown_path: '', output_html_path: '',
+        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+      } as RecentResumeRecord);
+    }
+
     listImportedFiles()
       .then(setImportedFiles)
       .catch((err) => {
