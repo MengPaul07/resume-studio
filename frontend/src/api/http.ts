@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || '/api/v1';
+const API_BASE = '/api/v1';
 const JSON_HEADERS: Record<string, string> = { 'Content-Type': 'application/json' };
 
 const USER_ID_KEY = 'resume_user_id';
