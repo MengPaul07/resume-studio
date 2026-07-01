@@ -8,6 +8,7 @@ import type {
 import { withListDedup, invalidateListCache } from './cache';
 import { postJson, postForm, requestJson, deleteRequest } from './http';
 import { getEffectiveLLMConfig, type LLMConfigPayload } from './llm';
+import { loadResumes, upsertResume as localUpsert, deleteResume as localDelete, getResume as localGet } from '../lib/localStore';
 
 // ── Agent Run (v1/v2 legacy) ──────────────────────────────────────
 
@@ -110,27 +111,27 @@ export async function runAgentFromImport(params: {
 // ── Recent Resumes ────────────────────────────────────────────────
 
 export async function listRecentResumes(limit = 20, force = false): Promise<RecentResumeRecord[]> {
-  const cacheKey = `recent-resumes:${limit}`;
-  return withListDedup<RecentResumeRecord[]>(
-    cacheKey,
-    async () => {
-      const data = await requestJson<{ items: RecentResumeRecord[] }>(
-        `/agent/recent-resumes?limit=${limit}`,
-        { method: 'GET' },
-        'List recent resumes failed',
-      );
-      return Array.isArray(data.items) ? data.items : [];
-    },
-    force,
-  );
+  const local = loadResumes();
+  if (local.length > 0 && !force) return local.slice(0, limit);
+  try {
+    const data = await requestJson<{ items: RecentResumeRecord[] }>(
+      `/agent/recent-resumes?limit=${limit}`, { method: 'GET' }, 'List recent resumes failed',
+    );
+    for (const item of (Array.isArray(data.items) ? data.items : [])) {
+      if (!local.find(r => r.id === item.id)) localUpsert(item);
+    }
+    return loadResumes().slice(0, limit);
+  } catch { return local.slice(0, limit); }
 }
 
 export async function getRecentResume(resumeId: string): Promise<RecentResumeRecord> {
-  return requestJson<RecentResumeRecord>(
-    `/agent/recent-resumes/${encodeURIComponent(resumeId)}`,
-    { method: 'GET' },
-    'Get recent resume failed',
+  const local = localGet(resumeId);
+  if (local) return local;
+  const r = await requestJson<RecentResumeRecord>(
+    `/agent/recent-resumes/${encodeURIComponent(resumeId)}`, { method: 'GET' }, 'Get recent resume failed',
   );
+  localUpsert(r);
+  return r;
 }
 
 export async function saveRecentResume(params: {
@@ -147,25 +148,28 @@ export async function saveRecentResume(params: {
   template_name?: string;
   layout_preferences?: ResumeGenerationPreferences;
 }): Promise<RecentResumeRecord> {
-  const result = await postJson<RecentResumeRecord>(
-    '/agent/recent-resumes/save',
-    {
-      resume_id: params.resume_id ?? '',
-      title: params.title,
-      status: params.status ?? 'ready',
-      source: params.source ?? 'builder',
-      tags: params.tags ?? [],
-      resume_obj: params.resume_obj,
-      output_markdown: params.output_markdown ?? '',
-      output_html: params.output_html ?? '',
-      llm_config: getEffectiveLLMConfig(params.llm_config),
-      prefer_llm_html: params.prefer_llm_html ?? false,
-      template_name: params.template_name ?? 'modern_pro.html',
+  let result: RecentResumeRecord;
+  try {
+    result = await postJson<RecentResumeRecord>('/agent/recent-resumes/save', {
+      resume_id: params.resume_id ?? '', title: params.title, status: params.status ?? 'ready',
+      source: params.source ?? 'builder', tags: params.tags ?? [], resume_obj: params.resume_obj,
+      output_markdown: params.output_markdown ?? '', output_html: params.output_html ?? '',
+      llm_config: getEffectiveLLMConfig(params.llm_config), prefer_llm_html: params.prefer_llm_html ?? false,
+      template_name: params.template_name ?? 'modern_pro.html', layout_preferences: params.layout_preferences,
+    }, 'Save recent resume failed');
+    invalidateListCache('recent-resumes');
+  } catch {
+    result = {
+      id: params.resume_id || crypto.randomUUID(), title: params.title,
+      status: params.status ?? 'ready', source: params.source ?? 'builder',
+      tags: params.tags ?? [], resume_obj: params.resume_obj,
+      output_markdown: params.output_markdown ?? '', output_html: params.output_html ?? '',
+      template_name: params.template_name ?? '',
       layout_preferences: params.layout_preferences,
-    },
-    'Save recent resume failed',
-  );
-  invalidateListCache('recent-resumes');
+      created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+    } as RecentResumeRecord;
+  }
+  localUpsert(result);
   return result;
 }
 
@@ -185,9 +189,9 @@ export async function renderRecentResume(params: {
 }
 
 export async function deleteRecentResume(resumeId: string): Promise<void> {
-  await deleteRequest(
-    `/agent/recent-resumes/${encodeURIComponent(resumeId)}`,
-    'Delete recent resume failed',
-  );
-  invalidateListCache('recent-resumes');
+  localDelete(resumeId);
+  try {
+    await deleteRequest(`/agent/recent-resumes/${encodeURIComponent(resumeId)}`, 'Delete recent resume failed');
+    invalidateListCache('recent-resumes');
+  } catch { /* already deleted locally */ }
 }

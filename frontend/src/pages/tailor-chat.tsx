@@ -11,6 +11,7 @@ import {
   toolResumeTurn,
 } from '../api';
 import { SSEError } from '../api/sse';
+import { appendChatMessage } from '../lib/localStore';
 import { DEFAULT_PREFERENCES } from '../preferences';
 import { useTailorSession } from '../hooks/useTailorSession';
 import { useTailorDag } from '../hooks/useTailorDag';
@@ -457,6 +458,7 @@ export function TailorChatPage() {
     setThinkingText('');
     setLowConfItems(null);
     const persistResumeId = session.resumeRecord?.id || resumeId;
+    appendChatMessage(persistResumeId, { role: 'user', content: prompt, timestamp: new Date().toISOString() });
     session.persistTailorState(persistResumeId, {
       errorText: '',
       statusText: t('tailor.planningChain'),
@@ -676,6 +678,9 @@ export function TailorChatPage() {
       const assistantMessageText2 =
         (turn as { turn_output_bundle?: { assistant_message?: string; thinking?: string } }).turn_output_bundle
           ?.assistant_message || turn.assistant_message || '';
+      if (assistantMessageText2) {
+        appendChatMessage(persistResumeId, { role: 'assistant', content: assistantMessageText2, timestamp: new Date().toISOString() });
+      }
       const thinkingText =
         (turn as { turn_output_bundle?: { thinking?: string } }).turn_output_bundle?.thinking || '';
       const guidePrompts =
