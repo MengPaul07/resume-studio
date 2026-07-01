@@ -19,7 +19,10 @@ class Settings(BaseSettings):
 
     # API settings
     API_PREFIX: str = "/api/v1"
-    CORS_ORIGINS: list = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:8000").split(",")
+    @property
+    def CORS_ORIGINS(self) -> list[str]:
+        raw = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:8000")
+        return [o.strip() for o in raw.split(",") if o.strip()]
 
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./resume_intelligence.db")
