@@ -24,7 +24,11 @@ async def lifespan(app: FastAPI):
     print(f"[startup] {settings.APP_NAME} v{settings.APP_VERSION} starting...")
     print(f"   DEBUG mode: {settings.DEBUG}")
     print(f"   LLM Model: {settings.LLM_MODEL}")
-    _auto_seed_jd_library()
+    print(f"   RAG enabled: {settings.RAG_ENABLED}")
+    if settings.RAG_ENABLED:
+        _auto_seed_jd_library()
+    else:
+        print("   JD library: RAG disabled, skipping seed")
     yield
     print("[shutdown] Application shutdown")
 
