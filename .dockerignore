@@ -21,6 +21,8 @@ dist/
 .hermes/
 examples/
 tests/
+!tests/fixtures/
+!tests/fixtures/jds/
 docs/
 plans/
 src/services/data/
