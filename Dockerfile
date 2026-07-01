@@ -15,8 +15,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY src/ ./src/
 COPY config/ ./config/
+COPY templates/ ./templates/
 
-# Create runtime data directories
+# JD seed data (for auto-seeding FAISS index on startup)
+COPY tests/fixtures/jds/ ./tests/fixtures/jds/
+
+# Create runtime directories
 RUN mkdir -p /app/frontend/dist /app/src/services/data /app/outputs/manual_logs
 
 # Copy built frontend from stage 1
@@ -24,4 +28,5 @@ COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
 
 EXPOSE 8000
 
-CMD ["python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Railway injects $PORT; use it if set, otherwise default to 8000
+CMD ["sh", "-c", "python -m uvicorn src.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

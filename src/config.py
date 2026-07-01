@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     # API settings
     API_PREFIX: str = "/api/v1"
-    CORS_ORIGINS: list = ["http://localhost:5173", "http://localhost:8000"]
+    CORS_ORIGINS: list = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:8000").split(",")
 
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./resume_intelligence.db")

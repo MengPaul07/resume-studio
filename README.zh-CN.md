@@ -217,3 +217,342 @@ MIT License
 ---
 
 前端和模板灵感来自 [Resume-Matcher](https://github.com/srbhr/Resume-Matcher)。
+
+
+
+
+
+═══════════════════════════════════════════════════════════════════════════════
+                    用户发送 "帮我优化工作经历" 完整时序
+═══════════════════════════════════════════════════════════════════════════════
+
+┌──────────────┐     ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
+│   浏览器       │     │  FastAPI      │     │  turn_runner │     │  Agent Loop  │
+│  (React)      │     │  (main.py)    │     │  (主线程)     │     │  (子线程)     │
+└──────┬───────┘     └──────┬───────┘     └──────┬───────┘     └──────┬───────┘
+       │                    │                     │                     │
+       │                    │                     │                     │
+══ 1. 请求阶段 ═══════════════════════════════════════════════════════════════
+       │                    │                     │                     │
+       │ POST /agent/v3/    │                     │                     │
+       │   sessions/{id}/   │                     │                     │
+       │   turns:run        │                     │                     │
+       │ {message,          │                     │                     │
+       │  llm_config}       │                     │                     │
+       │───────────────────►│                     │                     │
+       │                    │                     │                     │
+       │                    │ ① extract_user_id   │                     │
+       │                    │   中间件: 读 Header   │                     │
+       │                    │   X-User-Id →        │                     │
+       │                    │   set_user_id(ctx)   │                     │
+       │                    │                     │                     │
+       │                    │ ② 路由匹配            │                     │
+       │                    │   routes_v3.py:102   │                     │
+       │                    │                     │                     │
+       │                    │ ③ 检查 session 存在   │                     │
+       │                    │   get_session(id)    │                     │
+       │                    │   → SQLite SELECT    │                     │
+       │                    │                     │                     │
+       │                    │ ④ set_llm_config(    │                     │
+       │                    │    payload.llm_      │                     │
+       │                    │    config)            │                     │
+       │                    │   → ContextVar 设值   │                     │
+       │                    │                     │                     │
+══ 2. 初始化阶段 ═════════════════════════════════════════════════════════════
+       │                    │                     │                     │
+       │                    │ ⑤ run_turn_sse()    │                     │
+       │                    │─────────────────────►                     │
+       │                    │                     │                     │
+       │                    │                     │ ⑥ create_turn       │
+       │                    │                     │   → SQLite INSERT   │
+       │                    │                     │   turns (status=    │
+       │                    │                     │    running)         │
+       │                    │                     │                     │
+       │                    │                     │ ⑦ add_message       │
+       │                    │                     │   role=user         │
+       │                    │                     │   content="帮我优化  │
+       │                    │                     │    工作经历"         │
+       │                    │                     │   → SQLite INSERT   │
+       │                    │                     │                     │
+══ 3. SSE: turn.started ════════════════════════════════════════════════════
+       │                    │                     │                     │
+       │  ←─── SSE ────────│←────────────────────│                     │
+       │ event:turn.started│  ⑧ yield SSE        │                     │
+       │ data:{session_id, │     emit_turn_       │                     │
+       │  turn_id,         │     started()        │                     │
+       │  user_message}    │                     │                     │
+       │                    │                     │                     │
+══ 4. Queue + Thread 创建 ═════════════════════════════════════════════════
+       │                    │                     │                     │
+       │                    │                     │ ⑨ _q = Queue()      │
+       │                    │                     │   创建线程安全管道     │
+       │                    │                     │                     │
+       │                    │                     │ ⑩ 捕获 contextvars   │
+       │                    │                     │   _captured =        │
+       │                    │                     │   get_llm_config()   │
+       │                    │                     │                     │
+       │                    │                     │ ⑪ Thread.start()    │
+       │                    │                     │─────────────────────►│
+       │                    │                     │                     │
+       │                    │                     │ ⑫ 主线程进入         │
+       │                    │                     │   while True:       │
+       │                    │                     │   _q.get() 阻塞等待  │
+       │                    │                     │                     │
+══ 5. Agent Loop 开始 ════════════════════════════════════════════════════
+       │                    │                     │                     │
+       │                    │                     │                     │ ⑬ set_llm_config
+       │                    │                     │                     │   (_captured)
+       │                    │                     │                     │   恢复配置
+       │                    │                     │                     │
+       │                    │                     │                     │ ⑭ _build_context
+       │                    │                     │                     │   读 session_state
+       │                    │                     │                     │   + 简历 JSON
+       │                    │                     │                     │   + 对话历史
+       │                    │                     │                     │   + 用户偏好
+       │                    │                     │                     │
+       │                    │                     │                     │ ⑮ 组装 messages
+       │                    │                     │                     │   [system_prompt,
+       │                    │                     │                     │    profile_text,
+       │                    │                     │                     │    chat_history,
+       │                    │                     │                     │    user_message]
+       │                    │                     │                     │
+══ 6. LLM Round 1: 理解意图 + 读简历 ═══════════════════════════════════════
+       │                    │                     │                     │
+       │                    │                     │                     │ ⑯ litellm.completion
+       │                    │                     │                     │   tool_choice=auto
+       │                    │                     │                     │   (等 3-8 秒)
+       │                    │                     │                     │
+       │                    │                     │                     │ LLM 返回:
+       │                    │                     │                     │ tool_calls=[
+       │                    │                     │                     │   read_resume]
+       │                    │                     │                     │ content=
+       │                    │                     │                     │ "先看看简历内容"
+       │                    │                     │                     │
+       │                    │                     │                     │ ⑰ _emit("thinking",
+       │                    │                     │                     │    "先看看简历内容")
+       │                    │                     │                     │  → _on_event()
+       │                    │                     │                     │  → _q.put("thinking")
+       │                    │                     │                     │─────────────────┐
+       │                    │                     │                     │                 │
+══ 7. SSE: turn.thinking ══════════════════════════════════════════════════════════════════╗
+       │                    │                     │                     │                 │
+       │                    │                     │ ⑱ _q.get() 返回     │                 │
+       │                    │                     │   item=("event",     │←────────────────┘
+       │                    │                     │    "thinking",... )  │
+       │                    │                     │                     │
+       │  ←─── SSE ────────│←────────────────────│                     │
+       │ event:turn.thinking│ ⑲ yield SSE        │                     │
+       │ data:{text:"先看看 │   emit_turn_        │                     │
+       │  简历内容"}         │   thinking()        │                     │
+       │                    │                     │                     │
+══ 8. Agent Loop: 执行工具 read_resume ═══════════════════════════════════════════════════
+       │                    │                     │                     │
+       │                    │                     │                     │ ⑳ _emit("step_start",
+       │                    │                     │                     │    {step_id:
+       │                    │                     │                     │     "agent_step_1",
+       │                    │                     │                     │     tool:
+       │                    │                     │                     │     "read_resume"})
+       │                    │                     │                     │  → _q.put("step_start")
+       │                    │                     │                     │─────────────────┐
+       │                    │                     │                     │                 │
+       │                    │                     │ ㉑ _q.get()         │                 │
+       │                    │                     │─────────────────────│←────────────────┘
+       │                    │                     │                     │
+       │  ←─── SSE ────────│←────────────────────│                     │
+       │ event:turn.step    │ ㉒ yield SSE        │                     │
+       │ data:{step_id:     │   emit_turn_step()  │                     │
+       │  "agent_step_1",   │                     │                     │
+       │  tool:"read_resume"}│                    │                     │
+       │                    │                     │                     │
+       │                    │                     │                     │ ㉓ registry.execute
+       │                    │                     │                     │   ("read_resume")
+       │                    │                     │                     │   → 从 session_state
+       │                    │                     │                     │    读简历 JSON
+       │                    │                     │                     │   → 返回给 LLM
+       │                    │                     │                     │
+       │                    │                     │                     │ ㉔ _emit("step_done",
+       │                    │                     │                     │    {step_id:
+       │                    │                     │                     │     "agent_step_1",
+       │                    │                     │                     │     tool:
+       │                    │                     │                     │     "read_resume",
+       │                    │                     │                     │     ms: 230
+       │                    │                     │                     │     status: "OK"})
+       │                    │                     │                     │  → _q.put("step_done")
+       │                    │                     │                     │─────────────────┐
+       │                    │                     │ ㉕ _q.get()         │                 │
+       │                    │                     │─────────────────────│←────────────────┘
+       │                    │                     │                     │
+       │  ←─── SSE ────────│←────────────────────│                     │
+       │ event:turn.step_   │  yield SSE          │                     │
+       │   done             │                     │                     │
+       │ data:{step_id:     │                     │                     │
+       │  "agent_step_1",   │                     │                     │
+       │  tool:"read_resume"│                     │                     │
+       │  status:"success"   │                     │                     │
+       │  duration_ms:230}  │                     │                     │
+       │                    │                     │                     │
+══ 9. LLM Round 2: 执行编辑 ═══════════════════════════════════════════════
+       │                    │                     │                     │
+       │                    │                     │                     │ ㉖ litellm.completion
+       │                    │                     │                     │   messages 含 tool
+       │                    │                     │                     │   result (简历内容)
+       │                    │                     │                     │   (等 5-15 秒)
+       │                    │                     │                     │
+       │                    │                     │                     │ LLM 返回:
+       │                    │                     │                     │ tool_calls=[
+       │                    │                     │                     │   edit_field(
+       │                    │                     │                     │    path="workExp",
+       │                    │                     │                     │    value="..."),
+       │                    │                     │                     │   edit_field(
+       │                    │                     │                     │    path="summary",
+       │                    │                     │                     │    value="...")
+       │                    │                     │                     │ ]
+       │                    │                     │                     │
+       │                    │                     │                     │ ㉗ _emit("reasoning",
+       │                    │                     │                     │  "需要修改...")
+       │                    │                     │                     │ → SSE: turn.thinking
+       │                    │                     │                     │
+       │                    │                     │                     │ ㉘ 并行执行 edit_field
+       │                    │                     │                     │   ThreadPoolExecutor
+       │                    │                     │                     │   写简历 JSON
+       │                    │                     │                     │   → all_items 累积
+       │                    │                     │                     │
+       │                    │                     │                     │ 每个 tool 都:
+       │                    │                     │                     │  _emit("step_start")
+       │                    │                     │                     │  _emit("step_done")
+       │                    │                     │                     │  → SSE: turn.step
+       │                    │                     │                     │  → SSE: turn.step_done
+       │                    │                     │                     │
+══ 10. LLM Round 3: compose 收尾 ══════════════════════════════════════════
+       │                    │                     │                     │
+       │                    │                     │                     │ ㉙ litellm.completion
+       │                    │                     │                     │   (最后一轮)
+       │                    │                     │                     │
+       │                    │                     │                     │ LLM 返回:
+       │                    │                     │                     │ tool_calls=[compose]
+       │                    │                     │                     │ assistant_message=
+       │                    │                     │                     │ "已为您生成5条修改建议"
+       │                    │                     │                     │
+       │                    │                     │                     │ ㉚ compose 工具触发
+       │                    │                     │                     │  → _compose_result
+       │                    │                     │                     │    保存所有 items
+       │                    │                     │                     │    + assistant_msg
+       │                    │                     │                     │  → return (退出loop)
+       │                    │                     │                     │
+       │                    │                     │                     │ ㉛ _q.put("result",
+       │                    │                     │                     │    agent_result)
+       │                    │                     │                     │─────────────────┐
+       │                    │                     │ ㉜ _q.get()         │                 │
+       │                    │                     │─────────────────────│←────────────────┘
+       │                    │                     │ item=("result",...) │
+       │                    │                     │ break (退出 while)  │
+       │                    │                     │                     │
+       │                    │                     │ ㉝ record step done: │
+       │                    │                     │   → SSE: turn.step_ │
+       │                    │                     │          done       │
+       │                    │                     │   (agent_loop完成)   │
+       │                    │                     │                     │
+══ 11. Compose & Self-Check ══════════════════════════════════════════════
+       │                    │                     │                     │
+       │                    │                     │ ㉞ _compose_and_     │
+       │                    │                     │    self_check()     │
+       │                    │                     │   合并所有 suggestion │
+       │                    │                     │   生成 actionable      │
+       │                    │                     │   summary           │
+       │                    │                     │   → verdict: pass   │
+       │                    │                     │                     │
+       │                    │                     │ → SSE: turn.step    │
+       │                    │                     │   (compose_and_     │
+       │                    │                     │    check)           │
+       │                    │                     │                     │
+══ 12. SSE: turn.message ═════════════════════════════════════════════════
+       │                    │                     │                     │
+       │  ←─── SSE ────────│←────────────────────│                     │
+       │ event:turn.message │  emit_turn_message  │                     │
+       │ data:{assistant_   │                     │                     │
+       │  message:"已为您   │                     │                     │
+       │  生成5条修改建议"}  │                     │                     │
+       │                    │                     │                     │
+══ 13. 持久化阶段 ═══════════════════════════════════════════════════════
+       │                    │                     │                     │
+       │                    │                     │ ㉟ add_message       │
+       │                    │                     │   role=assistant    │
+       │                    │                     │   content="已为您..." │
+       │                    │                     │   → SQLite INSERT   │
+       │                    │                     │                     │
+       │                    │                     │ ㊱ finish_turn       │
+       │                    │                     │   status=completed  │
+       │                    │                     │   → SQLite UPDATE   │
+       │                    │                     │                     │
+       │                    │                     │ ㊲ save_session_state │
+       │                    │                     │   suggestion_resume_ │
+       │                    │                     │   obj = normalized   │
+       │                    │                     │   → SQLite UPDATE   │
+       │                    │                     │   session_state     │
+       │                    │                     │                     │
+       │                    │                     │ ㊳ add_session_version │
+       │                    │                     │   refined_resume_obj │
+       │                    │                     │   → SQLite INSERT   │
+       │                    │                     │   session_versions  │
+       │                    │                     │                     │
+       │                    │                     │ ㊴ _build_turn_payload│
+       │                    │                     │   组装最终响应:       │
+       │                    │                     │   - suggestions     │
+       │                    │                     │   - fact_issues     │
+       │                    │                     │   - actionability   │
+       │                    │                     │   - thought_summary │
+       │                    │                     │                     │
+══ 14. SSE: turn.completed ══════════════════════════════════════════════
+       │                    │                     │                     │
+       │  ←─── SSE ────────│←────────────────────│                     │
+       │ event:turn.        │  ㊵ yield SSE       │                     │
+       │   completed         │  emit_turn_         │                     │
+       │ data:{完整payload}  │  completed()        │                     │
+       │                    │                     │                     │
+══ 15. 收尾 ═════════════════════════════════════════════════════════════
+       │                    │                     │                     │
+       │                    │                     │ ㊶ _save_compact_    │
+       │                    │                     │    turn_log()       │
+       │                    │                     │   sse_trace → 磁盘   │
+       │                    │                     │                     │
+       │                    │                     │ ㊷ 启动后台线程 _extract│
+       │                    │                     │   (daemon=True)     │
+       │                    │                     │   → 提取用户偏好     │
+       │                    │                     │   → user_preferences │
+       │                    │                     │     /{userId}.json  │
+       │                    │                     │                     │
+       │  ←─── HTTP 200 ───│                     │                     │
+       │  (连接关闭，SSE结束)│                     │                     │
+       │                    │                     │                     │
+══ 16. 前端处理 ═════════════════════════════════════════════════════════
+       │                    │                     │                     │
+       │ ㊸ EventSource 收事件│                     │                     │
+       │ ㊹ turn.started     │                     │                     │
+       │  → setMessages        │                     │                     │
+       │    threadRunning=true│                     │                     │
+       │                      │                     │                     │
+       │ ㊺ turn.thinking    │                     │                     │
+       │  → setThinkingText  │                     │                     │
+       │                      │                     │                     │
+       │ ㊻ turn.step         │                     │                     │
+       │  → addThreadStep    │                     │                     │
+       │                      │                     │                     │
+       │ ㊼ turn.step_done    │                     │                     │
+       │  → markStepDone     │                     │                     │
+       │                      │                     │                     │
+       │ ㊽ turn.message      │                     │                     │
+       │  → clearProgress    │                     │                     │
+       │                      │                     │                     │
+       │ ㊾ turn.completed    │                     │                     │
+       │  → parseSuggestions │                     │                     │
+       │  → updatePreview    │                     │                     │
+       │  → persistTailorState│                     │                     │
+       │     localStorage     │                     │                     │
+       │                      │                     │                     │
+═══════╧═════════════════════╧═════════════════════╧═════════════════════
+
+总耗时: 15-40 秒 (取决于 LLM 响应速度)
+SSE 事件数: 10-30 个
+LLM 调用: 2-6 轮 (Agent Loop 自适应)
+Queue 跨线程通信: 每步 1 次
+SQLite 写入: 6-8 次 (turn, message×2, state, version, finish_turn)
