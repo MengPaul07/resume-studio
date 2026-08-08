@@ -41,5 +41,13 @@ class Settings(BaseSettings):
     # RAG toggle
     RAG_ENABLED: bool = os.getenv("RAG_ENABLED", "False").lower() == "true"
 
+    # Personal content is transient by default. Only committed sample data is read from disk.
+    PERSONAL_DATA_STORAGE: str = os.getenv("PERSONAL_DATA_STORAGE", "memory").strip().lower()
+    PERSONAL_DATA_LOGGING: bool = os.getenv("PERSONAL_DATA_LOGGING", "False").lower() == "true"
+
+    @property
+    def persist_personal_data(self) -> bool:
+        return self.PERSONAL_DATA_STORAGE == "disk"
+
 
 settings = Settings()

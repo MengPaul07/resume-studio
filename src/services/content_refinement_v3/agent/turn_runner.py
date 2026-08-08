@@ -1030,8 +1030,9 @@ def apply_changes(*, session_id: str, human_review_decision: Dict[str, Any] | No
     _record_version(session_id=session_id, refined_document_obj=refined, suggestion_document_obj=persisted, source="apply", turn_id=turn_id, note=f"accepted={len(resolved_item_keys)}")
 
     # Sync refined data back to recent_resumes so Builder preview sees agent edits
+    from src.config import settings
     _resume_id = str(session.get("resume_id", "")).strip()
-    if _resume_id and refined:
+    if settings.persist_personal_data and _resume_id and refined:
         try:
             from src.services.content_refinement_v3.storage.recent_resume_store import save_recent_resume as _save_rr, get_recent_resume as _get_rr
             _rr = _get_rr(_resume_id, include_payload=False)

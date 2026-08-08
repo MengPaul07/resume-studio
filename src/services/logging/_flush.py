@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from ._trace import TurnTracer
+from src.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +80,16 @@ def flush_turn_tracer(
     argument is kept for old call sites, but SQLite span storage is
     retired so this function no longer creates a second production log path.
     """
+    if not settings.PERSONAL_DATA_LOGGING:
+        return {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "session_id": session_id,
+            "turn_id": turn_id,
+            "meta": tracer.meta(),
+            "spans": [],
+            "result": {},
+        }
+
     _ensure_dirs()
     _rotate_debug_log()
     _cleanup_old_json_logs()

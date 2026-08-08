@@ -5,9 +5,13 @@ from pathlib import Path
 from typing import Any, Dict, List
 from uuid import uuid4
 
+from src.config import settings
+
 
 _DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "session_memory"
 _DB_PATH = _DATA_DIR / "session_memory.sqlite3"
+_MEMORY_URI = "file:resume-studio-session-memory?mode=memory&cache=shared"
+_memory_keeper: sqlite3.Connection | None = None
 
 
 def _utc_now() -> str:
@@ -33,8 +37,17 @@ def _ensure_store() -> None:
 
 
 def _connect() -> sqlite3.Connection:
-    _ensure_store()
-    conn = sqlite3.connect(_DB_PATH)
+    global _memory_keeper
+    if settings.persist_personal_data:
+        _ensure_store()
+        conn = sqlite3.connect(_DB_PATH)
+    else:
+        if _memory_keeper is None:
+            _memory_keeper = sqlite3.connect(_MEMORY_URI, uri=True, check_same_thread=False)
+            _memory_keeper.row_factory = sqlite3.Row
+            _memory_keeper.execute("PRAGMA foreign_keys = ON;")
+            _init_schema(_memory_keeper)
+        conn = sqlite3.connect(_MEMORY_URI, uri=True, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
     _init_schema(conn)

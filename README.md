@@ -143,7 +143,9 @@ Practice with interviewers from different domains. The flow supports interviewer
 | **Layout Design**| Template state is separated from resume content, so changing a layout does not silently mutate the resume itself. |
 | **Export** | Printable HTML is the default export path. TeX is generated as source for users who want to compile in Overleaf or a local XeLaTeX environment. |
 | **Evaluation** | Agent behavior has regression scenarios, fixture-based tests, and reporting scripts for iterative improvement. |
-| **Local-first** | The project is designed to run locally with explicit `.env` configuration and local runtime artifacts. |
+| **Local-first privacy** | Resumes, imports, job descriptions, and chat history persist in the browser. The server keeps active AI sessions in memory and reads only bundled sample data. |
+
+> **Privacy note:** AI features must send the current resume/JD content to the configured backend and LLM provider for processing. The application does not persist that personal content on the server by default, but it is transiently processed there. Clearing browser site data removes the locally saved workspace.
 
 ## Quick Start
 
@@ -211,7 +213,7 @@ Resume Studio uses a function-calling agent loop rather than a single prompt tha
 | Tool registry | All tools registered via `@tool` decorator; LLM selects based on JSON schema |
 | Self-check | Code-based verdict on output quality — no extra LLM call needed |
 | SSE streaming | Every tool call, reasoning step, and final result streamed to frontend in real time |
-| Turn logging | Full interaction trace saved to disk — LLM decisions, tool args, results, timing |
+| Turn logging | Personal-content traces are disabled by default and can be enabled explicitly for local debugging. |
 
 ### Key Files
 

@@ -1,7 +1,9 @@
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List
+from uuid import uuid4
 
 from fastapi import APIRouter, File, HTTPException, UploadFile
 from fastapi.responses import JSONResponse
@@ -9,22 +11,11 @@ from pydantic import BaseModel, Field
 
 from src.services.build_llm import build_llm
 from src.services.content_refinement_v3.backends.resource import (
-    delete_import_record,
-    delete_job_description,
-    delete_recent_resume,
     get_job_description,
-    get_import_record,
-    get_recent_resume,
     is_supported_document,
     json_parse_document,
     list_job_descriptions,
-    list_import_records,
-    list_recent_resumes,
     parse_document_to_text,
-    save_job_description,
-    save_import_record,
-    save_recent_resume,
-    update_recent_resume_rendered_output,
 )
 from src.services.layout_design.service import run_layout_design
 from src.utils.context import set_llm_config
@@ -56,7 +47,8 @@ class RenderRecentResumeRequest(BaseResourceRequest):
 
 
 class RunImportRequest(BaseResourceRequest):
-    import_id: str = ""
+    raw_text: str = ""
+    file_name: str = "resume"
     max_iterations: int = Field(default=2, ge=1, le=10)
     use_llm: bool = True
     layout_preferences: Dict[str, Any] = Field(default_factory=dict)
@@ -66,6 +58,13 @@ class SaveJobDescriptionRequest(BaseResourceRequest):
     job_description_id: str = ""
     title: str = "Job Description"
     content: str = ""
+
+
+class StatelessRenderRequest(BaseResourceRequest):
+    resume_id: str = ""
+    resume_obj: Dict[str, Any] = Field(default_factory=dict)
+    template_name: str = "modern_pro.html"
+    layout_preferences: Dict[str, Any] = Field(default_factory=dict)
 
 
 def _run_resume_pipeline_from_text(
@@ -156,7 +155,17 @@ async def import_file_route(file: UploadFile = File(...)) -> Dict[str, Any]:
         raw_text = parse_document_to_text(tmp_path, use_llm_cleanup=False)
         if not str(raw_text or "").strip():
             raise HTTPException(status_code=422, detail="no text extracted from file")
-        return save_import_record(file_name=file_name, raw_text=raw_text)
+        now = datetime.now(timezone.utc).isoformat()
+        return {
+            "id": uuid4().hex,
+            "file_name": file_name,
+            "file_ext": suffix,
+            "char_count": len(raw_text),
+            "raw_text_preview": raw_text[:300],
+            "raw_text_path": "",
+            "created_at": now,
+            "raw_text": raw_text,
+        }
     except HTTPException:
         raise
     except Exception as exc:
@@ -171,17 +180,11 @@ async def import_file_route(file: UploadFile = File(...)) -> Dict[str, Any]:
 
 @router.post("/agent/run-import")
 async def run_import_route(payload: RunImportRequest) -> Dict[str, Any]:
-    if not payload.import_id.strip():
-        raise HTTPException(status_code=422, detail="import_id is required")
     if not payload.use_llm:
         raise HTTPException(status_code=400, detail="LLM execution is required for import build")
-
-    item = get_import_record(payload.import_id.strip(), include_raw_text=True)
-    if not item:
-        raise HTTPException(status_code=404, detail="import record not found")
-    raw_text = str(item.get("raw_text", "") or "").strip()
+    raw_text = payload.raw_text.strip()
     if not raw_text:
-        raise HTTPException(status_code=422, detail="import record has empty raw_text")
+        raise HTTPException(status_code=422, detail="raw_text is required")
 
     set_llm_config(payload.llm_config)
     try:
@@ -195,24 +198,17 @@ async def run_import_route(payload: RunImportRequest) -> Dict[str, Any]:
 
 @router.get("/agent/imports")
 async def list_imports_route(limit: int = 50) -> Dict[str, Any]:
-    items = list_import_records(limit=limit)
-    return {"items": items}
+    return {"items": []}
 
 
 @router.get("/agent/imports/{import_id}")
 async def get_import_route(import_id: str, include_raw_text: bool = True) -> Dict[str, Any]:
-    item = get_import_record(import_id, include_raw_text=include_raw_text)
-    if not item:
-        raise HTTPException(status_code=404, detail="import record not found")
-    return item
+    raise HTTPException(status_code=404, detail="imports are stored in the browser")
 
 
 @router.delete("/agent/imports/{import_id}")
 async def delete_import_route(import_id: str) -> Dict[str, Any]:
-    deleted = delete_import_record(import_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="import record not found")
-    return {"ok": True}
+    raise HTTPException(status_code=403, detail="personal imports are stored in the browser")
 
 
 @router.get("/agent/job-descriptions")
@@ -230,112 +226,65 @@ async def get_job_description_route(job_description_id: str, include_content: bo
 
 @router.post("/agent/job-descriptions/save")
 async def save_job_description_route(payload: SaveJobDescriptionRequest) -> Dict[str, Any]:
-    if not payload.content.strip():
-        raise HTTPException(status_code=422, detail="content is required")
-    try:
-        return save_job_description(
-            job_description_id=payload.job_description_id.strip(),
-            title=payload.title,
-            content=payload.content,
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"save job description failed: {exc}")
+    raise HTTPException(status_code=403, detail="personal job descriptions are stored in the browser")
 
 
 @router.delete("/agent/job-descriptions/{job_description_id}")
 async def delete_job_description_route(job_description_id: str) -> Dict[str, Any]:
-    deleted = delete_job_description(job_description_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="job description not found")
-    return {"ok": True}
+    raise HTTPException(status_code=403, detail="personal job descriptions are stored in the browser")
 
 
 @router.get("/agent/recent-resumes")
 async def list_recent_resumes_route(limit: int = 20) -> Dict[str, Any]:
-    items = list_recent_resumes(limit=limit)
-    for item in items:
-        if isinstance(item, dict) and "doc_type" not in item:
-            item["doc_type"] = "resume"
-    return {"items": items}
+    return {"items": []}
 
 
 @router.get("/agent/recent-resumes/{resume_id}")
 async def get_recent_resume_route(resume_id: str, include_payload: bool = True) -> Dict[str, Any]:
-    item = get_recent_resume(resume_id, include_payload=include_payload)
-    if not item:
-        raise HTTPException(status_code=404, detail="recent resume not found")
-    if "doc_type" not in item:
-        item["doc_type"] = "resume"
-    return item
+    raise HTTPException(status_code=404, detail="resumes are stored in the browser")
 
 
 @router.post("/agent/recent-resumes/save")
 async def save_recent_resume_route(payload: SaveRecentResumeRequest) -> Dict[str, Any]:
+    raise HTTPException(status_code=403, detail="personal resumes are stored in the browser")
+
+
+@router.post("/agent/render-resume")
+async def render_resume_route(payload: StatelessRenderRequest) -> Dict[str, Any]:
+    if not payload.resume_obj:
+        raise HTTPException(status_code=422, detail="resume_obj is required")
     set_llm_config(payload.llm_config)
-    try:
-        item = save_recent_resume(
-            resume_obj=payload.resume_obj,
-            title=payload.title,
-            tags=payload.tags,
-            status=payload.status,
-            source=payload.source,
-            output_markdown=payload.output_markdown,
-            output_html=payload.output_html,
-            resume_id=payload.resume_id,
-            prefer_llm_html=payload.prefer_llm_html,
-            template_name=payload.template_name,
-            layout_preferences=payload.layout_preferences,
-        )
-        item["doc_type"] = "resume"
-        return item
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"save recent resume failed: {exc}")
-
-
-@router.post("/agent/recent-resumes/{resume_id}/render")
-async def render_recent_resume_route(resume_id: str, payload: RenderRecentResumeRequest) -> Dict[str, Any]:
-    set_llm_config(payload.llm_config)
-    existing = get_recent_resume(resume_id, include_payload=True)
-    if not existing:
-        raise HTTPException(status_code=404, detail="recent resume not found")
-
-    resume_obj = existing.get("resume_obj", {})
-    if not isinstance(resume_obj, dict) or not resume_obj:
-        raise HTTPException(status_code=422, detail="recent resume has empty resume_obj")
-
     try:
         from src.services.template_editor import align_for_render
 
-        template_name = str(existing.get("template_name", "") or "").strip()
-        template_id = template_name.replace(".html", "").replace("_", "-") if template_name else "swiss-single"
-        aligned = align_for_render(template_id=template_id, resume_obj=resume_obj, session_id=resume_id)
+        template_id = payload.template_name.replace(".html", "").replace("_", "-") or "swiss-single"
+        aligned = align_for_render(
+            template_id=template_id,
+            resume_obj=payload.resume_obj,
+            session_id=payload.resume_id or uuid4().hex,
+        )
         resume_obj = aligned["resume_obj"]
-
         rendered = run_layout_design(
             resume_obj=resume_obj,
             layout_preferences=payload.layout_preferences,
             refined_resume_obj=resume_obj,
         )
-        updated = update_recent_resume_rendered_output(
-            resume_id=resume_id,
-            output_html=str(rendered.get("output_html", "") or ""),
-            output_markdown=str(rendered.get("output_markdown", "") or ""),
-        )
-        if not updated:
-            raise HTTPException(status_code=404, detail="recent resume not found")
-        updated["doc_type"] = "resume"
-        updated["design_spec"] = rendered.get("design_spec", {})
-        updated["alignment_report"] = aligned.get("alignment_report", {})
-        return updated
-    except HTTPException:
-        raise
+        return {
+            "resume_obj": resume_obj,
+            "output_html": str(rendered.get("output_html", "") or ""),
+            "output_markdown": str(rendered.get("output_markdown", "") or ""),
+            "design_spec": rendered.get("design_spec", {}),
+            "alignment_report": aligned.get("alignment_report", {}),
+        }
     except Exception as exc:
-        raise HTTPException(status_code=500, detail=f"render recent resume failed: {exc}")
+        raise HTTPException(status_code=500, detail=f"render resume failed: {exc}")
+
+
+@router.post("/agent/recent-resumes/{resume_id}/render")
+async def render_recent_resume_route(resume_id: str, payload: RenderRecentResumeRequest) -> Dict[str, Any]:
+    raise HTTPException(status_code=403, detail="use the stateless render endpoint with browser-owned data")
 
 
 @router.delete("/agent/recent-resumes/{resume_id}")
 async def delete_recent_resume_route(resume_id: str) -> Dict[str, Any]:
-    deleted = delete_recent_resume(resume_id)
-    if not deleted:
-        raise HTTPException(status_code=404, detail="recent resume not found")
-    return {"ok": True}
+    raise HTTPException(status_code=403, detail="personal resumes are stored in the browser")

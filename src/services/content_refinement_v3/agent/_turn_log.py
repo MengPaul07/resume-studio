@@ -16,6 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List
 
+from src.config import settings
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent.parent
 DEFAULT_DIR = PROJECT_ROOT / "outputs" / "manual_logs"
 
@@ -35,6 +37,8 @@ def save_turn_log(
     agent_dump should contain the raw agent loop output dict from _run_agent_loop,
     which includes sse_events with tool_call and tool_result entries.
     """
+    if not settings.PERSONAL_DATA_LOGGING:
+        return None
     try:
         out = output_dir or DEFAULT_DIR
         now = datetime.now(timezone.utc)

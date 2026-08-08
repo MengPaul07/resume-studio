@@ -18,6 +18,7 @@ def isolate_runtime_stores(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> N
 
     monkeypatch.setattr(session_store, "_DATA_DIR", session_dir)
     monkeypatch.setattr(session_store, "_DB_PATH", session_dir / "session_memory.sqlite3")
+    monkeypatch.setattr(session_store.settings, "PERSONAL_DATA_STORAGE", "disk")
 
     monkeypatch.setattr(import_store, "_DATA_DIR", imports_dir)
     monkeypatch.setattr(import_store, "_INDEX_PATH", imports_dir / "imports_index.json")

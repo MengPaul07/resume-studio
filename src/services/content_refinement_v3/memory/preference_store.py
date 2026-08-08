@@ -15,9 +15,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from src.config import settings
+
 _DATA_DIR = Path(__file__).resolve().parents[2] / "data" / "user_preferences"
 
 _locks: dict[str, threading.Lock] = {}
+_volatile_memory: dict[str, dict[str, Any]] = {}
 
 
 def _ensure_dir():
@@ -35,6 +38,8 @@ def _user_lock(user_id: str) -> threading.Lock:
 
 
 def load_memory(user_id: str) -> dict[str, Any]:
+    if not settings.persist_personal_data:
+        return _volatile_memory.get(user_id, {"preferences": []})
     _ensure_dir()
     fp = _file_path(user_id)
     if not fp.exists():
@@ -46,6 +51,9 @@ def load_memory(user_id: str) -> dict[str, Any]:
 
 
 def save_memory(user_id: str, data: dict[str, Any]):
+    if not settings.persist_personal_data:
+        _volatile_memory[user_id] = data
+        return
     _ensure_dir()
     fp = _file_path(user_id)
     fp.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -81,7 +89,7 @@ def memory_to_prompt(user_id: str) -> str:
     if not prefs:
         return ""
 
-    lines = ["USER MEMORY (persisted across sessions):"]
+    lines = ["USER PREFERENCES FOR THIS RUN:"]
     for p in prefs:
         lines.append(f"  - {p['value']}")
     return "\n".join(lines)

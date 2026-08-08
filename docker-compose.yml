@@ -5,9 +5,6 @@ services:
       - "8000:8000"
     env_file:
       - .env
-    volumes:
-      - ./outputs:/app/outputs
-      - ./src/services/data:/app/src/services/data
     restart: unless-stopped
 
   # Optional: dev mode with hot-reload (uncomment and use `docker compose -f docker-compose.yml -f docker-compose.dev.yml up`)

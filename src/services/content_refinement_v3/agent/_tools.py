@@ -356,9 +356,12 @@ def _load_resume(session_id: str) -> tuple[dict, dict]:
 def _save_resume(session_id: str, resume: dict) -> None:
     from ..session.service import save_session_state
     from ..backends.session import get_session as _get_sess
+    from src.config import settings
     try:
         save_session_state(session_id=session_id, refined_resume_obj=resume)
         # Sync to recent_resumes so Builder preview sees agent edits
+        if not settings.persist_personal_data:
+            return
         sess = _get_sess(session_id, include_state=False)
         if sess:
             rid = str(sess.get("resume_id", "")).strip()
