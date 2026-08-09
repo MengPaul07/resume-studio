@@ -230,16 +230,16 @@ export function DashboardPage() {
                 {t('dashboard.subtitle')}
               </p>
             </div>
-            <div className="grid grid-cols-3 gap-2">
-              <div className="rounded-lg bg-[var(--brand-surface-soft)] p-3">
+            <div className="grid grid-cols-3 divide-x divide-[var(--brand-line)] rounded-lg bg-[var(--brand-surface-soft)] md:gap-2 md:divide-x-0 md:bg-transparent">
+              <div className="px-3 py-2 md:rounded-lg md:bg-[var(--brand-surface-soft)] md:p-3">
                 <p className="font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.imports')}</p>
                 <p className="font-sans text-xl font-bold text-[var(--brand-ink)] dark:text-zinc-100">{importedFiles.length}</p>
               </div>
-              <div className="rounded-lg bg-[var(--brand-surface-soft)] p-3">
+              <div className="px-3 py-2 md:rounded-lg md:bg-[var(--brand-surface-soft)] md:p-3">
                 <p className="font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.resumes')}</p>
                 <p className="font-sans text-xl font-bold text-[var(--brand-ink)] dark:text-zinc-100">{recentResumes.length}</p>
               </div>
-              <div className="rounded-lg bg-[var(--brand-surface-soft)] p-3">
+              <div className="px-3 py-2 md:rounded-lg md:bg-[var(--brand-surface-soft)] md:p-3">
                 <p className="font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.engine')}</p>
                 <StatusBadge variant="success" className="mt-1">{t('dashboard.ready')}</StatusBadge>
               </div>

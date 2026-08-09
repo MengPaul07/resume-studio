@@ -55,7 +55,7 @@ export function AppShell() {
 
   return (
     <div className="writing-studio min-h-screen overflow-x-hidden bg-background text-foreground brand-grid-bg">
-      <header className="sticky top-0 z-50 border-b border-[var(--brand-line)] bg-white/80 dark:bg-[var(--brand-surface)]/80 backdrop-blur-xl backdrop-saturate-150">
+      <header className={`${isFocusedWorkspace ? 'hidden md:block' : ''} sticky top-0 z-50 border-b border-[var(--brand-line)] bg-white/80 dark:bg-[var(--brand-surface)]/80 backdrop-blur-xl backdrop-saturate-150`}>
         <div className="mx-auto flex h-14 max-w-[88rem] items-center justify-between px-4 md:px-6">
           <Link to="/dashboard" className="inline-flex items-center gap-2.5">
             <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--brand-signal)] text-white shadow-sm">

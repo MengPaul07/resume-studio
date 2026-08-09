@@ -1065,12 +1065,14 @@ export function TailorChatPage() {
     inputHistory.handleInputChange(text);
   }
 
+  const hasTailorChanges = autoAppliedDiffs.length > 0 || (session.pendingChanges?.length ?? 0) > 0;
+
   // 鈹€鈹€ Render 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
 
   return (
     <>
     <PageTransition>
-      <section className="h-[calc(100dvh-3.5rem)] overflow-hidden md:h-auto md:px-8 md:py-8">
+      <section className="h-[100dvh] overflow-hidden md:h-auto md:px-8 md:py-8">
         <div className="mx-auto flex h-full w-full max-w-[86rem] flex-col md:block md:h-auto md:space-y-4">
           <div className="flex min-h-16 shrink-0 items-center gap-3 border-b border-[var(--brand-line)] bg-[var(--brand-surface)] px-3 md:hidden">
             <Link
@@ -1103,7 +1105,11 @@ export function TailorChatPage() {
               type="button"
               onClick={session.handleSaveTailoredResume}
               disabled={session.isSaving || session.isBootstrapping || !session.resumeRecord || Object.keys(session.refinedResumeObj).length === 0}
-              className="relative inline-flex size-11 items-center justify-center rounded-lg bg-[var(--brand-signal)] text-white disabled:opacity-40"
+              className={`relative inline-flex size-11 items-center justify-center rounded-lg disabled:opacity-40 ${
+                hasTailorChanges
+                  ? 'bg-[var(--brand-signal)] text-white'
+                  : 'bg-[var(--brand-signal-soft)] text-[var(--brand-signal)]'
+              }`}
               aria-label={t('tailor.saveTailor')}
             >
               {session.isSaving ? <Loader2 className="size-5 animate-spin" /> : <WandSparkles className="size-5" />}
@@ -1289,7 +1295,12 @@ export function TailorChatPage() {
                 />
               )}
 
-              <div ref={chatScrollRef} className="flex-1 min-h-0 space-y-3 overflow-auto p-3 md:p-4">
+              <div
+                ref={chatScrollRef}
+                className={`flex-1 min-h-0 overflow-auto p-3 md:p-4 ${
+                  visibleMessages.length <= 1 ? 'flex flex-col justify-center gap-3' : 'space-y-3'
+                }`}
+              >
                 {visibleMessages.map((msg) => (
                   <ChatBubble
                     key={msg.id}

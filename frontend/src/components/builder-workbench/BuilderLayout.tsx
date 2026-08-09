@@ -34,7 +34,7 @@ export function BuilderLayout({
 
   return (
     <section className="brand-grid-bg w-full overflow-hidden md:h-[calc(100vh-3.5rem)] md:px-6 md:py-5">
-      <div className="flex h-[calc(100dvh-3.5rem)] flex-col bg-[var(--brand-paper)] md:hidden">
+      <div className="flex h-[100dvh] flex-col bg-[var(--brand-paper)] md:hidden">
         <header className="shrink-0 border-b border-[var(--brand-line)] bg-[var(--brand-surface)] px-4 py-3">
           <div className="flex min-h-11 items-center gap-3">
             <Link
@@ -84,7 +84,7 @@ export function BuilderLayout({
             type="button"
             onClick={() => setMobileMode('edit')}
             className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg text-sm font-semibold ${
-              mobileMode === 'edit' ? 'bg-[var(--brand-signal)] text-white' : 'text-[var(--brand-ink-muted)]'
+              mobileMode === 'edit' ? 'bg-[var(--brand-signal-soft)] text-[var(--brand-signal)]' : 'text-[var(--brand-ink-muted)]'
             }`}
           >
             <SlidersHorizontal className="size-4" /> {t('common.edit')}
@@ -96,7 +96,7 @@ export function BuilderLayout({
               setMobileMode('preview');
             }}
             className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg text-sm font-semibold ${
-              mobileMode === 'preview' ? 'bg-[var(--brand-signal)] text-white' : 'text-[var(--brand-ink-muted)]'
+              mobileMode === 'preview' ? 'bg-[var(--brand-signal-soft)] text-[var(--brand-signal)]' : 'text-[var(--brand-ink-muted)]'
             }`}
           >
             <Eye className="size-4" /> {t('common.preview')}
