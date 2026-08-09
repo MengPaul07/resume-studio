@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Layout, Loader2, MessageCircleQuestion, Send, WandSparkles } from 'lucide-react';
+import { ArrowLeft, Eye, Layout, Loader2, MessageCircle, MessageCircleQuestion, Send, WandSparkles } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/button';
@@ -66,6 +66,7 @@ export function TailorChatPage() {
   };
   const [showJdPanel, setShowJdPanel] = useState(false);
   const [showInterview, setShowInterview] = useState(false);
+  const [mobileWorkspace, setMobileWorkspace] = useState<'chat' | 'preview'>('chat');
   const mode = showInterview ? 'interview' as const : 'refine' as const;
 
   const dag = useTailorDag(
@@ -1060,18 +1061,18 @@ export function TailorChatPage() {
   return (
     <>
     <PageTransition>
-      <section className="px-4 py-10 md:px-8">
-        <div className="mx-auto w-full max-w-[86rem] space-y-4">
+      <section className="py-2 md:px-8 md:py-8">
+        <div className="mx-auto w-full max-w-[86rem] space-y-2 md:space-y-4">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-2 px-3 md:px-0">
             <Link
               to="/dashboard"
-              className="inline-flex items-center gap-2 border border-black dark:border-zinc-600 bg-canvas px-3 py-2 font-mono text-xs uppercase"
+              className="inline-flex h-10 items-center gap-2 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-surface)] px-3 font-sans text-xs font-semibold md:rounded-none md:border-black md:bg-canvas md:font-mono md:uppercase dark:md:border-zinc-600"
             >
               <ArrowLeft className="size-4" />
               {t('nav.back')}
             </Link>
-            <div className="flex items-center gap-3">
+            <div className="flex min-w-0 items-center gap-1.5 md:gap-3">
               <Button
                 size="sm"
                 variant="outline"
@@ -1089,19 +1090,19 @@ export function TailorChatPage() {
                   <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
                 )}
               </span>
-                {session.isSaving ? t('common.saving') : (autoAppliedDiffs.length > 0 || (session.pendingChanges?.length ?? 0) > 0) ? 'Save*' : t('tailor.saveTailor')}
+                <span className="hidden sm:inline">{session.isSaving ? t('common.saving') : (autoAppliedDiffs.length > 0 || (session.pendingChanges?.length ?? 0) > 0) ? 'Save*' : t('tailor.saveTailor')}</span>
               </Button>
               <Link
                 to={`/builder?resumeId=${resumeId}`}
-                className="inline-flex items-center gap-1.5 rounded border border-black dark:border-zinc-600 bg-white dark:bg-[var(--brand-surface)] dark:text-zinc-200 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide hover:bg-gray-50 dark:hover:bg-[var(--brand-surface-soft)]"
+                className="inline-flex h-10 items-center gap-1.5 rounded-lg border border-[var(--brand-line)] bg-white px-3 font-sans text-[11px] font-semibold hover:bg-gray-50 dark:bg-[var(--brand-surface)] dark:text-zinc-200 dark:hover:bg-[var(--brand-surface-soft)] md:h-auto md:rounded md:border-black md:py-1.5 md:font-mono md:uppercase md:tracking-wide dark:md:border-zinc-600"
               >
                 <Layout className="size-3.5" />
-                {t('tailor.layout')}
+                <span className="hidden sm:inline">{t('tailor.layout')}</span>
               </Link>
-              <div className="border border-black dark:border-zinc-600 bg-canvas px-2 py-1 font-mono text-xs uppercase">
+              <div className="hidden border border-black bg-canvas px-2 py-1 font-mono text-xs uppercase dark:border-zinc-600 lg:block">
                 resume
               </div>
-              <div className="font-mono text-xs uppercase text-gray-700 dark:text-zinc-300">
+              <div className="hidden font-mono text-xs uppercase text-gray-700 dark:text-zinc-300 xl:block">
                 {session.resumeRecord
                   ? t('tailor.resumeLabel', { title: session.resumeRecord.title })
                   : t('tailor.noResumeLoaded')}
@@ -1110,17 +1111,19 @@ export function TailorChatPage() {
           </div>
 
           {/* Session List */}
-          <SessionListPanel
-            sessions={session.resumeSessions}
-            activeResumeId={resumeId}
-            onSelectSession={(newId) => {
-              const next = new URLSearchParams(searchParams);
-              next.set('resumeId', newId);
-              setSearchParams(next);
-            }}
-            loading={session.sessionListLoading}
-            onRefresh={() => session.refreshResumeSessions(undefined, true)}
-          />
+          <div className="px-3 md:px-0">
+            <SessionListPanel
+              sessions={session.resumeSessions}
+              activeResumeId={resumeId}
+              onSelectSession={(newId) => {
+                const next = new URLSearchParams(searchParams);
+                next.set('resumeId', newId);
+                setSearchParams(next);
+              }}
+              loading={session.sessionListLoading}
+              onRefresh={() => session.refreshResumeSessions(undefined, true)}
+            />
+          </div>
 
           {/* Needs Import Banner */}
           {session.needsImport ? (
@@ -1136,19 +1139,39 @@ export function TailorChatPage() {
             </div>
           ) : null}
 
+          <div className="mx-3 grid grid-cols-2 rounded-lg bg-[var(--brand-surface-soft)] p-1 xl:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileWorkspace('chat')}
+              className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-md text-sm font-semibold ${mobileWorkspace === 'chat' ? 'bg-[var(--brand-surface)] text-[var(--brand-signal)] shadow-sm' : 'text-[var(--brand-ink-muted)]'}`}
+            >
+              <MessageCircle className="size-4" /> Conversation
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileWorkspace('preview')}
+              className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-md text-sm font-semibold ${mobileWorkspace === 'preview' ? 'bg-[var(--brand-surface)] text-[var(--brand-signal)] shadow-sm' : 'text-[var(--brand-ink-muted)]'}`}
+            >
+              <Eye className="size-4" /> Preview
+              {session.pendingChanges.length > 0 ? (
+                <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-[var(--brand-signal)] px-1.5 text-[10px] text-white">{session.pendingChanges.length}</span>
+              ) : null}
+            </button>
+          </div>
+
           {/* Main Grid */}
-          <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_1.25fr] xl:h-[calc(100vh-8rem)]">
+          <div className="grid h-[calc(100dvh-15rem)] min-h-[30rem] grid-cols-1 gap-0 md:mx-0 md:gap-4 xl:h-[calc(100vh-8rem)] xl:grid-cols-[1fr_1.25fr]">
             {/* Chat Panel */}
-            <div className="flex flex-col overflow-hidden border-2 border-black dark:border-zinc-600 bg-white dark:bg-[var(--brand-surface)] shadow-[6px_6px_0px_0px_#000000] dark:shadow-none dark:border dark:border-[var(--brand-line)]">
-              <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b-2 border-black bg-[var(--brand-surface-soft)] px-4 py-3 dark:border-zinc-600">
-                <h1 className="font-serif text-2xl uppercase">{t('tailor.chatTitle')}</h1>
+            <div className={`${mobileWorkspace === 'chat' ? 'flex' : 'hidden'} flex-col overflow-hidden border-y border-[var(--brand-line)] bg-white dark:bg-[var(--brand-surface)] md:rounded-xl md:border xl:flex xl:rounded-none xl:border-2 xl:border-black xl:shadow-[6px_6px_0px_0px_#000000] dark:xl:border-zinc-600 dark:xl:shadow-none`}>
+              <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--brand-line)] bg-[var(--brand-surface-soft)] px-3 py-2.5 md:px-4 xl:border-b-2 xl:border-black dark:xl:border-zinc-600">
+                <h1 className="font-sans text-base font-semibold md:text-lg xl:font-serif xl:text-2xl xl:uppercase">{t('tailor.chatTitle')}</h1>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
-                    className="inline-flex items-center gap-2 rounded-full border-2 border-black bg-[var(--brand-signal)] px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-wide text-white shadow-[3px_3px_0px_0px_#000000] transition-all hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[5px_5px_0px_0px_#000000] active:translate-y-0 active:shadow-[2px_2px_0px_0px_#000000] dark:border-zinc-200 dark:bg-zinc-100 dark:text-zinc-950 dark:shadow-none dark:ring-2 dark:ring-zinc-100/20"
+                    className="inline-flex h-10 items-center gap-2 rounded-lg bg-[var(--brand-signal)] px-3 font-sans text-[11px] font-semibold text-white md:h-auto md:rounded-full md:py-2 xl:border-2 xl:border-black xl:px-4 xl:font-mono xl:font-bold xl:uppercase xl:tracking-wide xl:shadow-[3px_3px_0px_0px_#000000] dark:xl:border-zinc-200 dark:xl:bg-zinc-100 dark:xl:text-zinc-950 dark:xl:shadow-none"
                     onClick={() => setShowInterview(true)}
                   >
                     <MessageCircleQuestion className="size-4" />
-                    {t('tailor.mockInterview')}
+                    <span className="hidden sm:inline">{t('tailor.mockInterview')}</span>
                   </button>
                   <button
                     className="rounded border border-blue-400 dark:border-blue-600 bg-blue-50 dark:bg-blue-950 px-2.5 py-1 text-[11px] text-blue-700 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900"
@@ -1176,7 +1199,7 @@ export function TailorChatPage() {
                 />
               )}
 
-              <div ref={chatScrollRef} className="flex-1 min-h-0 space-y-3 overflow-auto p-4">
+              <div ref={chatScrollRef} className="flex-1 min-h-0 space-y-3 overflow-auto p-3 md:p-4">
                 {visibleMessages.map((msg) => (
                   <ChatBubble
                     key={msg.id}
@@ -1277,13 +1300,13 @@ export function TailorChatPage() {
                   disabled={session.isRunning}
                 />
 
-                <div className="space-y-2 border-t-2 border-black dark:border-zinc-600 p-4">
+                <div className="space-y-2 border-t border-[var(--brand-line)] bg-[var(--brand-surface)] p-3 md:p-4 xl:border-t-2 xl:border-black dark:xl:border-zinc-600">
                   <Textarea
                     value={session.inputText}
                     onChange={(e) => handleInputChange(e.target.value)}
                     onKeyDown={handleInputKeyDown}
                     placeholder={t('tailor.inputPlaceholder')}
-                    className="chat-input-area min-h-[100px]"
+                    className="chat-input-area min-h-[72px] md:min-h-[100px]"
                   />
                   <div className="flex flex-wrap items-center gap-2">
                     <Button
@@ -1329,7 +1352,7 @@ export function TailorChatPage() {
                         <p className="font-mono text-xs text-red-700 dark:text-red-400">{session.errorText}</p>
                       ) : null}
                     </div>
-                    <p className="font-mono text-[10px] text-slate-300 dark:text-zinc-500">
+                    <p className="hidden font-mono text-[10px] text-slate-300 dark:text-zinc-500 sm:block">
                       {t('tailor.keyboardHint')}
                     </p>
                   </div>
@@ -1337,7 +1360,7 @@ export function TailorChatPage() {
             </div>
 
             {/* Preview Panel */}
-            <div className="flex flex-col overflow-hidden rounded-2xl bg-[#f5f5f7] dark:bg-[var(--brand-surface-soft)] shadow-[0_4px_24px_rgba(0,0,0,0.04)] dark:shadow-none dark:border dark:border-[var(--brand-line)]">
+            <div className={`${mobileWorkspace === 'preview' ? 'flex' : 'hidden'} flex-col overflow-hidden bg-[#f5f5f7] dark:bg-[var(--brand-surface-soft)] md:rounded-xl md:border md:border-[var(--brand-line)] xl:flex xl:rounded-2xl xl:shadow-[0_4px_24px_rgba(0,0,0,0.04)] dark:shadow-none`}>
               <div className="shrink-0 border-b border-gray-200 dark:border-[var(--brand-line)] bg-white/80 dark:bg-[var(--brand-surface)]/80 backdrop-blur px-5 py-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h2 className="font-sans text-lg font-semibold tracking-tight text-gray-900 dark:text-[var(--brand-ink)]"
@@ -1356,7 +1379,7 @@ export function TailorChatPage() {
               </div>
 
               <div ref={previewScrollRef}
-                className="relative flex-1 min-h-0 overflow-auto bg-[#f5f5f7] dark:bg-[var(--brand-surface-soft)] p-6 lg:p-8"
+                className="relative flex-1 min-h-0 overflow-auto bg-[#f5f5f7] p-2 dark:bg-[var(--brand-surface-soft)] sm:p-4 lg:p-8"
               >
                 {Object.keys(session.refinedResumeObj).length === 0 ? (
                   <div className="mx-auto w-full min-h-[400px] max-w-[820px] rounded-2xl bg-white dark:bg-[var(--brand-surface)] px-10 py-20 shadow-sm dark:shadow-none dark:border dark:border-[var(--brand-line)] flex items-center justify-center">
@@ -1413,4 +1436,3 @@ export function TailorChatPage() {
     </>
   );
 }
-

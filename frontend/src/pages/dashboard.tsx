@@ -217,29 +217,29 @@ export function DashboardPage() {
   };
 
   return (
-    <section className="min-h-screen px-4 py-8 md:px-8">
-      <div className="mx-auto max-w-[88rem] rounded-2xl border border-[var(--brand-line)] bg-[var(--brand-paper)] shadow-sm">
-        <header className="border-b border-[var(--brand-line)] p-6 md:p-8">
+    <section className="min-h-screen py-2 md:px-8 md:py-8">
+      <div className="mx-auto max-w-[88rem] overflow-hidden border-[var(--brand-line)] bg-[var(--brand-paper)] md:rounded-2xl md:border md:shadow-sm">
+        <header className="border-b border-[var(--brand-line)] p-4 md:p-8">
           <div className="grid gap-4 md:grid-cols-[1.6fr_1fr] md:items-end">
             <div>
               <p className="font-sans text-xs font-semibold tracking-[0.14em] text-[var(--brand-signal)]">
                 {t('dashboard.workflowConsole')}
               </p>
-              <h1 className="mt-2 font-sans text-3xl font-bold leading-tight tracking-tight md:text-5xl text-[var(--brand-ink)] dark:text-zinc-100">{t('dashboard.title')}</h1>
+              <h1 className="mt-1 font-sans text-2xl font-bold leading-tight md:mt-2 md:text-5xl text-[var(--brand-ink)] dark:text-zinc-100">{t('dashboard.title')}</h1>
               <p className="mt-3 max-w-2xl font-sans text-sm text-[var(--brand-ink-muted)]">
                 {t('dashboard.subtitle')}
               </p>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              <div className="rounded-lg border border-[var(--brand-line)] bg-[var(--brand-surface)] p-3">
+              <div className="rounded-lg bg-[var(--brand-surface-soft)] p-3">
                 <p className="font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.imports')}</p>
                 <p className="font-sans text-xl font-bold text-[var(--brand-ink)] dark:text-zinc-100">{importedFiles.length}</p>
               </div>
-              <div className="rounded-lg border border-[var(--brand-line)] bg-[var(--brand-surface)] p-3">
+              <div className="rounded-lg bg-[var(--brand-surface-soft)] p-3">
                 <p className="font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.resumes')}</p>
                 <p className="font-sans text-xl font-bold text-[var(--brand-ink)] dark:text-zinc-100">{recentResumes.length}</p>
               </div>
-              <div className="rounded-lg border border-[var(--brand-line)] bg-[var(--brand-surface)] p-3">
+              <div className="rounded-lg bg-[var(--brand-surface-soft)] p-3">
                 <p className="font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.engine')}</p>
                 <StatusBadge variant="success" className="mt-1">{t('dashboard.ready')}</StatusBadge>
               </div>
@@ -248,17 +248,17 @@ export function DashboardPage() {
         </header>
 
         <main className="grid gap-4 lg:grid-cols-[1.2fr_1.8fr]">
-          <section className="bg-[var(--brand-surface)] p-5 md:p-6">
+          <section className="bg-[var(--brand-surface)] p-4 md:p-6">
             <h2 className="font-sans text-xs font-semibold tracking-wider text-[var(--brand-signal)]">{t('dashboard.studioFlow')}</h2>
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 grid auto-cols-[minmax(15rem,82vw)] grid-flow-col gap-3 overflow-x-auto pb-2 [scrollbar-width:none] md:auto-cols-auto md:grid-flow-row md:overflow-visible md:pb-0 md:[scrollbar-width:auto] [&::-webkit-scrollbar]:hidden">
               {workflowModules.map((module, idx) => {
                 const Icon = iconMap[module.tone];
                 return (
                   <div key={module.title} className="relative border border-[var(--brand-line)] bg-[var(--brand-paper)] p-4">
-                    <span className="absolute -left-2 -top-2 inline-flex h-6 w-6 items-center justify-center border border-[var(--brand-line)] bg-[var(--brand-signal)] font-mono text-[10px] text-white">
+                    <span className="absolute left-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-md bg-[var(--brand-signal)] font-mono text-[10px] text-white">
                       {idx + 1}
                     </span>
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 pl-8">
                       <span className="inline-flex h-9 w-9 items-center justify-center border border-[var(--brand-line)] bg-[var(--brand-surface-soft)]">
                         <Icon className="size-4 text-[var(--brand-signal)]" />
                       </span>
@@ -299,7 +299,7 @@ export function DashboardPage() {
           </section>
 
           <section className="grid gap-4 md:grid-cols-2">
-            <div className="bg-[var(--brand-paper)] p-5 md:p-6">
+            <div className="bg-[var(--brand-paper)] p-4 md:p-6">
               <h2 className="font-sans text-xs font-semibold tracking-wider text-[var(--brand-signal)]">{t('dashboard.importedRawText')}</h2>
               <p className="mt-1 font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.importHint')}</p>
               <input ref={fileInputRef} type="file" className="hidden" accept={ACCEPTED_EXTS.join(',')} onChange={handleFileSelected} />
@@ -352,7 +352,7 @@ export function DashboardPage() {
               </div>
             </div>
 
-            <div className="bg-[var(--brand-paper)] p-5 md:p-6">
+            <div className="bg-[var(--brand-paper)] p-4 md:p-6">
               <h2 className="font-sans text-xs font-semibold tracking-wider text-[var(--brand-signal)]">{t('dashboard.recentResumes')}</h2>
               <p className="mt-1 font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.resumeHint')}</p>
               <div className="mt-3 space-y-2 max-h-[50vh] overflow-auto pr-1">

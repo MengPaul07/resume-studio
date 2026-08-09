@@ -77,7 +77,7 @@ export function InterviewPage() {
 
   if (selectedResume) {
     return (
-      <div className="h-[calc(100vh-57px)]">
+      <div className="h-[calc(100dvh-8rem)] md:h-[calc(100vh-57px)]">
         <InterviewModal
           embedded
           resumeObj={(selectedResume.resume_obj || {}) as Record<string, unknown>}
@@ -92,11 +92,11 @@ export function InterviewPage() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-57px)] flex flex-col">
+    <div className="flex min-h-[calc(100dvh-8rem)] flex-col md:min-h-[calc(100vh-57px)]">
       {/* Hero */}
-      <section className="flex flex-col items-center text-center px-6 pt-16 pb-10">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[var(--brand-signal)] text-white shadow-lg shadow-[var(--brand-signal)]/20">
-          <MessageCircle className="size-7" />
+      <section className="flex flex-col items-center px-4 pb-6 pt-8 text-center md:px-6 md:pb-10 md:pt-16">
+        <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--brand-signal)] text-white shadow-sm md:mb-4 md:h-14 md:w-14 md:rounded-2xl">
+          <MessageCircle className="size-6 md:size-7" />
         </div>
         <h1 className="font-sans text-2xl font-bold text-[var(--brand-ink)] tracking-tight">{t('nav.interview')}</h1>
         <p className="mt-2 max-w-md font-sans text-sm text-[var(--brand-ink-muted)] leading-relaxed">
@@ -105,8 +105,8 @@ export function InterviewPage() {
       </section>
 
       {/* Selection */}
-      <section className="flex-1 px-6 pb-12">
-        <div className="mx-auto max-w-4xl space-y-8">
+      <section className="flex-1 px-4 pb-4 md:px-6 md:pb-12">
+        <div className="mx-auto max-w-4xl space-y-6 md:space-y-8">
 
           {/* Resume selection */}
           <div>
@@ -122,7 +122,7 @@ export function InterviewPage() {
                 ))}
               </div>
             ) : resumes.length === 0 ? (
-              <div className="rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-12 text-center">
+              <div className="rounded-xl border border-[var(--brand-line)] bg-[var(--brand-surface)] p-8 text-center md:p-12">
                 <MessageCircle className="mx-auto size-8 text-[var(--brand-ink-muted)]/20 mb-3" />
                 <p className="font-sans text-sm text-[var(--brand-ink-muted)]">No resumes yet</p>
                 <p className="mt-1 font-sans text-xs text-[var(--brand-ink-muted)]">Create or import a resume first, then come back here.</p>
@@ -230,8 +230,8 @@ export function InterviewPage() {
 
           {/* Start CTA */}
           {pickedResumeId && (
-            <div className="pt-4 border-t border-[var(--brand-line)]">
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-[var(--brand-surface-soft)] border border-[var(--brand-line)]">
+            <div className="sticky bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-20 border-t border-[var(--brand-line)] bg-[var(--brand-paper)] py-3 md:static md:bg-transparent md:pt-4">
+              <div className="flex flex-col gap-3 rounded-xl bg-[var(--brand-surface-soft)] p-4 sm:flex-row sm:items-center">
                 <div className="flex-1">
                   <p className="font-sans text-xs text-[var(--brand-ink-muted)]">Ready to start:</p>
                   <p className="font-sans text-sm font-semibold text-[var(--brand-ink)]">
@@ -240,7 +240,7 @@ export function InterviewPage() {
                   </p>
                 </div>
                 <button onClick={startInterview}
-                  className="rounded-lg bg-[var(--brand-signal)] px-6 py-2.5 font-sans text-sm font-semibold text-white transition-all hover:brightness-110 active:scale-[0.98] shadow-lg shadow-[var(--brand-signal)]/20"
+                  className="min-h-11 w-full rounded-lg bg-[var(--brand-signal)] px-6 py-2.5 font-sans text-sm font-semibold text-white shadow-sm transition-[transform,filter] hover:brightness-110 active:scale-[0.98] sm:w-auto"
                 >
                   Start Interview
                 </button>

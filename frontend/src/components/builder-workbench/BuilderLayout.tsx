@@ -1,4 +1,5 @@
-import { ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Eye, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { ReactNode } from 'react';
 
@@ -25,12 +26,14 @@ export function BuilderLayout({
   footerLeft,
   footerRight,
 }: BuilderLayoutProps) {
+  const [mobileMode, setMobileMode] = useState<'edit' | 'preview'>('edit');
+
   return (
-    <section className="brand-grid-bg h-screen w-full overflow-hidden px-3 py-3 md:px-6 md:py-5">
-      <div className="mx-auto flex h-full max-w-[96rem] flex-col rounded-2xl border border-[var(--brand-line)] bg-[var(--brand-paper)] shadow-sm">
-        <header className={`border-b px-4 md:px-6 ${compactHeader ? 'py-2.5 md:py-3' : 'py-4 md:py-5'}`}>
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div>
+    <section className="brand-grid-bg h-[calc(100dvh-8rem)] min-h-[32rem] w-full overflow-hidden md:h-[calc(100vh-3.5rem)] md:px-6 md:py-5">
+      <div className="mx-auto flex h-full max-w-[96rem] flex-col overflow-hidden border-[var(--brand-line)] bg-[var(--brand-paper)] md:rounded-2xl md:border md:shadow-sm">
+        <header className={`shrink-0 border-b px-3 md:px-6 ${compactHeader ? 'py-2 md:py-3' : 'py-3 md:py-5'}`}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="shrink-0">
               <Link
                 to="/dashboard"
                 className="inline-flex items-center gap-1 font-mono text-[11px] tracking-[0.08em] text-[var(--brand-signal)] underline-offset-4 hover:underline"
@@ -53,17 +56,33 @@ export function BuilderLayout({
                 </>
               ) : null}
             </div>
-            <div className="flex flex-wrap items-center gap-2">{actions}</div>
+            <div className="flex min-w-0 flex-1 items-center justify-start gap-2 overflow-x-auto pb-1 [scrollbar-width:none] md:justify-end [&::-webkit-scrollbar]:hidden">{actions}</div>
+          </div>
+          <div className="mt-2 grid grid-cols-2 rounded-lg bg-[var(--brand-surface-soft)] p-1 lg:hidden">
+            <button
+              type="button"
+              onClick={() => setMobileMode('edit')}
+              className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-md text-sm font-semibold ${mobileMode === 'edit' ? 'bg-[var(--brand-surface)] text-[var(--brand-signal)] shadow-sm' : 'text-[var(--brand-ink-muted)]'}`}
+            >
+              <SlidersHorizontal className="size-4" /> Edit
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileMode('preview')}
+              className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-md text-sm font-semibold ${mobileMode === 'preview' ? 'bg-[var(--brand-surface)] text-[var(--brand-signal)] shadow-sm' : 'text-[var(--brand-ink-muted)]'}`}
+            >
+              <Eye className="size-4" /> Preview
+            </button>
           </div>
         </header>
 
         <main className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[24rem_1px_minmax(0,1fr)]">
-          <div className="min-h-0 overflow-y-auto bg-[var(--brand-paper)] p-4 md:p-5">{editorPanel}</div>
+          <div className={`${mobileMode === 'edit' ? 'block' : 'hidden'} min-h-0 overflow-y-auto bg-[var(--brand-paper)] p-3 md:p-5 lg:block`}>{editorPanel}</div>
           <div className="hidden bg-black dark:bg-zinc-600 lg:block" />
-          <div className="min-h-0 overflow-hidden bg-[var(--brand-surface-soft)]">{previewPanel}</div>
+          <div className={`${mobileMode === 'preview' ? 'block' : 'hidden'} min-h-0 overflow-hidden bg-[var(--brand-surface-soft)] lg:block`}>{previewPanel}</div>
         </main>
 
-        <footer className="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 font-mono text-[10px] tracking-[0.08em] text-[var(--brand-signal)] md:px-6">
+        <footer className="hidden flex-wrap items-center justify-between gap-3 border-t px-4 py-3 font-mono text-[10px] tracking-[0.08em] text-[var(--brand-signal)] md:flex md:px-6">
           <span>{footerLeft}</span>
           <span>{footerRight}</span>
         </footer>

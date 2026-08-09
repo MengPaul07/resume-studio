@@ -444,7 +444,7 @@ export function ResumeViewPage() {
                   setSearchParams({ resumeId: nextId }, { replace: true });
                 }
               }}
-              className="h-10 min-w-[14rem] border border-black dark:border-gray-600 bg-[var(--brand-paper)] px-3 font-mono text-xs uppercase tracking-wide outline-none focus:border-[var(--brand-signal)]"
+              className="h-10 min-w-[10rem] border border-black bg-[var(--brand-paper)] px-3 font-mono text-xs uppercase tracking-wide outline-none focus:border-[var(--brand-signal)] sm:min-w-[14rem] dark:border-gray-600"
             >
               {recentResumes.length === 0 ? <option value="">{t('dashboard.noResumes')}</option> : null}
               {recentResumes.map((item) => (
@@ -453,6 +453,10 @@ export function ResumeViewPage() {
                 </option>
               ))}
             </select>
+            <Button onClick={() => void handleSaveHtml()} disabled={savingHtml || !resume?.id}>
+              <Save />
+              {savingHtml ? t('common.saving') : t('common.save')}
+            </Button>
             <Link
               to={`/tailor?resumeId=${resume?.id || activeResumeId}`}
               className="inline-flex items-center gap-1.5 rounded border border-black dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wide hover:bg-gray-50 dark:hover:bg-gray-700"
@@ -460,10 +464,6 @@ export function ResumeViewPage() {
               <WandSparkles className="size-3.5" />
               {t('nav.tailor')}
             </Link>
-            <Button onClick={() => void handleSaveHtml()} disabled={savingHtml || !resume?.id}>
-              <Save />
-              {savingHtml ? t('common.saving') : t('common.save')}
-            </Button>
             <Button variant="outline" onClick={handleDownload} disabled={!resume?.id}>
               <Download />
               {t('resume.exportHtml')}

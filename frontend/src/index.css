@@ -233,6 +233,8 @@
     @apply bg-background text-foreground;
     font-feature-settings: "calt" 1, "liga" 1;
     line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
   button {
     font-family: var(--font-sans);
@@ -294,12 +296,26 @@
 
 .writing-studio button,
 .writing-studio a {
-  transition: all 160ms ease;
+  transition-property: color, background-color, border-color, box-shadow, filter, opacity, transform;
+  transition-duration: 160ms;
+  transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .writing-studio button:hover,
 .writing-studio a:hover {
   filter: saturate(1.04);
+}
+
+.writing-studio button:active,
+.writing-studio a:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .writing-studio button,
+  .writing-studio a {
+    transition-duration: 0ms;
+  }
 }
 
 @media print {
