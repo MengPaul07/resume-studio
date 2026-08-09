@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { ScopedResumeHtml } from './ScopedResumeHtml';
 
 interface PageContainerProps {
   html: string;
@@ -92,9 +93,9 @@ export function PageContainer({
               width: `${contentWidth}px`,
             }}
           >
-            <div
+            <ScopedResumeHtml
+              html={html}
               style={{ width: `${contentWidth}px` }}
-              dangerouslySetInnerHTML={{ __html: html }}
             />
           </div>
         </div>

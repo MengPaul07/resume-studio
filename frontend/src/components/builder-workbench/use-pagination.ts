@@ -91,7 +91,9 @@ export function usePagination({
       }
 
       // ── Find items that should NOT be split ──
-      const items = container.querySelectorAll('.resume-item, [data-resume-item], [data-no-break]');
+      const shadowHost = container.querySelector<HTMLElement>('.resume-shadow-host');
+      const queryRoot: ParentNode = shadowHost?.shadowRoot || container;
+      const items = queryRoot.querySelectorAll('.resume-item, [data-resume-item], [data-no-break]');
       const containerRect = container.getBoundingClientRect();
       const itemBounds: ItemBounds[] = [];
 
@@ -105,7 +107,7 @@ export function usePagination({
       });
 
       // ── Prevent section header orphans ──
-      const sectionTitles = container.querySelectorAll(
+      const sectionTitles = queryRoot.querySelectorAll(
         '.resume-section-title, .resume-section-title-sm, [data-section] h2, [data-section] h3, .section-title, section > h2, section > h3',
       );
       sectionTitles.forEach((title) => {
@@ -137,7 +139,7 @@ export function usePagination({
       });
 
       // Also protect bullet items from being split
-      const listItems = container.querySelectorAll('li');
+      const listItems = queryRoot.querySelectorAll('li');
       listItems.forEach((li) => {
         const rect = li.getBoundingClientRect();
         itemBounds.push({

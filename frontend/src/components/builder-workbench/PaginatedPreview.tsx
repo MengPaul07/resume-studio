@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ensureUtf8HtmlDocument } from '../../lib/html-encoding';
 import { PageContainer } from './PageContainer';
+import { ScopedResumeHtml } from './ScopedResumeHtml';
 import { usePagination } from './use-pagination';
 import { clamp, mmToPx, PAGE_FORMAT_MM, type PageCountMode, type PageFormat, type PageMeta } from './types';
 
@@ -26,7 +27,13 @@ function extractDisplayHtml(rawHtml: string): string {
   const doc = new DOMParser().parseFromString(html, 'text/html');
 
   const styles = Array.from(doc.head.querySelectorAll('style, link[rel="stylesheet"]'))
-    .map((el) => el.outerHTML)
+    .map((el) => {
+      if (el.tagName !== 'STYLE') return el.outerHTML;
+      const css = (el.textContent || '')
+        .replace(/:root\b/g, ':host')
+        .replace(/(^|[}\s,])body(?=\s*[{,.#:\[])/gm, '$1.resume-display-scope');
+      return `<style>${css}</style>`;
+    })
     .join('\n');
 
   const scopeFix = `<style>
@@ -169,7 +176,7 @@ export function PaginatedPreview({
         style={{ width: `${contentWidth}px` }}
         aria-hidden="true"
       >
-        <div dangerouslySetInnerHTML={{ __html: displayHtml }} />
+        <ScopedResumeHtml html={displayHtml} className="resume-shadow-host" />
       </div>
 
       {/* Visible pages */}

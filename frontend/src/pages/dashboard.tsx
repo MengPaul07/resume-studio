@@ -1,7 +1,7 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Folder, FolderArchive, PencilRuler, PenLine, Sparkles, Upload } from 'lucide-react';
+import { ArrowRight, ChevronDown, Folder, FolderArchive, PencilRuler, PenLine, Sparkles, Upload } from 'lucide-react';
 import {
   deleteImportedFile,
   deleteRecentResume,
@@ -68,7 +68,7 @@ function getErrorMessage(error: unknown, fallback: string): string {
 }
 
 export function DashboardPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [importing, setImporting] = useState(false);
@@ -250,7 +250,63 @@ export function DashboardPage() {
         <main className="grid gap-4 lg:grid-cols-[1.2fr_1.8fr]">
           <section className="bg-[var(--brand-surface)] p-4 md:p-6">
             <h2 className="font-sans text-xs font-semibold tracking-wider text-[var(--brand-signal)]">{t('dashboard.studioFlow')}</h2>
-            <div className="mt-4 grid auto-cols-[minmax(15rem,82vw)] grid-flow-col gap-3 overflow-x-auto pb-2 [scrollbar-width:none] md:auto-cols-auto md:grid-flow-row md:overflow-visible md:pb-0 md:[scrollbar-width:auto] [&::-webkit-scrollbar]:hidden">
+            <div className="mt-4 space-y-3 md:hidden">
+              <Link
+                to="/create"
+                className="flex min-h-20 items-center gap-4 rounded-lg bg-[var(--brand-signal)] p-4 text-white"
+              >
+                <span className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-white/15">
+                  <Sparkles className="size-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-base font-semibold">{t('dashboard.build.title')}</span>
+                  <span className="mt-0.5 block text-xs text-white/75">{t('dashboard.build.desc')}</span>
+                </span>
+                <ArrowRight className="size-5 shrink-0" />
+              </Link>
+              <button
+                type="button"
+                onClick={handlePickFile}
+                className="flex min-h-16 w-full items-center gap-4 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-paper)] p-4 text-left"
+              >
+                <span className="inline-flex size-10 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-signal-soft)] text-[var(--brand-signal)]">
+                  <Upload className="size-5" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold">{t('dashboard.import.title')}</span>
+                  <span className="mt-0.5 block text-xs text-[var(--brand-ink-muted)]">PDF / DOC / DOCX</span>
+                </span>
+              </button>
+              <details className="mobile-disclosure rounded-lg border border-[var(--brand-line)] bg-[var(--brand-paper)]">
+                <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 px-4 text-sm font-semibold [&::-webkit-details-marker]:hidden">
+                  <PencilRuler className="size-4 text-[var(--brand-signal)]" />
+                  <span className="flex-1">{i18n.language.startsWith('zh') ? '继续处理简历' : 'Continue working'}</span>
+                  <ChevronDown className="mobile-disclosure-chevron size-4 text-[var(--brand-ink-muted)]" />
+                </summary>
+                <div className="border-t border-[var(--brand-line)] px-2 py-1">
+                  {workflowModules.slice(2).map((module) => {
+                    const Icon = iconMap[module.tone];
+                    return (
+                      <Link
+                        key={module.action}
+                        to={module.to}
+                        className="flex min-h-14 items-center gap-3 rounded-lg px-2 text-sm hover:bg-[var(--brand-surface-soft)]"
+                      >
+                        <span className="inline-flex size-9 items-center justify-center rounded-lg bg-[var(--brand-surface-soft)] text-[var(--brand-signal)]">
+                          <Icon className="size-4" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block font-semibold">{t(`dashboard.${module.action}.title`)}</span>
+                          <span className="block truncate text-xs text-[var(--brand-ink-muted)]">{t(`dashboard.${module.action}.desc`)}</span>
+                        </span>
+                        <ArrowRight className="size-4 text-[var(--brand-ink-muted)]" />
+                      </Link>
+                    );
+                  })}
+                </div>
+              </details>
+            </div>
+            <div className="mt-4 hidden gap-3 md:grid">
               {workflowModules.map((module, idx) => {
                 const Icon = iconMap[module.tone];
                 return (
@@ -299,7 +355,7 @@ export function DashboardPage() {
           </section>
 
           <section className="grid gap-4 md:grid-cols-2">
-            <div className="bg-[var(--brand-paper)] p-4 md:p-6">
+            <div className="order-2 bg-[var(--brand-paper)] p-4 md:order-1 md:p-6">
               <h2 className="font-sans text-xs font-semibold tracking-wider text-[var(--brand-signal)]">{t('dashboard.importedRawText')}</h2>
               <p className="mt-1 font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.importHint')}</p>
               <input ref={fileInputRef} type="file" className="hidden" accept={ACCEPTED_EXTS.join(',')} onChange={handleFileSelected} />
@@ -352,7 +408,7 @@ export function DashboardPage() {
               </div>
             </div>
 
-            <div className="bg-[var(--brand-paper)] p-4 md:p-6">
+            <div className="order-1 bg-[var(--brand-paper)] p-4 md:order-2 md:p-6">
               <h2 className="font-sans text-xs font-semibold tracking-wider text-[var(--brand-signal)]">{t('dashboard.recentResumes')}</h2>
               <p className="mt-1 font-sans text-[11px] font-medium text-[var(--brand-ink-muted)]">{t('dashboard.resumeHint')}</p>
               <div className="mt-3 space-y-2 max-h-[50vh] overflow-auto pr-1">

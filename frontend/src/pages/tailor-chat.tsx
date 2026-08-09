@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, Eye, Layout, Loader2, MessageCircle, MessageCircleQuestion, Send, WandSparkles } from 'lucide-react';
+import { ArrowLeft, ChevronDown, Eye, Layout, Loader2, MessageCircle, MessageCircleQuestion, Send, WandSparkles, X } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/button';
@@ -68,6 +68,15 @@ export function TailorChatPage() {
   const [showInterview, setShowInterview] = useState(false);
   const [mobileWorkspace, setMobileWorkspace] = useState<'chat' | 'preview'>('chat');
   const mode = showInterview ? 'interview' as const : 'refine' as const;
+
+  useEffect(() => {
+    if (mobileWorkspace !== 'preview') return;
+    const closePreview = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileWorkspace('chat');
+    };
+    window.addEventListener('keydown', closePreview);
+    return () => window.removeEventListener('keydown', closePreview);
+  }, [mobileWorkspace]);
 
   const dag = useTailorDag(
     session.sessionId,
@@ -1061,10 +1070,91 @@ export function TailorChatPage() {
   return (
     <>
     <PageTransition>
-      <section className="py-2 md:px-8 md:py-8">
-        <div className="mx-auto w-full max-w-[86rem] space-y-2 md:space-y-4">
+      <section className="h-[calc(100dvh-3.5rem)] overflow-hidden md:h-auto md:px-8 md:py-8">
+        <div className="mx-auto flex h-full w-full max-w-[86rem] flex-col md:block md:h-auto md:space-y-4">
+          <div className="flex min-h-16 shrink-0 items-center gap-3 border-b border-[var(--brand-line)] bg-[var(--brand-surface)] px-3 md:hidden">
+            <Link
+              to="/dashboard"
+              aria-label={t('nav.back')}
+              className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-surface-soft)]"
+            >
+              <ArrowLeft className="size-5" />
+            </Link>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base font-semibold">{t('nav.tailor')}</h1>
+              <p className="truncate text-xs text-[var(--brand-ink-muted)]">
+                {session.resumeRecord?.title || t('tailor.noResumeLoaded')}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMobileWorkspace('preview')}
+              className="relative inline-flex size-11 items-center justify-center rounded-lg bg-[var(--brand-surface-soft)] text-[var(--brand-signal)]"
+              aria-label={t('tailor.resumePreview')}
+            >
+              <Eye className="size-5" />
+              {session.pendingChanges.length > 0 ? (
+                <span className="absolute right-0.5 top-0.5 inline-flex min-w-4 items-center justify-center rounded-full bg-[var(--status-warning)] px-1 text-[9px] font-bold text-white">
+                  {session.pendingChanges.length}
+                </span>
+              ) : null}
+            </button>
+            <button
+              type="button"
+              onClick={session.handleSaveTailoredResume}
+              disabled={session.isSaving || session.isBootstrapping || !session.resumeRecord || Object.keys(session.refinedResumeObj).length === 0}
+              className="relative inline-flex size-11 items-center justify-center rounded-lg bg-[var(--brand-signal)] text-white disabled:opacity-40"
+              aria-label={t('tailor.saveTailor')}
+            >
+              {session.isSaving ? <Loader2 className="size-5 animate-spin" /> : <WandSparkles className="size-5" />}
+            </button>
+          </div>
+
+          <details className="mobile-disclosure shrink-0 border-b border-[var(--brand-line)] bg-[var(--brand-surface)] px-3 py-2 md:hidden">
+            <summary className="flex min-h-11 cursor-pointer list-none items-center gap-3 rounded-lg bg-[var(--brand-surface-soft)] px-3 text-sm font-semibold [&::-webkit-details-marker]:hidden">
+              <MessageCircle className="size-4 text-[var(--brand-signal)]" />
+              <span className="min-w-0 flex-1 truncate">{i18n.language.startsWith('zh') ? '简历与工具' : 'Resume context and tools'}</span>
+              {targetJd ? <span className="size-2 rounded-full bg-[var(--status-done)]" /> : null}
+              <ChevronDown className="mobile-disclosure-chevron size-4 text-[var(--brand-ink-muted)]" />
+            </summary>
+            <div className="space-y-3 px-1 pb-1 pt-3">
+              <SessionListPanel
+                sessions={session.resumeSessions}
+                activeResumeId={resumeId}
+                onSelectSession={(newId) => {
+                  const next = new URLSearchParams(searchParams);
+                  next.set('resumeId', newId);
+                  setSearchParams(next);
+                }}
+                loading={session.sessionListLoading}
+                onRefresh={() => session.refreshResumeSessions(undefined, true)}
+              />
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[var(--brand-line)] text-xs font-semibold"
+                  onClick={() => setShowJdPanel(!showJdPanel)}
+                >
+                  {showJdPanel ? t('tailor.hideJd') : t('tailor.viewJd')}
+                </button>
+                <button
+                  type="button"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-[var(--brand-line)] text-xs font-semibold"
+                  onClick={() => setShowInterview(true)}
+                >
+                  <MessageCircleQuestion className="size-4" /> {t('tailor.mockInterview')}
+                </button>
+                <Link
+                  to={`/builder?resumeId=${resumeId}`}
+                  className="col-span-2 inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-[var(--brand-signal-soft)] text-xs font-semibold text-[var(--brand-signal)]"
+                >
+                  <Layout className="size-4" /> {t('tailor.layout')}
+                </Link>
+              </div>
+            </div>
+          </details>
           {/* Header */}
-          <div className="flex items-center justify-between gap-2 px-3 md:px-0">
+          <div className="hidden items-center justify-between gap-2 md:flex">
             <Link
               to="/dashboard"
               className="inline-flex h-10 items-center gap-2 rounded-lg border border-[var(--brand-line)] bg-[var(--brand-surface)] px-3 font-sans text-xs font-semibold md:rounded-none md:border-black md:bg-canvas md:font-mono md:uppercase dark:md:border-zinc-600"
@@ -1111,7 +1201,7 @@ export function TailorChatPage() {
           </div>
 
           {/* Session List */}
-          <div className="px-3 md:px-0">
+          <div className="hidden md:block">
             <SessionListPanel
               sessions={session.resumeSessions}
               activeResumeId={resumeId}
@@ -1139,7 +1229,7 @@ export function TailorChatPage() {
             </div>
           ) : null}
 
-          <div className="mx-3 grid grid-cols-2 rounded-lg bg-[var(--brand-surface-soft)] p-1 xl:hidden">
+          <div className="mx-3 hidden grid-cols-2 rounded-lg bg-[var(--brand-surface-soft)] p-1 md:grid xl:hidden">
             <button
               type="button"
               onClick={() => setMobileWorkspace('chat')}
@@ -1160,10 +1250,10 @@ export function TailorChatPage() {
           </div>
 
           {/* Main Grid */}
-          <div className="grid h-[calc(100dvh-15rem)] min-h-[30rem] grid-cols-1 gap-0 md:mx-0 md:gap-4 xl:h-[calc(100vh-8rem)] xl:grid-cols-[1fr_1.25fr]">
+          <div className="grid min-h-0 flex-1 grid-cols-1 gap-0 md:h-[calc(100dvh-15rem)] md:min-h-[30rem] md:flex-none md:gap-4 xl:h-[calc(100vh-8rem)] xl:grid-cols-[1fr_1.25fr]">
             {/* Chat Panel */}
-            <div className={`${mobileWorkspace === 'chat' ? 'flex' : 'hidden'} flex-col overflow-hidden border-y border-[var(--brand-line)] bg-white dark:bg-[var(--brand-surface)] md:rounded-xl md:border xl:flex xl:rounded-none xl:border-2 xl:border-black xl:shadow-[6px_6px_0px_0px_#000000] dark:xl:border-zinc-600 dark:xl:shadow-none`}>
-              <div className="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--brand-line)] bg-[var(--brand-surface-soft)] px-3 py-2.5 md:px-4 xl:border-b-2 xl:border-black dark:xl:border-zinc-600">
+            <div className={`${mobileWorkspace === 'chat' ? 'flex' : 'hidden'} flex-col overflow-hidden bg-white dark:bg-[var(--brand-surface)] md:rounded-xl md:border md:border-[var(--brand-line)] xl:flex xl:rounded-none xl:border-2 xl:border-black xl:shadow-[6px_6px_0px_0px_#000000] dark:xl:border-zinc-600 dark:xl:shadow-none`}>
+              <div className="hidden shrink-0 items-center justify-between gap-2 border-b border-[var(--brand-line)] bg-[var(--brand-surface-soft)] px-4 py-2.5 md:flex xl:border-b-2 xl:border-black dark:xl:border-zinc-600">
                 <h1 className="font-sans text-base font-semibold md:text-lg xl:font-serif xl:text-2xl xl:uppercase">{t('tailor.chatTitle')}</h1>
                 <div className="flex flex-wrap items-center gap-2">
                   <button
@@ -1360,13 +1450,25 @@ export function TailorChatPage() {
             </div>
 
             {/* Preview Panel */}
-            <div className={`${mobileWorkspace === 'preview' ? 'flex' : 'hidden'} flex-col overflow-hidden bg-[#f5f5f7] dark:bg-[var(--brand-surface-soft)] md:rounded-xl md:border md:border-[var(--brand-line)] xl:flex xl:rounded-2xl xl:shadow-[0_4px_24px_rgba(0,0,0,0.04)] dark:shadow-none`}>
-              <div className="shrink-0 border-b border-gray-200 dark:border-[var(--brand-line)] bg-white/80 dark:bg-[var(--brand-surface)]/80 backdrop-blur px-5 py-4">
+            <div
+              role={mobileWorkspace === 'preview' ? 'dialog' : undefined}
+              aria-modal={mobileWorkspace === 'preview' ? true : undefined}
+              className={`${mobileWorkspace === 'preview' ? 'fixed inset-0 z-[70] flex md:relative md:inset-auto md:z-auto' : 'hidden'} flex-col overflow-hidden bg-[#f5f5f7] dark:bg-[var(--brand-surface-soft)] md:rounded-xl md:border md:border-[var(--brand-line)] xl:flex xl:rounded-2xl xl:shadow-[0_4px_24px_rgba(0,0,0,0.04)] dark:shadow-none`}
+            >
+              <div className="shrink-0 border-b border-gray-200 bg-white/95 px-4 py-3 backdrop-blur dark:border-[var(--brand-line)] dark:bg-[var(--brand-surface)]/95 md:px-5 md:py-4">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <h2 className="font-sans text-lg font-semibold tracking-tight text-gray-900 dark:text-[var(--brand-ink)]"
                     style={{ fontFamily: "'Inter', 'SF Pro Display', system-ui, sans-serif" }}>
                     {t('tailor.resumePreview')}
                   </h2>
+                  <button
+                    type="button"
+                    onClick={() => setMobileWorkspace('chat')}
+                    className="inline-flex size-11 items-center justify-center rounded-lg bg-[var(--brand-surface-soft)] text-[var(--brand-ink-muted)] md:hidden"
+                    aria-label="Close preview"
+                  >
+                    <X className="size-5" />
+                  </button>
                 </div>
                 <p className="mt-1.5 font-sans text-xs text-gray-400 dark:text-zinc-500"
                   style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
