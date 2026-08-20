@@ -1,3 +1,10 @@
+---
+title: Resume Studio 文档
+description: 从本地启动到求职工作流，快速理解 Resume Studio 的产品与工程边界。
+category: start
+order: 1
+---
+
 # Resume Studio — AI Resume Builder & Mock Interview Platform
 
 > AI-powered resume builder, optimizer, and mock interview platform.  
@@ -21,17 +28,17 @@ Resume Studio 是一个全栈应用，帮助你从零构建专业简历、用 AI
 | [Mock Interview](./features/mock-interview.md) | Realistic interview practice — 12 interviewer presets, coding problems, review mode |
 | *LaTeX Export* | One-click LaTeX copy for Overleaf — XeLaTeX compatible, matches HTML output |
 | *Internationalisation* | Full zh-CN / en-US support across all features |
-| *JD Library* | 87+ Chinese tech company job descriptions for targeted tailoring |
+| *JD Library* | Bundled job-description samples for targeted tailoring |
 
 ### Tech Stack / 技术栈
 
 | Layer | Technology |
 |-------|-----------|
-| Frontend | React 19 + TypeScript + Tailwind CSS v4 + Vite |
-| Backend | Python 3.13 + FastAPI + LiteLLM |
+| Frontend | React 18 + TypeScript + Tailwind CSS v4 + Vite |
+| Backend | Python 3.11+ + FastAPI + LiteLLM |
 | AI/ML | Function-calling agent loop with autonomous tool selection |
 | Search | FAISS vector store + BGE-small-zh embedding for JD matching |
-| Desktop | Tauri (optional) for native Windows builds |
+| Deployment | FastAPI static serving, Docker or a managed container |
 
 ### Quick Links / 快速链接
 
@@ -49,3 +56,7 @@ Resume Studio 是一个全栈应用，帮助你从零构建专业简历、用 AI
 4. **[Mock Interview](./features/mock-interview.md)** — 模拟面试 / 编程题 + 复盘
 5. **[Settings](./features/settings.md)** — 设置 / LLM 配置
 6. **[Development](./development/)** — 开发文档 / 架构与配置
+
+## Public docs
+
+`frontend/src/docs/content/` 是 `job.chatverse.fun/docs` 的公开文档集。根目录 `docs/` 可以继续记录更完整的工程笔记，但新增内容上线前请先确认不包含密钥、个人资料或内部运维信息。

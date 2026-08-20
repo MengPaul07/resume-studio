@@ -3,6 +3,8 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from './components/layout/app-shell';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { DashboardPage } from './pages/dashboard';
+import { DocsShell } from './components/layout/docs-shell';
+import DocsPage from './docs/DocsPage';
 
 // Route-level code splitting: heavy pages load on demand
 const CreateResumePage = lazy(() => import('./pages/create-resume').then(m => ({ default: m.CreateResumePage })));
@@ -30,6 +32,10 @@ export default function App() {
         <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
+
+          <Route element={<DocsShell />}>
+            <Route path="/docs/*" element={<DocsPage />} />
+          </Route>
 
           <Route element={<AppShell />}>
             <Route path="/dashboard" element={<DashboardPage />} />

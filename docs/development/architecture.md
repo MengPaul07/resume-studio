@@ -56,7 +56,7 @@
 
 | Component | Technology |
 |-----------|-----------|
-| Framework | React 19 |
+| Framework | React 18 |
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 |
 | Build | Vite |
@@ -145,7 +145,7 @@ components/
 
 | Component | Technology |
 |-----------|-----------|
-| Framework | FastAPI (Python 3.13) |
+| Framework | FastAPI (Python 3.11+) |
 | LLM Gateway | LiteLLM |
 | Embeddings | fastembed (BAAI/bge-small-zh-v1.5) |
 | Vector Search | FAISS |
@@ -321,14 +321,15 @@ User clicks "Copy LaTeX"
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LLM_PROVIDER` | `openai` | Primary LLM provider |
-| `LLM_MODEL` | `gpt-4o` | Model name |
-| `LLM_API_KEY` | — | API key |
-| `LLM_API_BASE` | — | Custom endpoint |
-| `LLM_MAX_TOKENS` | `4096` | Max output tokens |
-| `LLM_TEMPERATURE` | `0.7` | Sampling temperature |
+| `API_BASE` | `https://api.deepseek.com` | Default LiteLLM endpoint |
+| `API_KEY` | — | Default API key |
+| `LLM_MODEL` | `deepseek-chat` | Model name |
+| `LLM_MAX_TOKENS` | `2048` | Max output tokens |
+| `LLM_TEMPERATURE` | `0` | Sampling temperature |
 | `DEBUG` | `false` | Debug mode |
-| `CORS_ORIGINS` | `["*"]` | CORS allowed origins |
+| `CORS_ORIGINS` | local frontend/backend | Comma-separated allowed origins |
+| `RAG_ENABLED` | `false` | Enable JD indexing and retrieval |
+| `PERSONAL_DATA_STORAGE` | `memory` | Keep personal data transient by default |
 
 ### File-based Config / 文件配置
 

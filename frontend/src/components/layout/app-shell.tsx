@@ -85,6 +85,13 @@ export function AppShell() {
                 );
               })}
             </nav>
+            <Link
+              to="/docs"
+              className="hidden h-8 items-center gap-1.5 rounded-lg px-2.5 font-sans text-xs font-semibold text-[var(--brand-ink-muted)] transition-colors hover:bg-[var(--brand-surface-soft)] hover:text-[var(--brand-signal)] md:inline-flex"
+            >
+              <FileText className="size-3.5" />
+              文档
+            </Link>
             <button
               onClick={toggleTheme}
               className="hidden h-8 w-8 items-center justify-center rounded-lg font-sans text-xs font-medium text-[var(--brand-ink-muted)] hover:bg-[var(--brand-surface-soft)] transition-colors md:inline-flex"
@@ -159,6 +166,14 @@ export function AppShell() {
           >
             <Settings className="size-5 text-[var(--brand-signal)]" />
             {t('nav.settings')}
+          </Link>
+          <Link
+            to="/docs"
+            onClick={() => setMobileMoreOpen(false)}
+            className="flex min-h-12 items-center gap-3 rounded-lg bg-[var(--brand-surface-soft)] px-4 text-sm font-semibold"
+          >
+            <FileText className="size-5 text-[var(--brand-signal)]" />
+            文档
           </Link>
           <button
             type="button"

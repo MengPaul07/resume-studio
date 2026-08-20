@@ -41,7 +41,7 @@ python3 --version   # should be ≥ 3.11
 # IMPORTANT: check "Add Python to PATH" during installation
 
 # Option 2: Microsoft Store
-# Search "Python 3.13" in Microsoft Store
+# Search "Python 3.11" (or newer) in Microsoft Store
 
 # Verify
 python --version    # should be ≥ 3.11
@@ -132,12 +132,15 @@ cd ..
 Create `.env` in the project root:
 
 ```env
-LLM_PROVIDER=openai
+API_BASE=https://api.openai.com/v1
+API_KEY=your-api-key
 LLM_MODEL=gpt-4o
-LLM_API_KEY=your-api-key
 LLM_MAX_TOKENS=4096
 LLM_TEMPERATURE=0.7
 DEBUG=true
+RAG_ENABLED=false
+PERSONAL_DATA_STORAGE=memory
+CORS_ORIGINS=http://127.0.0.1:5173,http://127.0.0.1:8000
 ```
 
 ### 3. Seed JD database / 导入 JD 数据
@@ -147,7 +150,7 @@ DEBUG=true
 python scripts/seed_jds.py
 ```
 
-This loads 87+ campus JDs from `tests/fixtures/jds/`. Skip if you don't need JD matching.
+The fixtures contain bundled job-description samples. Skip this step if you don't need JD matching; the main resume and interview flows do not depend on the index.
 
 ### 4. Run / 启动
 
@@ -172,7 +175,7 @@ cd resume-studio/frontend
 npm run dev
 ```
 
-Frontend typically starts on `http://localhost:5173`. Backend on `http://localhost:8000`.
+Frontend typically starts on `http://127.0.0.1:5173`. Backend on `http://127.0.0.1:8000`.
 
 ### 5. Verify / 验证
 
@@ -234,24 +237,14 @@ python -m pytest tests/llm -n auto -q
 python -m pytest tests -q
 ```
 
-### Agent Eval / Agent 评估
+### Agent regression / Agent 回归
 
-```bash
-# Terminal 1: Start server
-.venv/Scripts/python.exe -m uvicorn src.main:app --host 127.0.0.1 --port 8000
-
-# Terminal 2: Run eval
-set PYTHONPATH=.
-.venv/Scripts/python.exe scripts/agent_eval.py --base-url http://127.0.0.1:8000/api/v1 -j 4
-
-# Fast regression (19 scenarios)
-python scripts/agent_eval.py --regression --base-url http://127.0.0.1:8000/api/v1 -j 4
-```
+The committed, no-key regression suite lives under `tests/unit/` and `tests/integration/`. Run those suites first; LLM-backed tests under `tests/llm/` require a configured model and are intentionally not part of the default check.
 
 ## Project Structure / 项目结构
 
 ```
-resume-builder/
+resume-studio/
 ├── docs/                    # Documentation (← you are here)
 │   ├── index.md
 │   ├── features/
@@ -269,7 +262,8 @@ resume-builder/
 │   │   ├── components/      # Reusable components
 │   │   ├── lib/             # Utilities, hooks, types
 │   │   ├── i18n/            # Translations (zh.json, en.json)
-│   │   └── api/             # API client
+│   │   ├── api/             # API client
+│   │   └── docs/content/    # Curated public docs bundled into job.chatverse.fun/docs
 │   ├── package.json
 │   └── vite.config.ts
 ├── src/                     # Python backend
@@ -289,13 +283,11 @@ resume-builder/
 │   ├── llm/                  # Real LLM API required
 │   └── fixtures/             # Shared test data (resumes, jds, expected)
 ├── scripts/                 # Utility scripts
-│   ├── seed_jds.py          # JD database seeding
-│   ├── agent_eval.py        # Agent evaluation
-│   └── dres_bench.py        # Benchmark tooling
+│   └── seed_jds.py          # JD database seeding
 ├── templates/               # Built-in templates
 │   └── swiss-single.json
 ├── requirements.txt         # Python dependencies
-└── AGENTS.md                # Agent coding ops manual
+└── Dockerfile               # Optional container deployment
 ```
 
 ## Common Issues / 常见问题
@@ -322,7 +314,7 @@ npm install
 
 ```bash
 # Run from project root, not from src/
-cd resume-builder
+cd resume-studio
 python -c "from src.main import app; print('OK')"
 ```
 

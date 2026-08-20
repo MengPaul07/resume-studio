@@ -100,7 +100,7 @@ Hover shows "(double-click to edit)" hint.
 ### JD Matching / JD 匹配
 
 - **Target JD Panel**: Load a job description from the built-in JD library
-- **JD Library**: 87+ Chinese tech company JDs from Alibaba, ByteDance, Tencent, etc.
+- **JD Library**: bundled Chinese tech-company JD samples for targeted matching.
 - **JD-aware tailoring**: AI considers the target JD when making suggestions
 - JD fields: Title, Company, Location, Category, Keywords, Responsibilities, Requirements
 
