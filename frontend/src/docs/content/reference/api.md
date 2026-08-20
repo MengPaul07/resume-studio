@@ -49,4 +49,4 @@ POST /api/v1/agent/v3/template:export-latex
 POST /api/v1/latex/tex
 ```
 
-开发时可打开 `http://127.0.0.1:8000/docs` 查看 FastAPI 自动生成的请求 schema。SSE 客户端必须持续读取流，并在断线时用 session 查询，而不是重复提交同一个 turn。
+开发时可打开 `http://127.0.0.1:8000/api-docs` 查看 FastAPI 自动生成的请求 schema。公开产品文档使用 `/docs`，两者互不冲突。SSE 客户端必须持续读取流，并在断线时用 session 查询，而不是重复提交同一个 turn。

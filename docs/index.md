@@ -44,7 +44,7 @@ Resume Studio 是一个全栈应用，帮助你从零构建专业简历、用 AI
 
 - [Development Setup](./development/setup.md) — Run the project locally
 - [Architecture](./development/architecture.md) — System design and data flow
-- [API Reference](http://localhost:8000/docs) — Auto-generated OpenAPI docs (when running)
+- [API Reference](http://localhost:8000/api-docs) — Auto-generated OpenAPI docs (when running)
 
 ---
 

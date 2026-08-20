@@ -70,6 +70,11 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     description="resume-builder API with CLI-style session loop (v3).",
+    # Keep the public product guide at /docs; expose FastAPI's generated
+    # schema under a separate path so the two surfaces do not collide.
+    docs_url="/api-docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
     lifespan=lifespan,
 )
 
@@ -127,7 +132,7 @@ else:
     async def root():
         return {
             "message": f"Welcome to {settings.APP_NAME} (Frontend build not found)",
-            "docs_url": "/docs",
+            "docs_url": "/api-docs",
             "openapi_url": "/openapi.json",
         }
 

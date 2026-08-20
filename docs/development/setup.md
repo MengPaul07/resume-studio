@@ -182,7 +182,7 @@ Frontend typically starts on `http://127.0.0.1:5173`. Backend on `http://127.0.0
 - Open `http://localhost:5173` in browser
 - Dashboard should show with engine status
 - Navigate to Settings → Test API Connectivity
-- API docs: `http://localhost:8000/docs`
+- API docs: `http://localhost:8000/api-docs`
 
 ## Windows-Specific / Windows 特别说明
 
