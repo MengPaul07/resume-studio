@@ -58,12 +58,16 @@ Select a provider to auto-fill model and API base:
 | Provider | Default Endpoint | 默认端点 |
 |----------|-----------------|---------|
 | OpenAI | `https://api.openai.com/v1` | OpenAI API |
-| Anthropic | `https://api.anthropic.com` | Anthropic API |
+| Anthropic | `https://api.anthropic.com/v1` | Anthropic API |
 | Google | `https://generativelanguage.googleapis.com/v1beta` | Gemini API |
 | DeepSeek | `https://api.deepseek.com/v1` | DeepSeek API |
 | GLM | `https://open.bigmodel.cn/api/paas/v4` | 智谱 API |
-| MiniMax | `https://api.minimax.chat/v1` | MiniMax API |
+| MiniMax | `https://api.minimaxi.com/v1` | MiniMax 中国 API |
+| Kimi | `https://api.moonshot.cn/v1` | Moonshot 中国 API |
+| Qwen | `https://dashscope.aliyuncs.com/compatible-mode/v1` | DashScope 中国 API |
 | Custom | Any OpenAI-compatible endpoint | 任意兼容端点 |
+
+The curated catalog tracks current first-party text models, including GPT-5.6, Claude 5, Gemini 3.7, GLM-5.2, MiniMax M3, Kimi K3, and Qwen 3.8. Custom LiteLLM model names remain supported.
 
 ### API Configuration / API 配置
 
@@ -79,9 +83,9 @@ Select a provider to auto-fill model and API base:
 
 Type any LiteLLM-compatible model name directly without selecting a preset:
 ```
-openai/gpt-4o
-anthropic/claude-sonnet-4
-deepseek/deepseek-chat
+openai/gpt-5.6-sol
+anthropic/claude-sonnet-5
+deepseek/deepseek-v4-flash
 ```
 
 直接输入任意 LiteLLM 兼容的模型名，无需选择预设。
@@ -112,9 +116,9 @@ Click **Reset** to restore all settings to defaults.
 
 | Data | Storage |
 |------|---------|
-| LLM config | Backend `.env` / environment variables |
-| Provider selection | localStorage (frontend-only) |
+| LLM config | Browser localStorage; sent with each AI request |
+| Server fallback | Backend `.env` / environment variables |
 
-> Backend settings (API key, model, base URL) are read from environment variables on startup. The frontend settings page writes to localStorage for display convenience — actual API calls use backend config.
+> Browser settings take precedence for AI requests. Backend environment variables are used only when a request does not include an LLM configuration.
 
-后端设置从环境变量读取。前端设置页写入 localStorage 仅用于展示便利 — 实际 API 调用使用后端配置。
+浏览器设置会随 AI 请求发送并优先使用；请求未携带 LLM 配置时，后端才使用环境变量作为回退。

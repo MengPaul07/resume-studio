@@ -1,5 +1,37 @@
 from __future__ import annotations
 
+import pytest
+
+
+@pytest.mark.parametrize(
+    ("model", "api_base"),
+    [
+        ("qwen3.8-max", "https://dashscope.aliyuncs.com/compatible-mode/v1"),
+        ("glm-5.2", "https://open.bigmodel.cn/api/paas/v4"),
+        ("MiniMax-M3", "https://api.minimaxi.com/v1"),
+        ("kimi-k3", "https://api.moonshot.cn/v1"),
+    ],
+)
+def test_openai_compatible_presets_use_configured_endpoint(model, api_base):
+    from src.services.build_llm import LiteLLMAdapter
+
+    llm = LiteLLMAdapter(model=model, api_key="test-key", api_base=api_base)
+
+    assert llm.model == f"openai/{model}"
+    assert llm.api_base == api_base
+
+
+def test_local_qwen_still_uses_ollama():
+    from src.services.build_llm import LiteLLMAdapter
+
+    llm = LiteLLMAdapter(
+        model="qwen3:8b",
+        api_key="",
+        api_base="http://localhost:11434",
+    )
+
+    assert llm.model == "ollama/qwen3:8b"
+
 
 def test_build_llm_prefers_deepseek_env_for_deepseek_model(monkeypatch):
     from src.services import build_llm as build_llm_module

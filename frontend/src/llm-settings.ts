@@ -15,17 +15,17 @@ export const LLM_PROVIDERS: LLMProvider[] = [
   {
     id: 'openai', name: 'OpenAI',
     api_base: 'https://api.openai.com/v1',
-    models: ['gpt-5.5', 'gpt-5.4-pro', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.4-high', 'gpt-5.3-codex', 'gpt-5.2', 'gpt-4.1'],
+    models: ['gpt-5.6-sol', 'gpt-5.6-terra', 'gpt-5.6-luna', 'gpt-5.5', 'gpt-5.4'],
   },
   {
     id: 'anthropic', name: 'Anthropic',
     api_base: 'https://api.anthropic.com/v1',
-    models: ['claude-opus-4-7', 'claude-opus-4-6', 'claude-opus-4-5-20251101', 'claude-opus-4-1-20250805', 'claude-sonnet-4-6', 'claude-sonnet-4-5-20250929', 'claude-haiku-4-5-20251001'],
+    models: ['claude-fable-5', 'claude-opus-5', 'claude-sonnet-5', 'claude-haiku-4-5-20251001'],
   },
   {
     id: 'google', name: 'Google Gemini',
     api_base: 'https://generativelanguage.googleapis.com/v1beta',
-    models: ['gemini-3.1-pro-preview', 'gemini-3-pro-preview', 'gemini-3-flash-preview', 'gemini-2.5-pro', 'gemini-2.5-flash'],
+    models: ['gemini-3.7-flash', 'gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-pro-preview'],
   },
   {
     id: 'deepseek', name: 'DeepSeek',
@@ -35,22 +35,22 @@ export const LLM_PROVIDERS: LLMProvider[] = [
   {
     id: 'zhipu', name: 'Zhipu GLM',
     api_base: 'https://open.bigmodel.cn/api/paas/v4',
-    models: ['glm-5', 'glm-4-plus', 'glm-4-flash'],
+    models: ['glm-5.2', 'glm-5.1', 'glm-5-turbo', 'glm-5'],
   },
   {
     id: 'minimax', name: 'MiniMax',
-    api_base: 'https://api.minimax.chat/v1',
-    models: ['MiniMax-M2.7', 'minimax-m2.5'],
+    api_base: 'https://api.minimaxi.com/v1',
+    models: ['MiniMax-M3', 'MiniMax-M2.7', 'MiniMax-M2.7-highspeed', 'MiniMax-M2.5'],
   },
   {
     id: 'moonshot', name: 'Moonshot (Kimi)',
     api_base: 'https://api.moonshot.cn/v1',
-    models: ['kimi-k2.5', 'moonshot-v1-128k'],
+    models: ['kimi-k3', 'kimi-k2.7-code', 'kimi-k2.6'],
   },
   {
     id: 'qwen', name: 'Qwen (DashScope)',
     api_base: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
-    models: ['qwen3.6-max-preview', 'qwen3.6-plus', 'qwen3.5-plus', 'qwen3.5-flash', 'qwen3-max', 'qwen3-coder-next', 'qwen3-vl-flash'],
+    models: ['qwen3.8-max', 'qwen3.7-plus', 'qwen3.7-flash', 'qwen3.6-flash'],
   },
 ];
 
