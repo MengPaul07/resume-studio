@@ -205,7 +205,23 @@ def _session_state_snapshot(session_id: str) -> Tuple[Dict[str, Any], Dict[str, 
     suggestions = suggestions if isinstance(suggestions, dict) else {"items": []}
     return session, state, {"refined_document_obj": refined, "suggestion_document_obj": _normalize_suggestions(suggestions)}
 
-def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_preferences: Dict[str, Any] | None = None, target_jd: str = "", mode: str = "refine", interview_config: Dict[str, Any] | None = None) -> Generator[str, None, None]:
+def run_turn_sse(
+    *,
+    session_id: str,
+    message: str,
+    allow_mutation: bool,
+    layout_preferences: Dict[str, Any] | None = None,
+    target_jd: str = "",
+    mode: str = "refine",
+    interview_config: Dict[str, Any] | None = None,
+    llm_config: Dict[str, Any] | None = None,
+) -> Generator[str, None, None]:
+    # StreamingResponse consumes this synchronous generator in a worker thread.
+    # ContextVars set by the async route are not inherited there, so carry the
+    # request's model configuration explicitly before any LLM call is made.
+    from src.utils.context import get_llm_config as _get_request_llm_config, set_llm_config as _set_request_llm_config
+    _request_llm_config = dict(llm_config) if isinstance(llm_config, dict) else dict(_get_request_llm_config())
+    _set_request_llm_config(_request_llm_config)
     del layout_preferences
 
     # Bootstrap
@@ -281,10 +297,10 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
         # Queue + thread for real-time SSE streaming
         _q: queue.Queue = queue.Queue()
 
-        # Capture LLM config in main thread before spawning — contextvars
-        # are not inherited by threading.Thread workers.
+        # Capture LLM config in the generator thread before spawning —
+        # contextvars are not inherited by threading.Thread workers.
         from src.utils.context import get_llm_config as _get_llm_cfg, get_user_id as _get_uid
-        _captured_llm_config = _get_llm_cfg()
+        _captured_llm_config = dict(_get_llm_cfg())
         _captured_user_id = _get_uid()
         if _captured_user_id:
             from src.services.content_refinement_v3.backends.session import save_session_state as _save_ss
@@ -688,6 +704,10 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
             except Exception:
                 pass
             def _extract():
+                # Raw background threads also do not inherit ContextVars. Keep
+                # memory extraction on the same provider as the originating turn.
+                from src.utils.context import set_llm_config as _set_memory_llm_cfg
+                _set_memory_llm_cfg(dict(_request_llm_config))
                 from src.services.content_refinement_v3.memory.extractor import update_memory_after_turn
                 n = update_memory_after_turn(
                     user_id=_user, user_message=_msg, assistant_message=_asst,
@@ -720,9 +740,13 @@ def run_turn_sse(*, session_id: str, message: str, allow_mutation: bool, layout_
 
 
 def resume_turn_sse(*, session_id: str, turn_id: str,
-                    user_response: str = "") -> Generator[str, None, None]:
+                    user_response: str = "",
+                    llm_config: Dict[str, Any] | None = None) -> Generator[str, None, None]:
     """Resume a paused turn. Loads saved LLM context, injects user response,
     continues the agent loop from where it left off."""
+    from src.utils.context import get_llm_config as _get_request_llm_config, set_llm_config as _set_request_llm_config
+    _request_llm_config = dict(llm_config) if isinstance(llm_config, dict) else dict(_get_request_llm_config())
+    _set_request_llm_config(_request_llm_config)
     session = get_session(session_id, include_state=True)
     if not session:
         raise ValueError("session not found")

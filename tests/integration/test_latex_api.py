@@ -136,6 +136,49 @@ class TestHtmlToLatexEndpoint:
         r = client.post("/api/v1/agent/v3/html-to-latex", json={})
         assert r.status_code == 422, f"Expected 422, got {r.status_code}"
 
+    def test_uses_request_llm_config(self, monkeypatch):
+        """The LLM conversion endpoint must honor the saved model endpoint."""
+        from types import SimpleNamespace
+
+        import litellm
+        from src.services import build_llm as build_llm_module
+        from src.utils.context import get_llm_config
+
+        captured_config: dict = {}
+        completion_kwargs: dict = {}
+
+        def fake_build_llm():
+            captured_config.update(get_llm_config())
+            return SimpleNamespace(
+                model="openai/custom-model",
+                api_key="request-key",
+                api_base="https://custom.example/v1",
+            )
+
+        def fake_completion(**kwargs):
+            completion_kwargs.update(kwargs)
+            return SimpleNamespace(
+                choices=[SimpleNamespace(message=SimpleNamespace(content="\\\\documentclass{article}"))]
+            )
+
+        monkeypatch.setattr(build_llm_module, "build_llm", fake_build_llm)
+        monkeypatch.setattr(litellm, "completion", fake_completion)
+
+        config = {
+            "model": "custom-model",
+            "api_key": "request-key",
+            "api_base": "https://custom.example/v1",
+        }
+        client = TestClient(app)
+        r = client.post(
+            "/api/v1/agent/v3/html-to-latex",
+            json={"html": "<p>resume</p>", "llm_config": config},
+        )
+
+        assert r.status_code == 200, r.text
+        assert captured_config == config
+        assert completion_kwargs["api_base"] == config["api_base"]
+
     def test_prompt_includes_style_contract_and_stability_rules(self):
         html = """
         <style>

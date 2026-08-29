@@ -40,7 +40,7 @@ def _make_session(monkeypatch, resume_obj: dict):
     return resp.json()["session_id"]
 
 
-def _run_turn(session_id: str, message: str, monkeypatch, llm_rounds: list):
+def _run_turn(session_id: str, message: str, monkeypatch, llm_rounds: list, llm_config: dict | None = None):
     """Run a turn with mocked LLM and return collected SSE events."""
     from src.main import app
     from fastapi.testclient import TestClient
@@ -71,10 +71,14 @@ def _run_turn(session_id: str, message: str, monkeypatch, llm_rounds: list):
     client = TestClient(app)
     events: list[tuple[str, dict]] = []
 
+    request_payload = {"message": message, "allow_mutation": True}
+    if llm_config is not None:
+        request_payload["llm_config"] = llm_config
+
     with client.stream(
         "POST",
         f"/api/v1/agent/v3/sessions/{session_id}/turns:run",
-        json={"message": message, "allow_mutation": True},
+        json=request_payload,
     ) as response:
         event_type = None
         for raw_line in response.iter_lines():
@@ -87,6 +91,49 @@ def _run_turn(session_id: str, message: str, monkeypatch, llm_rounds: list):
                 event_type = None
 
     return events
+
+
+def test_stream_turn_preserves_request_llm_config(monkeypatch):
+    """The sync SSE generator runs in a threadpool and must keep request config."""
+    resume = _load_resume()
+    sid = _make_session(monkeypatch, resume)
+
+    from types import SimpleNamespace
+    from src.services.content_refinement_v3.agent import _agent_loop as al
+    from src.utils.context import get_llm_config
+
+    captured: list[dict] = []
+
+    def fake_build_llm():
+        captured.append(dict(get_llm_config()))
+        return SimpleNamespace(
+            model="openai/custom-model",
+            api_key="request-key",
+            api_base="https://custom.example/v1",
+            temperature=0.0,
+            max_tokens=2048,
+        )
+
+    monkeypatch.setattr(al, "build_llm", fake_build_llm)
+    events = _run_turn(
+        sid,
+        "你好",
+        monkeypatch,
+        [_make_resp(content="你好，我可以帮你什么？", tool_calls=[_make_tc("c1", "compose")])],
+        llm_config={
+            "model": "custom-model",
+            "api_key": "request-key",
+            "api_base": "https://custom.example/v1",
+        },
+    )
+
+    assert any(event_type == "turn.completed" for event_type, _ in events)
+    assert captured, "agent did not build an LLM"
+    assert captured[0] == {
+        "model": "custom-model",
+        "api_key": "request-key",
+        "api_base": "https://custom.example/v1",
+    }
 
 
 # ── Mock LLM constructors ──

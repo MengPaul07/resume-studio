@@ -118,6 +118,7 @@ async def run_turn(session_id: str, payload: V3RunTurnRequest):
         target_jd=payload.target_jd,
         mode=payload.mode,
         interview_config=payload.interview_config or {},
+        llm_config=payload.llm_config,
     )
     return StreamingResponse(generator, media_type="text/event-stream")
 
@@ -144,6 +145,7 @@ async def resume_turn(session_id: str, payload: V3ResumeTurnRequest) -> Dict[str
             session_id=session_id,
             turn_id=payload.turn_id,
             user_response=payload.user_response,
+            llm_config=payload.llm_config,
         ):
             if event_str.startswith("event: turn.completed"):
                 # Parse the data line
@@ -538,6 +540,12 @@ async def html_to_latex(payload: Dict[str, Any]) -> Dict[str, Any]:
     """Convert HTML resume to LaTeX via LLM (backup for built-in renderer)."""
     from litellm import completion
     from src.services.build_llm import build_llm
+
+    # This endpoint receives a plain JSON payload instead of a Pydantic request
+    # model, so explicitly hydrate the request-scoped model configuration.
+    # Otherwise build_llm() falls back to the server's .env (usually DeepSeek).
+    requested_llm_config = payload.get("llm_config", {})
+    set_llm_config(requested_llm_config if isinstance(requested_llm_config, dict) else {})
 
     html = str(payload.get("html", "")).strip()
     if not html:

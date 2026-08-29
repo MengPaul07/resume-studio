@@ -2,7 +2,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Check, ChevronDown, ClipboardCopy, Copy, Download, ExternalLink, FileCode, FileText, Save, WandSparkles, X } from 'lucide-react';
-import { buildApiUrl, getRecentResume, listRecentResumes, saveRecentResume } from '../api';
+import { buildApiUrl, getEffectiveLLMConfig, getRecentResume, listRecentResumes, saveRecentResume } from '../api';
 import { BuilderLayout } from '../components/builder-workbench/BuilderLayout';
 import { EditorPanel } from '../components/builder-workbench/EditorPanel';
 import { TemplateSidebar, type StoredTemplate } from '../components/builder-workbench/TemplateSidebar';
@@ -524,6 +524,7 @@ export function ResumeViewPage() {
                             html: htmlDraft,
                             guidance,
                             sections: withSectionOrder(sections),
+                            llm_config: getEffectiveLLMConfig(),
                           }),
                         });
                         if (!resp.ok) throw new Error(await resp.text());
